@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arditi — Fronte italiano 1917–1918</title>
-<meta name="description" content="Gioco tattico stealth in 3D in stile Commandos: guida gli Arditi in sei azioni reali della Grande Guerra, dal Monte Fratta all’Isola dei Morti.">
+<meta name="description" content="Gioco tattico stealth in 3D in stile Commandos: guida gli Arditi in dieci azioni reali della Grande Guerra, dal ponte della Priula al Col della Berretta, tra pioggia, neve, nebbia e temporali.">
 <meta name="theme-color" content="#131610">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Arditi — Fronte italiano 1917–1918">
-<meta property="og:description" content="Gioco tattico stealth in 3D in stile Commandos: sei azioni reali degli Arditi nella Grande Guerra.">
+<meta property="og:description" content="Gioco tattico stealth in 3D in stile Commandos: dieci azioni reali degli Arditi nella Grande Guerra, con meteo dinamico.">
 <meta property="og:url" content="https://arditi.vercel.app/"><meta property="og:image" content="https://arditi.vercel.app/og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://arditi.vercel.app/og.jpg">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -274,6 +274,14 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 @keyframes introOut { from { opacity: 1; } to { opacity: 0; } }
 #hud.intro { opacity: 0; pointer-events: none; transition: opacity .5s; }
 #hud { transition: opacity .5s; }
+/* the weather report in the briefing: a stamped slip on the order */
+.wxbox { margin: 18px 0 4px; padding: 10px 12px; border: 1px dashed var(--paper-line); border-left: 4px solid #5d6a78; background: rgba(93,106,120,.08); font-family: var(--f-type); font-size: 14px; line-height: 1.5; color: var(--paper-ink); max-width: 65ch; }
+.wxbox b { font-weight: 700; }
+.wxbox span { display: block; margin-top: 4px; color: var(--paper-dim); font-size: 13px; }
+/* a dark band behind the mission title, so it reads over snow and fog too */
+#intro::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 300px; transform: translateY(-50%); z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(12,14,10,.62) 0%, rgba(12,14,10,.38) 55%, rgba(12,14,10,0) 100%); }
+#intro .i-date, #intro .i-place, #intro .i-skip { text-shadow: 0 1px 6px rgba(0,0,0,.8); }
 </style>
 </head>
 <body>
@@ -303,6 +311,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.05-4.95"/><path d="M19.6 3.6v4.8h-4.8"/></symbol>
     <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4.5h11l3 3v12H5Z"/><path d="M8 4.5v5h7v-5M8 19.5v-6h8v6"/></symbol>
     <symbol id="i-load" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 3.8v4.6h4.6"/><path d="M12 8v4.4l3 1.8"/></symbol>
+    <symbol id="i-gfx" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16.5V20"/><path d="M8.5 12.5l2.5-3 2 2 2.5-3.5" stroke-width="1.6"/></symbol>
     <symbol id="i-center" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></symbol>
     <symbol id="i-emblem" viewBox="0 0 64 64"><path d="M32 3c3.4 7.6 11.6 10.4 11.6 19.6 0 4.3-2.1 7.4-5.2 9.4 1-4.2 0-7.2-2.1-9.5 0 5.2-3 7.6-4.3 9.7-1.2-2.1-4.3-4.5-4.3-9.7-2.1 2.3-3.1 5.3-2.1 9.5-3.1-2-5.2-5.1-5.2-9.4C20.4 13.4 28.6 10.6 32 3Z" fill="currentColor" stroke="none"/><rect x="26" y="29.5" width="12" height="4.5" rx="1" fill="currentColor" stroke="none"/><circle cx="32" cy="47" r="14.5" fill="currentColor" stroke="none"/><path d="M19 47h26" stroke="#131610" stroke-width="2"/></symbol>
   </defs>
@@ -338,7 +347,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <h1 class="game-title">Arditi</h1>
     <div class="tricolore" aria-hidden="true"><i></i><i></i><i></i></div>
     <p class="dates">Fronte italiano 1917–1918</p>
-    <p class="pitch">Guida una squadra di arditi in sei azioni reali della Grande Guerra, dalle colline d’addestramento della Sdricca all’ultimo passaggio del Piave.</p>
+    <p class="pitch">Guida una squadra di arditi in dieci azioni reali della Grande Guerra, dalle colline d’addestramento della Sdricca alla nebbia del Grappa, sotto la pioggia, nella neve e nei temporali.</p>
     <p class="fieldlabel" id="lblDiff">Difficoltà</p>
     <div class="seg" id="diffTitle" role="group" aria-labelledby="lblDiff"></div>
     <p class="diff-desc" id="diffTitleDesc"></p>
@@ -349,6 +358,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <div class="actions">
       <button class="linkbtn" id="bHelpTitle">Come si gioca</button>
       <button class="linkbtn" id="bSoundTitle"><svg class="ic"><use href="#i-sound"/></svg><span>Audio sì</span></button>
+      <button class="linkbtn" id="bGfxTitle"><svg class="ic"><use href="#i-gfx"/></svg><span>Grafica</span></button>
     </div>
     <p class="fine">I membri della squadra sono inventati. Reparti, comandanti, luoghi, date, uniformi e armi sono storici.</p>
   </div>
@@ -358,7 +368,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
   <div class="page">
     <div class="page-head">
       <button class="back" id="bMissionsBack" aria-label="Torna al titolo"><svg class="ic"><use href="#i-back"/></svg></button>
-      <div><h2>Campagna</h2><p>Sei azioni, nell’ordine in cui furono combattute. Puoi giocarle in qualsiasi ordine.</p></div>
+      <div><h2>Campagna</h2><p>Dieci azioni, nell’ordine in cui furono combattute. Puoi giocarle in qualsiasi ordine.</p></div>
     </div>
     <ul class="mlist" id="mlist"></ul>
   </div>
@@ -389,6 +399,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <button class="btn" id="bRestart">Ricomincia la missione</button>
     <button class="btn" id="bHelpPause">Come si gioca</button>
     <button class="btn" id="bSoundPause"><svg class="ic"><use href="#i-sound"/></svg><span>Audio sì</span></button>
+    <button class="btn" id="bGfxPause"><svg class="ic"><use href="#i-gfx"/></svg><span>Grafica</span></button>
     <button class="btn" id="bQuit">Torna alla campagna</button>
   </div>
 </div>
@@ -404,6 +415,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
         <div class="legend-cones"><span><i style="background:rgba(236,214,140,.6)"></i>Tranquillo</span><span><i style="background:rgba(236,160,64,.7)"></i>Sospettoso</span><span><i style="background:rgba(226,96,52,.75)"></i>In allerta</span><span><i style="background:rgba(210,48,36,.8)"></i>Fa fuoco</span></div>
         Ogni cono è ciò che quel nemico vede. Un anello si riempie intorno a lui mentre ti nota: quando si chiude, dà l’allarme. Strisciando ti vede solo a metà distanza. Dentro un cespuglio sei invisibile, a meno che non ti stia accanto. Trincee, crateri e acqua ti rendono ancora più difficile da scorgere.</dd></div>
       <div><dt>Rumore</dt><dd>Spari ed esplosioni richiamano ogni nemico a portata d’orecchio. Un sasso lanciato attira le sentinelle vicine a controllare, e può aprirti la strada.</dd></div>
+      <div><dt>Meteo</dt><dd>Pioggia, temporale e vento coprono il rumore degli spari; nebbia, buio e neve accorciano la vista delle sentinelle, e nella neve si cammina più piano. Nei temporali un lampo illumina per un istante tutto il campo: quando lampeggia, stai giù. Le condizioni di ogni missione sono nel briefing.</dd></div>
       <div><dt>Corpi</dt><dd>Una guardia che trova un corpo dà l’allarme. Porta i corpi tra i cespugli o lasciali nel fiume.</dd></div>
       <div><dt>Pausa e salvataggi</dt><dd>Puoi mettere in pausa quando vuoi: gli ordini dati in pausa vengono eseguiti alla ripresa. Dal menu di pausa salvi il punto in cui sei e, se qualcosa va storto, riprendi da lì. Come in Commandos, salva spesso.</dd></div>
       <div><dt>Tastiera</dt><dd>1–6 seleziona · A tutti · C striscia · K pugnale · F fuoco · G petardo · X pinze · E carica · S sasso · B prendi o posa · Frecce sposta la visuale · Q/R ruota · Spazio pausa · F5 salva · F9 riprendi · Esc annulla</dd></div>
@@ -447,9 +459,25 @@ const PROP_LOW = new Set(['flagpole', 'target', 'shrine', 'kitchen', 'pontoonsta
 const LIGHT = {
   day:   { vis: 1,    tint: null },
   dawn:  { vis: 0.85, tint: 'rgba(60,44,78,0.18)' },
+  dusk:  { vis: 0.76, tint: 'rgba(30,26,46,0.36)' },
   night: { vis: 0.6,  tint: 'rgba(6,10,28,0.56)' },
   fog:   { vis: 0.65, tint: 'rgba(205,210,200,0.30)' },
 };
+/* Meteo: cambia quanto lontano vedono le sentinelle, quanto lontano arriva il rumore e quanto si cammina svelti.
+   Il vento copre i rumori. Nei temporali i lampi illuminano per un istante tutto il campo. */
+const WEATHER = {
+  clear: { label: 'Sereno', short: 'Sereno', sight: 1, noise: 1, walk: 1 },
+  rain:  { label: 'Pioggia battente', short: 'Pioggia', sight: 0.86, noise: 0.72, walk: 0.94, note: 'La pioggia copre i passi e i colpi soffocati; si vede meno lontano.' },
+  storm: { label: 'Temporale', short: 'Temporale', sight: 0.78, noise: 0.6, walk: 0.92, bolts: true, note: 'Il tuono copre quasi ogni rumore, ma un lampo illumina per un istante tutto il campo: quando lampeggia, stai giù.' },
+  snow:  { label: 'Neve e vento', short: 'Neve', sight: 0.8, noise: 0.85, walk: 0.86, note: 'La neve rallenta il passo e smorza i suoni; la tormenta accorcia la vista.' },
+  fog:   { label: 'Nebbia fitta', short: 'Nebbia', sight: 0.58, noise: 1, walk: 1, note: 'Nella nebbia le sentinelle vedono a pochi passi, ma sentono tutto.' },
+  ash:   { label: 'Fumo e cenere', short: 'Fumo', sight: 0.92, noise: 0.92, walk: 1, note: 'Il fumo del bombardamento vela il campo.' },
+};
+function missionWx(M) {
+  const w = M.wx || {};
+  const kind = w.kind || (M.style && M.style.weather) || 'clear';
+  return { kind: WEATHER[kind] ? kind : 'clear', wind: w.wind != null ? w.wind : kind === 'clear' ? 0.25 : 0.5 };
+}
 
 const ABIL = {
   crawl:   { label: 'Striscia', key: 'c', toggle: true },
@@ -670,7 +698,7 @@ const MISSIONS = [
       ['h', 25, 3, 40, 'x'], ['p', ':', [[10, 25], [30, 25], [18, 25], [19, 25]]],
       ['path', '=', [[1, 22], [8, 22], [10, 21], [18, 21], [20, 22], [28, 22], [30, 21], [36, 21], [38, 22], [42, 22]], 1],
       ['p', 'S', [[9, 23], [11, 23], [29, 23], [31, 23]]], ['p', ':', [[10, 23], [30, 23], [10, 22], [30, 22]]],
-      ['p', 'o', [[20, 26]]],
+      ['p', 'o', [[20, 26]]], ['p', '#', [[7, 26], [8, 26], [9, 26]]],
       ['h', 16, 1, 42, '#'], ['h', 15, 3, 40, '#'], ['p', ':', [[6, 16], [7, 16], [6, 15], [7, 15], [20, 16], [21, 16], [20, 15], [21, 15], [37, 16], [37, 15]]],
       ['p', ':', [[14, 17], [29, 17], [13, 17], [15, 17], [28, 17], [30, 17]]],
       ['path', '=', [[1, 12], [12, 12], [14, 11], [30, 11], [32, 12], [42, 12]], 1],
@@ -726,7 +754,237 @@ const MISSIONS = [
   },
   /* ---------------------------------------------------------------- 3 */
   {
-    id: 'moschin', num: 'III', name: 'Col Moschin',
+    id: 'priula', num: 'III', name: 'Il ponte della Priula',
+    place: 'Piave, tra Susegana e Nervesa', date: 'Novembre 1917, al tramonto',
+    unit: 'Reparti d’assalto della 2ª Armata, in retroguardia', context: 'Ritirata di Caporetto',
+    light: 'dusk', w: 44, h: 34, fill: '.', seed: 61, era: 1917, hat: 'adrian',
+    wx: { kind: 'rain', wind: 0.7 },
+    style: { tree: 'mulberry', wall: 'stucco', bridge: 'iron', water: 'flood', smoke: [[8, 2], [34, 2], [27, 6]] },
+    relief: [['ridge', 10, 1.2, 0.7], ['ridge', 25, 1.2, 0.7], ['slope', 9, 1, 0.5], ['slope', 26, 33, 0.4], ['noise', 0.22]],
+    ops: [
+      ['edge', 'TT#'],
+      ['blob', ',', 9, 6, 8, 3], ['blob', ',', 34, 7, 7, 3], ['blob', ',', 12, 30, 6, 2], ['blob', ',', 32, 31, 7, 2],
+      ['rect', 1, 10, 42, 2, '.'],
+      ['rect', 0, 12, 44, 1, 'g'],
+      ['rect', 0, 13, 44, 11, '~'],
+      ['blob', 'g', 8, 16, 5, 1.3, ['~']], ['blob', 'g', 33, 19, 6, 1.4, ['~']], ['blob', 'g', 30, 14, 3, 0.8, ['~']], ['blob', 'g', 12, 21, 3, 0.9, ['~']],
+      ['p', 'T', [[7, 16], [10, 16], [31, 19], [36, 19]]], ['p', 'b', [[8, 16], [33, 19], [34, 19], [12, 21]]],
+      ['rect', 0, 24, 44, 1, 'g'],
+      ['rect', 1, 25, 42, 2, '.'],
+      ['v', 21, 13, 23, '|'], ['v', 22, 13, 23, '|'],
+      ['v', 21, 1, 12, 'r'], ['v', 22, 1, 12, 'r'], ['v', 21, 24, 32, 'r'], ['v', 22, 24, 32, 'r'],
+      ['h', 3, 1, 42, 'r'],
+      ['rows', 'v', 3, 5, 9, 4, 2], ['rows', 'v', 32, 6, 9, 3, 2],
+      ['scatter', 'T', 14, 1, 4, 42, 6, ['.', ',']],
+      ['scatter', 'b', 18, 1, 4, 42, 6, ['.', ',']],
+      ['scatter', 'o', 10, 1, 4, 42, 6, ['.', ',']],
+      ['p', 'S', [[13, 8], [14, 8], [15, 8], [29, 8], [30, 8], [31, 8]]],
+      ['h', 10, 16, 19, 'S'], ['h', 10, 24, 27, 'S'],
+      ['p', 'c', [[18, 11], [25, 11]]],
+      ['h', 28, 1, 42, 'x'], ['p', '.', [[9, 28], [35, 28]]], ['p', 'r', [[21, 28], [22, 28]]],
+      ['h', 29, 1, 20, '='], ['h', 29, 23, 42, '='],
+      ['scatter', 'T', 10, 1, 30, 42, 3, ['.', ',']], ['scatter', 'b', 8, 1, 30, 42, 3, ['.', ',']],
+    ],
+    props: [
+      { t: 'house', c: 7, r: 1, w: 3, h: 2 }, { t: 'house', c: 13, r: 1, w: 3, h: 2 }, { t: 'house', c: 26, r: 1, w: 3, h: 2 }, { t: 'house', c: 33, r: 1, w: 3, h: 2 },
+      { t: 'house', c: 16, r: 5, w: 3, h: 2 }, { t: 'shed', c: 25, r: 5, w: 3, h: 2 }, { t: 'cart', c: 19, r: 9 }, { t: 'cart', c: 24, r: 12 },
+      { t: 'ironbridge', c: 21, r: 12, w: 2, h: 13 },
+      { t: 'house', c: 5, r: 31, w: 3, h: 2 }, { t: 'house', c: 36, r: 31, w: 3, h: 2 }, { t: 'shrine', c: 17, r: 31 },
+    ],
+    squad: [{ role: 'pugnale', c: 19, r: 11 }, { role: 'petardiere', c: 20, r: 11 }, { role: 'guastatore', c: 21, r: 11, ammo: { charge: 3 } },
+            { role: 'mitragliere', c: 22, r: 11 }, { role: 'lanciafiamme', c: 23, r: 11 }],
+    enemies: [
+      { id: 'mgA', t: 'mg', c: 14, r: 7, f: 90, scan: [50, 125] },
+      { id: 'g1', t: 'sentry', c: 12, r: 6, f: 120, scan: [90, 165] },
+      { id: 'mgB', t: 'mg', c: 30, r: 7, f: 90, scan: [55, 130] },
+      { id: 'g2', t: 'sentry', c: 32, r: 6, f: 60, scan: [15, 90] },
+      { id: 'off', t: 'officer', c: 22, r: 2, f: 90, scan: [60, 120] },
+      { id: 'p1', t: 'rifle', c: 2, r: 3, patrol: [[2, 3], [17, 3]] },
+      { id: 'p2', t: 'rifle', c: 26, r: 3, patrol: [[26, 3], [41, 3]] },
+      { id: 's3', t: 'sentry', c: 20, r: 4, f: 90, scan: [60, 120] },
+      { id: 'r1', t: 'sentry', c: 9, r: 10, f: 90, scan: [45, 135] },
+      { id: 'r2', t: 'sentry', c: 34, r: 10, f: 90, scan: [45, 135] },
+      { id: 'p4', t: 'rifle', c: 2, r: 9, patrol: [[2, 9], [12, 9]] },
+      { id: 'p5', t: 'rifle', c: 31, r: 9, patrol: [[31, 9], [41, 9]] },
+      { id: 'i1', t: 'sentry', c: 20, r: 26, f: 90, scan: [60, 120] },
+      { id: 'i2', t: 'sentry', c: 23, r: 26, f: 90, scan: [60, 120] },
+      { id: 'i3', t: 'rifle', c: 4, r: 25, patrol: [[4, 25], [16, 25]] },
+      { id: 'i4', t: 'rifle', c: 27, r: 25, patrol: [[27, 25], [39, 25]] },
+    ],
+    objects: [{ id: 'mine1', t: 'mine', c: 21, r: 21, armor: 'heavy', lock: ['a', 'b', 'c'] }, { id: 'mine2', t: 'mine', c: 22, r: 21, armor: 'heavy', lock: ['a', 'b', 'c'] }],
+    collapse: { cols: [21, 22], rows: [16, 23] },
+    reinforce: { c: 21, r: 1, count: 4 },
+    objectives: [
+      { id: 'a', type: 'kill', targets: ['mgA', 'mgB'], text: 'Fai tacere le due mitragliatrici che battono il ponte',
+        hint: 'L’avanguardia nemica ha piazzato due mitragliatrici negli orti ai lati della strada. Nel buio e sotto la pioggia le sentinelle vedono poco: passa tra le viti e i gelsi.' },
+      { id: 'b', type: 'kill', targets: ['i1', 'i2'], text: 'Elimina gli infiltrati alla testata sud',
+        hint: 'Una pattuglia nemica ha passato il fiume in barca più a valle e ora punta alle nostre trincee. Due uomini sorvegliano la strada oltre il ponte, voltati verso sud: prendili alle spalle.' },
+      { id: 'c', type: 'reach', zone: [1, 25, 42, 8], all: true, after: ['a'], text: 'Riporta tutta la squadra sulla riva destra',
+        hint: 'Il ponte è l’unica via. Chi resta sulla riva sinistra non tornerà.' },
+      { id: 'd', type: 'destroy', targets: ['mine1', 'mine2'], after: ['b', 'c'], text: 'Fai saltare il ponte',
+        hint: 'Il genio ha minato le ultime campate, ma il tiro ha tranciato i fili dei detonatori. Ferro deve piazzare una carica sulle camere da mina, poi tutti via di corsa: la spoletta dura sei secondi.' },
+    ],
+    brief: [
+      'Il fronte dell’Isonzo è crollato. Da giorni colonne di fanti, carri e profughi scendono sotto la pioggia verso il Piave, l’ultima linea prima della pianura veneta. Il ponte della Priula, sulla strada tra Conegliano e Treviso, è uno dei pochi passaggi rimasti.',
+      'Gli arditi fanno da retroguardia. Al tramonto l’avanguardia nemica è già tra le case e le vigne della riva sinistra. Tenete la testa di ponte finché passano gli ultimi, riportate la squadra di là e fate saltare le campate minate.',
+    ],
+    history: [
+      'Dopo lo sfondamento di Caporetto la 2ª Armata ripiegò dall’Isonzo al Tagliamento e poi al Piave. I suoi sei reparti d’assalto combatterono a Udine e poi coprirono la ritirata sui ponti di Vidor e della Priula, tenendo le posizioni finché i reparti regolari non ebbero passato il fiume.',
+      'Quando le ultime retroguardie furono passate, il genio fece saltare i ponti. Sul Piave, sul Grappa e sull’Altopiano l’esercito italiano fermò l’avanzata austro-tedesca nella battaglia d’arresto, tra novembre e dicembre 1917. I reparti d’assalto, decimati, furono ricostituiti durante l’inverno.',
+    ],
+  },
+  /* ---------------------------------------------------------------- 4 */
+  {
+    id: 'tremonti', num: 'IV', name: 'Col del Rosso',
+    place: 'Altopiano di Asiago, i Tre Monti', date: '28 gennaio 1918',
+    unit: 'Reparti d’assalto con la 33ª Divisione', context: 'Battaglia dei Tre Monti',
+    light: 'day', w: 44, h: 32, fill: '.', seed: 71, era: 1918, hat: 'adrian', winter: true,
+    wx: { kind: 'snow', wind: 0.75 },
+    style: { tree: 'conifer', wall: 'timber', smoke: [[38, 7], [5, 3]] },
+    relief: [['hill', 11, 5, 8, 2.2], ['hill', 33, 2, 8, 2.6], ['hill', 22, 18, 10, -0.5], ['slope', 26, 31, 0.6], ['noise', 0.5]],
+    ops: [
+      ['edge', 'TT#'],
+      ['scatter', 'T', 46, 1, 25, 42, 6, ['.']],
+      ['scatter', 'T', 24, 1, 1, 42, 8, ['.']],
+      ['scatter', 'd', 22, 1, 13, 42, 10, ['.']],
+      ['scatter', 'o', 22, 1, 13, 42, 9, ['.']],
+      ['scatter', '#', 16, 1, 1, 42, 22, ['.']],
+      ['scatter', 'b', 22, 1, 1, 42, 28, ['.']],
+      ['scatter', 'b', 12, 1, 15, 42, 6, ['.']], ['scatter', 'o', 8, 1, 15, 42, 6, ['.']],
+      ['path', '=', [[1, 12], [6, 12], [8, 11], [16, 11], [18, 12], [25, 12], [27, 11], [36, 11], [38, 12], [42, 12]], 1],
+      ['h', 14, 1, 42, 'x'], ['p', '.', [[7, 14], [20, 14], [33, 14]]],
+      ['p', 'S', [[11, 12], [12, 12], [13, 12], [30, 12], [31, 12], [32, 12]]],
+      ['path', '=', [[6, 7], [9, 5], [13, 4], [16, 6], [14, 8], [9, 8], [6, 7]], 1],
+      ['rect', 10, 5, 4, 3, '.'],
+      ['box', 20, 6, 6, 3, 'S'], ['rect', 21, 7, 4, 1, '.'], ['p', '.', [[22, 8], [23, 8]]],
+      ['path', '=', [[28, 4], [31, 4], [34, 3], [38, 4]], 1],
+      ['rect', 31, 1, 5, 2, '.'],
+      ['h', 22, 1, 42, 'x'], ['p', '.', [[10, 22], [21, 22], [22, 22], [34, 22]]],
+      ['h', 24, 1, 42, '='],
+      ['rect', 17, 26, 10, 3, '.'],
+    ],
+    props: [{ t: 'hut', c: 37, r: 7, w: 3, h: 2 }, { t: 'hut', c: 3, r: 2, w: 3, h: 2 }, { t: 'shed', c: 15, r: 27, w: 2, h: 1 }],
+    squad: [{ role: 'pugnale', c: 19, r: 27 }, { role: 'petardiere', c: 20, r: 27 }, { role: 'guastatore', c: 21, r: 27 },
+            { role: 'mitragliere', c: 22, r: 27 }, { role: 'lanciafiamme', c: 23, r: 27 }],
+    enemies: [
+      { id: 'mg1', t: 'mg', c: 12, r: 11, f: 90, scan: [60, 120] },
+      { id: 'mg2', t: 'mg', c: 31, r: 11, f: 90, scan: [60, 120] },
+      { id: 't1', t: 'rifle', c: 2, r: 12, patrol: [[2, 12], [7, 12]] },
+      { id: 't2', t: 'sentry', c: 18, r: 12, f: 90, scan: [50, 130] },
+      { id: 't3', t: 'rifle', c: 20, r: 12, patrol: [[20, 12], [25, 12]] },
+      { id: 't4', t: 'sentry', c: 37, r: 11, f: 90, scan: [60, 130] },
+      { id: 't5', t: 'rifle', c: 38, r: 12, patrol: [[38, 12], [41, 12]] },
+      { id: 'h1', t: 'sentry', c: 9, r: 5, f: 135, scan: [100, 170] },
+      { id: 'h2', t: 'sentry', c: 15, r: 6, f: 60, scan: [20, 100] },
+      { id: 'off', t: 'officer', c: 12, r: 6, f: 90, scan: [45, 135] },
+      { id: 'mt1', t: 'sentry', c: 22, r: 7, f: 90, scan: [60, 120] },
+      { id: 'mt2', t: 'rifle', c: 19, r: 9, patrol: [[19, 9], [27, 9]] },
+      { id: 'e1', t: 'sentry', c: 31, r: 4, f: 90, scan: [45, 135] },
+      { id: 'e2', t: 'sentry', c: 36, r: 4, f: 120, scan: [80, 160] },
+      { id: 'e3', t: 'rifle', c: 29, r: 6, patrol: [[29, 6], [36, 6]] },
+      { id: 'n1', t: 'rifle', c: 3, r: 17, patrol: [[3, 17], [14, 17]] },
+    ],
+    objects: [{ id: 'm1', t: 'mortar', c: 21, r: 7, armor: 'light' }, { id: 'm2', t: 'mortar', c: 24, r: 7, armor: 'light' }, { id: 'flag', t: 'flag', c: 33, r: 2 }],
+    reinforce: { c: 40, r: 2, count: 3 },
+    objectives: [
+      { id: 'a', type: 'kill', targets: ['mg1', 'mg2'], text: 'Sfonda la prima linea sotto il Col del Rosso',
+        hint: 'Le due Schwarzlose battono la neve davanti al reticolato. La tormenta copre i passi e accorcia la vista: avvicinati da un varco o aprine uno, e prendile alle spalle.' },
+      { id: 'b', type: 'destroy', targets: ['m1', 'm2'], text: 'Distruggi le bombarde nella sella tra i due colli',
+        hint: 'Le bombarde sono in una buca di sacchetti con l’ingresso a sud. Un petardo basta per ciascuna; il serviente guarda proprio da quella parte.' },
+      { id: 'c', type: 'reach', zone: [31, 1, 5, 2], text: 'Pianta il tricolore sul Col d’Echele',
+        hint: 'Basta un ardito sulla vetta. Le sentinelle sotto la cima guardano verso la sella: sali dal fianco.' },
+    ],
+    brief: [
+      'Nel dicembre 1917 l’offensiva austro-ungarica sull’Altopiano dei Sette Comuni ha preso il Col del Rosso, il Col d’Echele e il Monte Valbella, a pochi chilometri dall’orlo dell’altopiano e dalla pianura vicentina.',
+      'Alla fine di gennaio il Comando Supremo ordina di riprenderli. Con la fanteria e i bersaglieri, i reparti d’assalto attaccano nella neve alta e nel vento: sfondate la prima linea sotto il Col del Rosso, distruggete le bombarde nascoste nella sella e piantate il tricolore sul Col d’Echele.',
+    ],
+    history: [
+      'Tra il 27 e il 30 gennaio 1918 la 33ª Divisione e i reparti d’assalto I, II, IV e XVI ripresero il Col del Rosso, il Monte Valbella e il Col d’Echele, consolidandoli il 30. Combatterono qui anche la Brigata Sassari e i bersaglieri. Fu la Battaglia dei Tre Monti, la prima riscossa italiana dopo Caporetto.',
+      'Il 31 gennaio il XXIV Reparto d’assalto, il futuro X, attaccò ancora Casera Melaghetto, ma dovette lasciarla sotto il fuoco dell’artiglieria austro-ungarica. Oggi un museo a Sasso di Asiago ricorda la battaglia.',
+    ],
+  },
+  /* ---------------------------------------------------------------- 5 */
+  {
+    id: 'montello', num: 'V', name: 'Il Montello',
+    place: 'Giavera del Montello, Casa Bianca', date: '15–16 giugno 1918',
+    unit: 'XXVII Reparto d’assalto (colonnello Giacchi)', context: 'Battaglia del Solstizio',
+    light: 'dawn', w: 44, h: 32, fill: '.', seed: 83, era: 1918,
+    wx: { kind: 'storm', wind: 0.85 },
+    style: { tree: 'mix', wall: 'stucco', smoke: [[31, 5], [6, 12], [38, 15]] },
+    relief: [['slope', 25, 2, 3.0], ['ridge', 2, 2.2, 0.8], ['hill', 18, 15, 5, 0.4], ['noise', 0.45]],
+    ops: [
+      ['edge', 'TT#'],
+      ['scatter', 'T', 120, 1, 4, 42, 9, ['.']],
+      ['scatter', 'b', 34, 1, 4, 42, 9, ['.']],
+      ['scatter', 'T', 26, 1, 12, 42, 9, ['.']],
+      ['scatter', 'b', 20, 1, 12, 42, 11, ['.']],
+      ['path', ',', [[10, 3], [10, 30]], 1], ['path', ',', [[33, 3], [33, 25]], 1], ['h', 9, 1, 42, ','],
+      ['rect', 27, 5, 13, 4, '.'],
+      ['box', 11, 5, 6, 3, 'S'], ['rect', 12, 6, 4, 1, '.'], ['p', '.', [[13, 7], [14, 7]]],
+      ['rect', 12, 12, 14, 8, '.'],
+      ['rows', 'v', 3, 15, 6, 5, 2],
+      ['p', 'S', [[15, 18], [16, 18], [17, 18], [20, 18], [21, 18], [22, 18]]],
+      ['p', 'b', [[12, 13], [24, 13], [25, 17], [12, 18]]],
+      ['h', 3, 1, 42, '='], ['rect', 18, 1, 9, 2, '.'],
+      ['scatter', 'o', 14, 1, 10, 42, 14, ['.', ',']],
+      ['rect', 1, 24, 42, 1, '.'],
+      ['h', 26, 1, 42, 'r'], ['v', 10, 26, 30, 'r'],
+      ['scatter', 'T', 10, 1, 27, 42, 3, ['.']],
+      ['rect', 16, 28, 9, 2, '.'],
+    ],
+    props: [
+      { t: 'house', c: 17, r: 14, w: 4, h: 3, col: 0xece8dc, ruin: true }, { t: 'shed', c: 22, r: 12, w: 2, h: 1 }, { t: 'well', c: 14, r: 16 },
+      { t: 'house', c: 3, r: 27, w: 3, h: 2 }, { t: 'house', c: 12, r: 27, w: 3, h: 2 }, { t: 'church', c: 26, r: 27, w: 5, h: 3 }, { t: 'tower', c: 32, r: 27, w: 2, h: 2 },
+      { t: 'house', c: 36, r: 27, w: 3, h: 2 }, { t: 'shrine', c: 22, r: 2 }, { t: 'cart', c: 9, r: 25 },
+    ],
+    squad: [{ role: 'pugnale', c: 18, r: 29 }, { role: 'petardiere', c: 19, r: 29 }, { role: 'guastatore', c: 20, r: 29 },
+            { role: 'mitragliere', c: 21, r: 29 }, { role: 'lanciafiamme', c: 22, r: 29 }],
+    enemies: [
+      { id: 'mgA', t: 'mg', c: 16, r: 17, f: 90, scan: [55, 125] },
+      { id: 'mgB', t: 'mg', c: 21, r: 17, f: 90, scan: [55, 125] },
+      { id: 'cb1', t: 'sentry', c: 15, r: 14, f: 180, scan: [140, 220] },
+      { id: 'cb2', t: 'sentry', c: 22, r: 15, f: 0, scan: [-40, 40] },
+      { id: 'cb3', t: 'rifle', c: 16, r: 13, patrol: [[16, 13], [21, 13]] },
+      { id: 'f1', t: 'sentry', c: 7, r: 21, f: 90, scan: [45, 135] },
+      { id: 'f2', t: 'sentry', c: 31, r: 21, f: 90, scan: [45, 135] },
+      { id: 'f3', t: 'rifle', c: 25, r: 22, patrol: [[25, 22], [38, 22]] },
+      { id: 'f4', t: 'rifle', c: 3, r: 23, patrol: [[3, 23], [13, 23]] },
+      { id: 'lbc', t: 'sentry', c: 14, r: 6, f: 90, scan: [60, 120] },
+      { id: 'lbp', t: 'rifle', c: 5, r: 9, patrol: [[5, 9], [19, 9]] },
+      { id: 'b1', t: 'sentry', c: 31, r: 7, f: 90, scan: [50, 130] },
+      { id: 'b2', t: 'sentry', c: 35, r: 7, f: 90, scan: [50, 130] },
+      { id: 'b3', t: 'rifle', c: 28, r: 9, patrol: [[28, 9], [39, 9]] },
+      { id: 'off', t: 'officer', c: 22, r: 4, f: 90, scan: [45, 135] },
+      { id: 'rd1', t: 'sentry', c: 8, r: 3, f: 90, scan: [45, 135] },
+      { id: 'rd2', t: 'sentry', c: 37, r: 3, f: 90, scan: [45, 135] },
+      { id: 'rd3', t: 'rifle', c: 13, r: 3, patrol: [[13, 3], [29, 3]] },
+    ],
+    objects: [{ id: 'lb1', t: 'mortar', c: 12, r: 6, armor: 'light' }, { id: 'lb2', t: 'mortar', c: 15, r: 6, armor: 'light' },
+              { id: 'c1', t: 'howitzer', c: 30, r: 6 }, { id: 'c2', t: 'howitzer', c: 34, r: 6 }, { id: 'c3', t: 'howitzer', c: 38, r: 6 },
+              { id: 'flag', t: 'flag', c: 21, r: 1 }],
+    reinforce: { c: 41, r: 2, count: 4 },
+    objectives: [
+      { id: 'a', type: 'kill', targets: ['mgA', 'mgB'], text: 'Prendi Casa Bianca',
+        hint: 'Quattro assalti frontali sono già falliti: le due mitragliatrici battono il prato a sud della casa. Aggirala dal bosco e dalle viti, come fece la 2ª compagnia.' },
+      { id: 'b', type: 'kill', targets: ['b1', 'b2', 'b3'], text: 'Riprendi i cannoni da 149 perduti',
+        hint: 'La batteria presa ieri è nella radura a est. Tre uomini la sorvegliano; i tuoni coprono un colpo, ma non una raffica.' },
+      { id: 'c', type: 'destroy', targets: ['lb1', 'lb2'], text: 'Distruggi i lanciabombe nel bosco',
+        hint: 'Due lanciabombe sparano da una buca di sacchetti a ovest della presa. Un petardo per ciascuno.' },
+      { id: 'd', type: 'reach', zone: [18, 1, 9, 2], text: 'Riconquista il dosso della Madonnetta',
+        hint: 'Basta un ardito sulla cresta. L’ufficiale in trincea chiama aiuto: ogni lampo ti mostra a tutti.' },
+    ],
+    brief: [
+      'All’alba del 15 giugno gli austro-ungarici hanno passato il Piave e sono dilagati sul Montello, il lungo colle boscoso che chiude la pianura di Treviso. In mattinata hanno rotto la linea e preso intere batterie; ora scendono tra i boschi verso Giavera.',
+      'Il XXVII Reparto d’assalto arriva in camion da Albaredo e alle 16:20 contrattacca tra Giavera e Casa Agostini. Prendete Casa Bianca, riprendete i grossi calibri da 149 perduti, distruggete i lanciabombe e riconquistate il dosso della Madonnetta.',
+    ],
+    history: [
+      'Il 15 giugno la 1ª compagnia del XXVII fallì quattro assalti contro Casa Bianca e il suo capitano, Zaninelli, cadde al terzo; il quinto, di notte, con la 2ª compagnia sul fianco, prese la casa con 14 prigionieri, tre mitragliatrici e due lanciabombe. La 3ª compagnia riprese Giavera. All’alba del 16, con due battaglioni di bersaglieri, gli arditi riconquistarono il dosso della Madonnetta e quattro cannoni da 149 perduti il giorno prima.',
+      'Nei giorni seguenti la piena del Piave travolse i ponti austro-ungarici e gli ultimi reparti nemici ripassarono il fiume. Il XXVII ebbe 58 caduti tra ufficiali e soldati e fu citato nel bollettino di guerra del 21 giugno.',
+    ],
+  },
+  /* ---------------------------------------------------------------- 6 */
+  {
+    id: 'moschin', num: 'VI', name: 'Col Moschin',
     place: 'Massiccio del Grappa, quota 1279', date: '16 giugno 1918, ore 7:00',
     unit: 'IX Reparto d’assalto (maggiore Giovanni Messe)', context: 'Battaglia del Solstizio',
     light: 'day', w: 44, h: 32, fill: '.', seed: 31, era: 1918,
@@ -785,9 +1043,9 @@ const MISSIONS = [
       'Oggi il 9° Reggimento d’assalto paracadutisti porta il nome «Col Moschin» e celebra il 16 giugno come anniversario. Sulla vetta, a 1279 metri, un cippo ricorda la riconquista.',
     ],
   },
-  /* ---------------------------------------------------------------- 4 */
+  /* ---------------------------------------------------------------- 7 */
   {
-    id: 'caimani', num: 'IV', name: 'I Caimani del Piave',
+    id: 'caimani', num: 'VII', name: 'I Caimani del Piave',
     place: 'Fiume Piave', date: 'Giugno 1918, di notte',
     unit: 'Nuotatori volontari, i Caimani del Piave', context: 'Battaglia del Solstizio, 15–23 giugno 1918',
     light: 'night', w: 44, h: 32, fill: '.', seed: 41, era: 1918,
@@ -846,9 +1104,9 @@ const MISSIONS = [
       'Nell’offensiva finale di ottobre, speciali drappelli di arditi nuotatori tornarono a tenere le difficili comunicazioni attraverso il fiume con le teste di ponte sull’altra riva.',
     ],
   },
-  /* ---------------------------------------------------------------- 5 */
+  /* ---------------------------------------------------------------- 8 */
   {
-    id: 'moriago', num: 'V', name: 'Isola dei Morti',
+    id: 'moriago', num: 'VIII', name: 'Isola dei Morti',
     place: 'Moriago, medio Piave', date: '27 ottobre 1918',
     unit: 'Reparti d’assalto', context: 'Battaglia di Vittorio Veneto',
     light: 'dawn', w: 44, h: 32, fill: '.', seed: 53, era: 1918,
@@ -921,7 +1179,77 @@ const MISSIONS = [
     ],
     history: [
       'Il 27 ottobre 1918 gli arditi sfondarono la linea lungo il fiume e presero Moriago, il primo paese liberato nella battaglia, combattendo casa per casa. Nel pomeriggio subirono un violento contrattacco nella piana della Sernaglia, ma la testa di ponte resse e la strada per Vittorio Veneto era aperta.',
-      'Vi caddero tanti uomini che l’Isola Verde fu ribattezzata Isola dei Morti. Oggi è un parco della memoria, con una cappella votiva e un cippo degli arditi. L’armistizio fu firmato a Villa Giusti il 3 novembre 1918 e i combattimenti cessarono il giorno dopo.',
+      'Vi caddero tanti uomini che l’Isola Verde fu ribattezzata Isola dei Morti. Oggi è un parco della memoria, con una cappella votiva e un cippo degli arditi.',
+    ],
+  },
+  /* ---------------------------------------------------------------- 9 */
+  {
+    id: 'berretta', num: 'IX', name: 'Col della Berretta',
+    place: 'Massiccio del Grappa, quota 1520', date: '29 ottobre 1918, ore 9:25',
+    unit: 'IX Reparto d’assalto', context: 'Battaglia di Vittorio Veneto',
+    light: 'day', w: 44, h: 32, fill: ':', seed: 97, era: 1918,
+    wx: { kind: 'fog', wind: 0.35 },
+    style: { tree: 'conifer', wall: 'stone', mist: true, smoke: [[9, 9], [34, 11]] },
+    relief: [['slope', 30, 1, 5.2], ['hill', 21, 1, 7, 1.2], ['hill', 9, 12, 5, 0.6], ['noise', 0.6]],
+    ops: [
+      ['edge', '##T'],
+      ['blob', '.', 8, 17, 6, 3, [':']], ['blob', '.', 32, 20, 7, 3, [':']], ['blob', '.', 20, 27, 10, 3, [':']], ['blob', '.', 36, 8, 4, 2, [':']],
+      ['scatter', '#', 34, 1, 8, 42, 16, [':', '.']],
+      ['scatter', 'T', 18, 1, 14, 42, 16, ['.', ':']],
+      ['scatter', 'b', 22, 1, 4, 42, 24, ['.', ':']],
+      ['scatter', 'o', 20, 1, 8, 42, 14, [':', '.']],
+      ['h', 5, 1, 42, '#'], ['h', 6, 2, 41, '#'], ['p', ':', [[8, 5], [8, 6], [21, 5], [22, 5], [21, 6], [22, 6], [37, 5], [37, 6], [14, 6], [29, 6]]],
+      ['p', '#', [[13, 6], [30, 6]]],
+      ['rect', 18, 1, 8, 2, ':'], ['path', '=', [[3, 3], [12, 3], [16, 4], [27, 4], [31, 3], [41, 3]], 1],
+      ['path', '=', [[3, 13], [6, 10], [11, 9], [16, 10], [17, 13], [12, 14], [6, 14], [3, 13]], 1],
+      ['rect', 7, 11, 8, 2, ':'],
+      ['p', 'S', [[7, 13], [8, 13], [9, 13], [13, 12], [14, 12], [15, 12]]],
+      ['h', 22, 1, 42, 'x'], ['p', ':', [[5, 22], [17, 22], [27, 22], [39, 22]]],
+      ['h', 25, 1, 42, '='],
+      ['rect', 17, 27, 9, 3, '.'],
+    ],
+    props: [{ t: 'hut', c: 31, r: 13, w: 4, h: 3, stone: true }, { t: 'shed', c: 4, r: 27, w: 3, h: 2 }, { t: 'shed', c: 36, r: 27, w: 2, h: 2 }],
+    squad: [{ role: 'pugnale', c: 19, r: 28 }, { role: 'petardiere', c: 20, r: 28 }, { role: 'guastatore', c: 21, r: 28 },
+            { role: 'mitragliere', c: 22, r: 28 }, { role: 'lanciafiamme', c: 23, r: 28 }],
+    enemies: [
+      { id: 'mg1', t: 'mg', c: 8, r: 12, f: 90, scan: [50, 130] },
+      { id: 'mg2', t: 'mg', c: 14, r: 11, f: 90, scan: [50, 130] },
+      { id: 'q1', t: 'sentry', c: 5, r: 11, f: 135, scan: [100, 170] },
+      { id: 'q2', t: 'rifle', c: 4, r: 15, patrol: [[4, 15], [17, 15]] },
+      { id: 'q3', t: 'sentry', c: 11, r: 10, f: 90, scan: [60, 120] },
+      { id: 'cfo', t: 'officer', c: 33, r: 16, f: 90, scan: [45, 135] },
+      { id: 'cf1', t: 'sentry', c: 30, r: 16, f: 135, scan: [100, 180] },
+      { id: 'cf2', t: 'sentry', c: 36, r: 14, f: 45, scan: [0, 90] },
+      { id: 'cg1', t: 'sentry', c: 12, r: 8, f: 90, scan: [60, 120] },
+      { id: 'cg2', t: 'sentry', c: 31, r: 8, f: 90, scan: [60, 120] },
+      { id: 'o1', t: 'sentry', c: 6, r: 20, f: 90, scan: [45, 135] },
+      { id: 'o2', t: 'sentry', c: 26, r: 20, f: 90, scan: [45, 135] },
+      { id: 'o3', t: 'rifle', c: 10, r: 19, patrol: [[10, 19], [24, 19]] },
+      { id: 'o4', t: 'rifle', c: 28, r: 18, patrol: [[28, 18], [40, 18]] },
+      { id: 's1', t: 'sentry', c: 19, r: 3, f: 90, scan: [45, 135] },
+      { id: 's2', t: 'sentry', c: 25, r: 3, f: 90, scan: [45, 135] },
+      { id: 's3', t: 'rifle', c: 9, r: 4, patrol: [[9, 4], [20, 4]] },
+      { id: 's4', t: 'rifle', c: 24, r: 7, patrol: [[24, 7], [36, 7]] },
+    ],
+    objects: [{ id: 'cv1', t: 'cave', c: 13, r: 7, armor: 'light' }, { id: 'cv2', t: 'cave', c: 30, r: 7, armor: 'light' }, { id: 'flag', t: 'flag', c: 21, r: 1 }],
+    reinforce: { c: 40, r: 2, count: 4 },
+    objectives: [
+      { id: 'a', type: 'kill', targets: ['mg1', 'mg2'], text: 'Prendi quota 1520',
+        hint: 'Le due mitragliatrici sono nella trincea ad anello sulla quota, a ovest. Nella nebbia le sentinelle vedono a pochi passi ma sentono tutto: niente spari finché non sei addosso.' },
+      { id: 'b', type: 'kill', targets: ['cfo', 'cf1', 'cf2'], text: 'Riprendi il Cason delle Fratte',
+        hint: 'La casera di pietra sul fianco est è il comando del settore. L’ufficiale davanti alla porta chiama rinforzi da tutta la montagna.' },
+      { id: 'c', type: 'destroy', targets: ['cv1', 'cv2'], text: 'Fai saltare le caverne dei cannoni',
+        hint: 'Le caverne sono scavate nella fascia di roccia sotto la cima. Un petardo o una carica le chiudono.' },
+      { id: 'd', type: 'reach', zone: [18, 1, 8, 2], text: 'Sali al Col della Berretta',
+        hint: 'Basta un ardito sulla cima. I varchi nella fascia di roccia sono pochi e sorvegliati: quando la nebbia si dirada, ti vedranno.' },
+    ],
+    brief: [
+      'Il 24 ottobre 1918, un anno dopo Caporetto, comincia l’offensiva finale. Sul Grappa gli attacchi si infrangono per giorni contro l’Asolone, il Col della Berretta e il Pertica, mentre sul Piave la piena e la pioggia ritardano il passaggio.',
+      'La mattina del 29 una nebbia densa copre il massiccio. Alle 9:25 il IX Reparto d’assalto esce dalle trincee: prendete quota 1520, riprendete il Cason delle Fratte, fate saltare le caverne dei cannoni e salite al Col della Berretta.',
+    ],
+    history: [
+      'Nella nebbia gli arditi presero quota 1520, spinsero verso il Col della Berretta e ripresero il Cason delle Fratte. La nebbia era così fitta che i nemici si riconoscevano solo all’ultimo momento, e si combatté corpo a corpo. Quando la visibilità migliorò, i contrattacchi austro-ungarici costrinsero i reparti a tornare sulle posizioni di partenza poco dopo le 11. Il tenente Maurizio Zanfarino vi cadde e fu decorato di medaglia d’oro.',
+      'Sul Grappa gli austro-ungarici tennero le loro posizioni finché, alla fine di ottobre, il crollo della linea del Piave non li costrinse a ritirarsi. L’armistizio fu firmato a Villa Giusti il 3 novembre 1918 e i combattimenti cessarono il giorno dopo.',
     ],
   },
 ];
@@ -1175,6 +1503,7 @@ function createGame(mi, diffKey, opts = {}) {
   const M = MISSIONS[mi], diff = DIFF[diffKey] || DIFF.ardito;
   const G = {
     M, mi, diffKey, diff, map: buildMap(M), W: M.w, H: M.h, light: (LIGHT[M.light] || LIGHT.day).vis,
+    wx: missionWx(M), noiseK: 1, walkK: 1, bolt: 0, boltT: 0, bolts: 0,
     units: [], enemies: [], objects: [], fx: [], proj: [], charges: [], noises: [], texts: [],
     time: 0, paused: false, over: false, result: null, reason: '', overT: 0,
     waves: 0, lastWaveT: -999, pendingWave: null, wireCut: 0, alarmFlash: 0, whistleT: 0, msgT: {},
@@ -1183,7 +1512,11 @@ function createGame(mi, diffKey, opts = {}) {
   };
   if (!G.attract) M.squad.forEach((s, i) => G.units.push(makeUnit(G, s, i)));
   M.enemies.forEach(e => G.enemies.push(makeEnemy(G, e)));
-  (M.objects || []).forEach(o => G.objects.push({ id: o.id, type: o.t, x: ctr(o.c), y: ctr(o.r), armor: o.armor || null, destroyed: false, collected: false }));
+  (M.objects || []).forEach(o => G.objects.push({ id: o.id, type: o.t, x: ctr(o.c), y: ctr(o.r), armor: o.armor || null, destroyed: false, collected: false, lock: o.lock || null }));
+  // the weather: how far the sentries see, how far a noise carries, how fast a man walks
+  const W = WEATHER[G.wx.kind];
+  G.light *= W.sight; G.noiseK = W.noise * (1 - 0.18 * G.wx.wind); G.walkK = W.walk;
+  if (W.bolts) G.boltT = 5 + Math.random() * 5;
   G.objectives = G.attract ? [] : M.objectives.map(o => Object.assign({}, o, { done: false }));
   return G;
 }
@@ -1209,6 +1542,9 @@ function makeEnemy(G, d) {
     discovered: false, hidden: false, carriedBy: null, dummy: !!T.dummy, static: !!T.static, trainer: !!T.trainer,
     bark: null, barkT: 0, deadT: 0, spawned: !!d.spawned,
   };
+  // after dark some sentries walk with a lantern: they see farther, and they can be seen from afar
+  const dark = G.M.light === 'night' || G.M.light === 'dusk';
+  if (dark && (d.t === 'sentry' || d.t === 'officer')) { let h = 7; for (const ch of String(d.id)) h = (h * 31 + ch.charCodeAt(0)) | 0; e.lantern = ((h >>> 0) % 100) < 50; }
   if (e.patrol) e.facing = e.wantFace = Math.atan2(e.patrol[1 % e.patrol.length].y - e.y, e.patrol[1 % e.patrol.length].x - e.x);
   return e;
 }
@@ -1225,7 +1561,9 @@ function sound(G, kind, x, y) { if (!G.attract) G.onEvent('sfx', { kind, x, y })
 
 function effRange(G, e) {
   const hot = e.state === 'alert' || e.state === 'combat';
-  return e.T.range * TILE * G.diff.vision * G.light * (hot ? 1.15 : 1) * (e.wary ? 1.1 : 1);
+  // a flash of lightning shows the whole field for an instant
+  const light = G.bolt > 0 ? G.light + (Math.max(1, G.light) - G.light) * G.bolt : G.light;
+  return e.T.range * TILE * G.diff.vision * light * (hot ? 1.15 : 1) * (e.wary ? 1.1 : 1) * (e.lantern ? 1.2 : 1);
 }
 function effFov(e) {
   return (e.state === 'alert' || e.state === 'combat') ? 140 * D2R : e.T.fov * D2R;
@@ -1251,7 +1589,7 @@ function unitSpeed(G, u) {
   if (t.water) s *= 0.62; else s *= t.walk || 1;
   if (u.crawl && !t.water) s *= 0.45;
   if (u.carrying) s *= 0.6;
-  return s;
+  return s * G.walkK;
 }
 function approachPath(G, u, x, y, R) {
   let p = findPath(G, u.x, u.y, x, y, u);
@@ -1341,6 +1679,8 @@ function finishBusy(G, u) {
       msg(G, `${u.short} ha aperto un varco nel reticolato.`);
     }
   } else if (k === 'charge') {
+    const lk = lockedNear(G, d.x, d.y);
+    if (lk) { msg(G, 'Non ancora! Il ponte salta solo quando tutta la squadra è passata e la testata sud è sgombra.', 'warn', 'lock', 2); return; }
     if ((u.ammo.charge || 0) > 0) {
       u.ammo.charge--;
       G.charges.push({ x: d.x, y: d.y, fuse: 6, owner: u.id });
@@ -1451,11 +1791,12 @@ function explode(G, x, y, power) {
   for (const e of G.enemies) if (e.alive && !e.trainer && Math.hypot(e.x - x, e.y - y) <= r) killEnemy(G, e, 'blast');
   for (const u of G.units) if (u.alive) { const d = Math.hypot(u.x - x, u.y - y); if (d <= r) damage(G, u, power === 'charge' ? (d < r * 0.6 ? 5 : 2) : 2); }
   for (const o of G.objects) {
-    if (o.destroyed || !o.armor) continue;
+    if (o.destroyed || !o.armor || isLocked(G, o)) continue;
     const d = Math.hypot(o.x - x, o.y - y);
     if (d <= TILE * (power === 'charge' ? 1.7 : 1.3) && (o.armor === 'light' || power === 'charge')) {
       o.destroyed = true; G.fx.push({ k: 'smoke', x: o.x, y: o.y, t: 0, T: 99 });
       msg(G, OBJ_DONE[o.type] || 'Obiettivo distrutto.', 'good');
+      if (o.type === 'mine') collapseSpan(G, o);
     } else if (o.armor === 'heavy' && power !== 'charge' && d <= TILE * 1.3) {
       msg(G, 'Un petardo non basta per un obice: serve una carica da demolizione.', 'warn', 'heavy', 4);
     }
@@ -1467,10 +1808,25 @@ function explode(G, x, y, power) {
   }
   makeNoise(G, x, y, power === 'charge' ? 15 : 12, 'loud', { x, y });
 }
-const OBJ_DONE = { mortar: 'Mortaio distrutto.', trenchgun: 'Cannoncino distrutto.', boat: 'Barca d’assalto affondata.', howitzer: 'Obice distrutto.', cave: 'Caverna fatta saltare.', pontoon: 'Ponte di barche interrotto.' };
+function isLocked(G, o) { return !!(o.lock && !o.lock.every(id => { const b = G.objectives.find(x => x.id === id); return !b || b.done; })); }
+function lockedNear(G, x, y) { return G.objects.find(o => !o.destroyed && isLocked(G, o) && Math.hypot(o.x - x, o.y - y) <= TILE * 2.2) || null; }
+// a blown span drops into the river: the tiles become water, and whoever stood there goes with it
+function collapseSpan(G, o) {
+  const C = G.M.collapse; if (!C) return;
+  const c = tc(o.x);
+  for (let r = C.rows[0]; r <= C.rows[1]; r++) if (G.map[r][c] === '|') setTile(G, c, r, '~');
+  for (const e of G.enemies) if (e.alive && !passable(G, tc(e.x), tc(e.y), null)) killEnemy(G, e, 'blast');
+  for (const u of G.units) if (u.alive && !passable(G, tc(u.x), tc(u.y), u)) {
+    const p = nearestPassable(G, tc(u.x), tc(u.y), u, 6); if (p) { u.x = ctr(p[0]); u.y = ctr(p[1]); u.path = []; }
+  }
+  G.onEvent('collapse', { c, rows: C.rows });
+}
+const OBJ_DONE = { mine: 'La campata salta e crolla nel fiume!', mortar: 'Mortaio distrutto.', trenchgun: 'Cannoncino distrutto.', boat: 'Barca d’assalto affondata.', howitzer: 'Obice distrutto.', cave: 'Caverna fatta saltare.', pontoon: 'Ponte di barche interrotto.' };
 
 /* ---------- noise & alarms ---------- */
 function makeNoise(G, x, y, rT, kind, pt, src) {
+  // rain, thunder and wind swallow the sound of shots and blasts (a thrown stone still clatters close by)
+  if (kind === 'loud') rT *= 0.45 + 0.55 * G.noiseK;
   G.noises.push({ x, y, r: rT * TILE, t: 0, T: kind === 'soft' ? 0.9 : 1.1, kind });
   for (const e of G.enemies) {
     if (!e.alive || e.dummy || e === src || e.state === 'combat') continue;
@@ -1678,7 +2034,7 @@ function updateEnemy(G, e, dt) {
   }
   if (e.path.length && speed > 0) {
     const p = e.path[0], dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy);
-    const sp = speed * (tileAt(G, e.x, e.y).walk || 1) * dt;
+    const sp = speed * (tileAt(G, e.x, e.y).walk || 1) * G.walkK * dt;
     if (d <= sp) { e.x = p.x; e.y = p.y; e.path.shift(); if (!e.path.length) { e.lookBase = e.facing; e.lookT = 0; } }
     else { e.x += dx / d * sp; e.y += dy / d * sp; }
     if (d > 0.5) { const a = Math.atan2(dy, dx); e.facing = angNorm(e.facing + clamp(angNorm(a - e.facing), -7 * dt, 7 * dt)); }
@@ -1786,9 +2142,20 @@ function endGame(G, result, reason) {
   for (const u of G.units) { u.order = null; u.path = []; }
   G.onEvent('end', { result, reason });
 }
+function simWeather(G, dt) {
+  if (G.bolt > 0) G.bolt = Math.max(0, G.bolt - dt * 2.4);
+  if (!G.boltT) return;
+  G.boltT -= dt;
+  if (G.boltT <= 0) {
+    G.boltT = 7 + Math.random() * 10; G.bolt = 1; G.bolts++;
+    if (!G.attract) G.onEvent('bolt', { n: G.bolts });
+    if (G.bolts === 1) msg(G, 'Un lampo! Per un istante le sentinelle vedono tutto il campo.', 'warn');
+  }
+}
 function step(G, dt) {
   if (G.paused) return;
   G.time += dt;
+  simWeather(G, dt);
   G.alarmFlash = Math.max(0, G.alarmFlash - dt);
   if (!G.over) {
     for (const u of G.units) updateUnit(G, u, dt);
@@ -1811,6 +2178,17 @@ const GROUND = {
   'r': ['#84745a', '#79694e', '#927f60', '#6e5f46'],
   'h': ['#6a573b', '#5d4c33', '#786243', '#54442e'],
 };
+// winter: the same ground under snow, slush where it is trodden
+const SNOW_GROUND = {
+  '.': ['#e3e8ed', '#d5dce4', '#f2f5f8', '#c8d0d9'],
+  ',': ['#b8b3ab', '#a7a299', '#cbc6bd', '#9b958b'],
+  ':': ['#d2d7dc', '#bcc1c6', '#e6e9ec', '#aab0b6'],
+  'g': ['#cdd2d6', '#b8bdc2', '#e0e4e8', '#a7adb2'],
+  'r': ['#aaa49a', '#9d978c', '#bab4aa', '#8f897e'],
+  'h': GROUND.h,
+};
+let GPAL = GROUND;
+function setGroundPal(G) { GPAL = G && G.M.winter ? SNOW_GROUND : GROUND; }
 const COL = {
   uni: '#7d8159', uniD: '#62664a', uniL: '#959a6c', outline: '#23241a', fez: '#121212', skin: '#c99c75',
   enemy: '#6b787f', enemyD: '#566168', enemyL: '#84939a', eOut: '#1f2629', helm: '#485155', gold: '#d6aa4c', red: '#c8402f',
@@ -1824,7 +2202,7 @@ function isW(G, c, r) { if (c < 0 || r < 0 || c >= G.W || r >= G.H) return false
 function chAt(G, c, r) { if (c < 0 || r < 0 || c >= G.W || r >= G.H) return '#'; return G.map[r][c]; }
 
 function paintGround(ctx, key, c, r) {
-  const P = GROUND[key], x = c * TILE, y = r * TILE;
+  const P = GPAL[key] || GROUND[key], x = c * TILE, y = r * TILE;
   ctx.fillStyle = P[0]; ctx.fillRect(x, y, TILE, TILE);
   for (let i = 0; i < 11; i++) {
     const a = HASH(c, r, i), b = HASH(c, r, i + 31), k = HASH(c, r, i + 67);
@@ -1997,14 +2375,14 @@ function buildTerrain(G) {
   const cv = document.createElement('canvas');
   cv.width = G.W * TILE * TS; cv.height = G.H * TILE * TS;
   const ctx = cv.getContext('2d');
-  ctx.scale(TS, TS);
+  ctx.scale(TS, TS); setGroundPal(G);
   for (let r = 0; r < G.H; r++) for (let c = 0; c < G.W; c++) paintTileGround(G, ctx, c, r);
   for (let r = 0; r < G.H; r++) for (let c = 0; c < G.W; c++) paintTileFeature(G, ctx, c, r);
   V.terr = cv; V.terrCtx = ctx; V.terrG = G; G.dirtyTiles.length = 0;
 }
 function repaintDirty(G) {
   if (!G.dirtyTiles.length) return;
-  const ctx = V.terrCtx;
+  const ctx = V.terrCtx; setGroundPal(G);
   for (const [c, r] of G.dirtyTiles) {
     ctx.save(); ctx.beginPath(); ctx.rect((c - 1) * TILE, (r - 1) * TILE, TILE * 3, TILE * 3); ctx.clip();
     for (let y = r - 2; y <= r + 2; y++) for (let x = c - 2; x <= c + 2; x++) if (x >= 0 && y >= 0 && x < G.W && y < G.H) paintTileGround(G, ctx, x, y);
@@ -2285,6 +2663,8 @@ function render(G, UI, T) {
   ctx.drawImage(V.terr, 0, 0, G.W * TILE, G.H * TILE);
   const tint = (LIGHT[G.M.light] || {}).tint;
   if (tint) { ctx.fillStyle = tint; ctx.fillRect(0, 0, G.W * TILE, G.H * TILE); }
+  const wk = G.wx ? G.wx.kind : 'clear';
+  if (wk === 'fog' || wk === 'snow') { ctx.fillStyle = wk === 'fog' ? 'rgba(200,204,202,.32)' : 'rgba(230,236,242,.12)'; ctx.fillRect(0, 0, G.W * TILE, G.H * TILE); }
   const vx0 = V.cam.x - 300, vy0 = V.cam.y - 300, vx1 = V.cam.x + V.w / z + 300, vy1 = V.cam.y + V.h / z + 300;
   const inView = p => p.x > vx0 && p.x < vx1 && p.y > vy0 && p.y < vy1;
   // objective zones & marks
@@ -2391,8 +2771,24 @@ function render(G, UI, T) {
     const k = (T - UI.tap.t) / 0.5;
     ctx.strokeStyle = `rgba(241,232,207,${1 - k})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(UI.tap.x, UI.tap.y, 6 + k * 12, 0, TAU); ctx.stroke();
   }
+  render2DWeather(G, T);
 }
 
+// the 2D map's weather: streaks of rain, drifting flakes, the white of a lightning flash
+function render2DWeather(G, T) {
+  const ctx = V.ctx, wk = G.wx ? G.wx.kind : 'clear';
+  ctx.setTransform(V.dpr, 0, 0, V.dpr, 0, 0);
+  if (wk === 'rain' || wk === 'storm') {
+    ctx.strokeStyle = 'rgba(200,214,224,.28)'; ctx.lineWidth = 1; ctx.beginPath();
+    const n = wk === 'storm' ? 220 : 140;
+    for (let i = 0; i < n; i++) { const x = (HASH(i, 1, 5) * V.w + T * 120) % V.w, y = (HASH(i, 2, 5) * V.h + T * (700 + HASH(i, 3, 5) * 200)) % V.h; ctx.moveTo(x, y); ctx.lineTo(x - 4, y + 14); }
+    ctx.stroke();
+  } else if (wk === 'snow') {
+    ctx.fillStyle = 'rgba(255,255,255,.8)';
+    for (let i = 0; i < 160; i++) { const x = (HASH(i, 1, 6) * V.w + T * 40 + Math.sin(T + i) * 10) % V.w, y = (HASH(i, 2, 6) * V.h + T * (40 + HASH(i, 3, 6) * 30)) % V.h; ctx.fillRect(x, y, 2, 2); }
+  }
+  if (G.bolt > 0) { ctx.fillStyle = `rgba(230,236,255,${0.45 * G.bolt})`; ctx.fillRect(0, 0, V.w, V.h); }
+}
 /* ---------- briefing thumbnail ---------- */
 function drawThumb(canvas, mi) {
   const G = createGame(mi, 'ardito', {});
@@ -2400,7 +2796,7 @@ function drawThumb(canvas, mi) {
   canvas.width = M.w * k * 2; canvas.height = M.h * k * 2;
   const ctx = canvas.getContext('2d');
   const tmp = document.createElement('canvas'); tmp.width = M.w * TILE; tmp.height = M.h * TILE;
-  const t2 = tmp.getContext('2d');
+  const t2 = tmp.getContext('2d'); setGroundPal(G);
   for (let r = 0; r < G.H; r++) for (let c = 0; c < G.W; c++) paintTileGround(G, t2, c, r);
   for (let r = 0; r < G.H; r++) for (let c = 0; c < G.W; c++) paintTileFeature(G, t2, c, r);
   ctx.drawImage(tmp, 0, 0, canvas.width, canvas.height);
@@ -2421,19 +2817,29 @@ const R3 = {
   models: new Map(), cones: new Map(), fxVis: new Map(), projVis: new Map(), chargeVis: new Map(), textVis: new Map(),
   own: [], sprTex: new Map(), particles: [], wire: null, lastT: 0, zoneKey: '', zone: null, flash: null, dyn: null,
   sun: null, hemi: null, base: null, wdist: null, anim: [], emitters: [], mist: [], boomT: 0, propTiles: new Set(),
-  windU: { value: 0 }, swayMat: null, shake: 0, weather: null, onFlash: null,
+  windU: { value: 0 }, windK: { value: 1 }, swayMat: null, shake: 0, weather: null, onFlash: null,
+  post: null, rt: null, Q: null, snow: false, lanterns: [], bridge: null,
 };
+/* graphics quality: 'ultra' renders above the screen's own resolution and sharpens the result */
+const QUALITY = {
+  ultra: { label: 'Ultra 4K', pr: 3, ss: 1.5, budget: 12.5e6, shadow: 4096, post: true, detail: true, gtex: 4096, gk: 2.0, drops: 1.6, aniso: 16, smooth: true },
+  alta:  { label: 'Alta',  pr: 2, ss: 1.0, budget: 8.3e6,  shadow: 2048, post: true, detail: true, gtex: 3200, gk: 1.5, drops: 1.0, aniso: 8, smooth: true },
+  media: { label: 'Media', pr: 1.5, ss: 1.0, budget: 3.2e6, shadow: 1024, post: false, detail: false, gtex: 2048, gk: 1.2, drops: 0.6, aniso: 4, smooth: false },
+};
+const QUALITY_ORDER = ['ultra', 'alta', 'media'];
+function r3Quality() { return R3.Q || QUALITY.alta; }
 const EXT = 14;      // tiles of scenery drawn past each edge of the playable map
 let GK = 1.5;        // ground texture pixels per simulation pixel (shrinks on big maps)
 const L3 = {
   day:   { bg: 0x1a1e16, sky: 0xe4ecf0, gnd: 0x5c5a44, hemi: 0.82, sun: 0xfff0d8, sunI: 1.15, dir: [-0.45, 1, 0.55], water: 0x5f97a6, foam: 0xe6eee4, wEm: 0x000000, spark: 0.4, fog: [78, 130], cone: 0.18 },
   dawn:  { bg: 0x1c1922, sky: 0xcfb9dd, gnd: 0x4a4036, hemi: 0.72, sun: 0xffb27a, sunI: 1.12, dir: [0.9, 0.5, 0.3], water: 0x6f8aa6, foam: 0xf2dccb, wEm: 0x0b0d16, spark: 0.34, fog: [74, 124], cone: 0.2 },
+  dusk:  { bg: 0x121119, sky: 0x8a7ea6, gnd: 0x2c2724, hemi: 0.6, sun: 0xff9a5c, sunI: 0.78, dir: [0.95, 0.34, -0.25], water: 0x5a6a80, foam: 0xd0c4c0, wEm: 0x0a0c14, spark: 0.3, fog: [70, 118], cone: 0.22 },
   night: { bg: 0x080b12, sky: 0x4a5c8c, gnd: 0x151515, hemi: 0.52, sun: 0xa4b8ff, sunI: 0.52, dir: [-0.3, 1, -0.45], water: 0x46648a, foam: 0x9fb4cc, wEm: 0x0d1a2c, spark: 0.2, fog: [66, 112], cone: 0.24 },
 };
 // the river's own colour where it is famous for it
 const WATER_STYLE = {
   emerald: { day: [0x3f9c8c, 0xe2f2e8], dawn: [0x4f9a94, 0xf4e2d4], night: [0x2c6070, 0x9fc0c8] },
-  flood:   { day: [0x6e8472, 0xe8e6d4], dawn: [0x667c70, 0xf0e2cf], night: [0x3e5060, 0xa8b0b8] },
+  flood:   { day: [0x6e8472, 0xe8e6d4], dawn: [0x667c70, 0xf0e2cf], dusk: [0x56665e, 0xc8c2b8], night: [0x3e5060, 0xa8b0b8] },
 };
 const CONE_COL = { idle: 0x45c24e, returning: 0x45c24e, suspicious: 0xe8c43a, alert: 0xec8434, combat: 0xe23c2c };
 
@@ -2458,7 +2864,9 @@ function prismGeo() {
 function geo() {
   if (GEO.box) return GEO;
   GEO.box = new THREE.BoxGeometry(1, 1, 1);
-  GEO.sph = new THREE.SphereGeometry(1, 12, 8);
+  GEO.sph = new THREE.SphereGeometry(1, 16, 12);
+  GEO.head = new THREE.SphereGeometry(1, 20, 14);
+  GEO.ico1 = new THREE.IcosahedronGeometry(1, 1);
   GEO.sph6 = new THREE.SphereGeometry(1, 8, 6);
   GEO.hemi = new THREE.SphereGeometry(1, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
   GEO.cyl = new THREE.CylinderGeometry(1, 1, 1, 10);
@@ -2479,14 +2887,19 @@ function geo() {
   GEO.thinRing = new THREE.RingGeometry(0.96, 1, 56).rotateX(-Math.PI / 2);
   GEO.oct = new THREE.OctahedronGeometry(1, 0);
   GEO.tiny = GEO.oct;
-  GEO.bag = new THREE.SphereGeometry(1, 6, 3);
+  // a filled sandbag: a squashed, squared-off pillow
+  GEO.bag = (() => { const g = new THREE.SphereGeometry(1, 12, 6), P = g.attributes.position, v = new THREE.Vector3();
+    for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i); P.setXYZ(i, Math.sign(v.x) * Math.pow(Math.abs(v.x), 0.45), Math.sign(v.y) * Math.pow(Math.abs(v.y), 0.85), Math.sign(v.z) * Math.pow(Math.abs(v.z), 0.55)); }
+    g.computeVertexNormals(); return g; })();
   GEO.tuft = new THREE.ConeGeometry(1, 1, 3);
   // torso: a lathe, widest at the chest, sloping to the neck
-  GEO.torso = new THREE.LatheGeometry([[0.8, 0], [0.84, 0.18], [0.95, 0.5], [1.0, 0.74], [0.93, 0.9], [0.6, 0.99], [0.32, 1.03]].map(([x, y]) => new THREE.Vector2(x, y)), 12);
+  GEO.torso = new THREE.LatheGeometry([[0.8, 0], [0.84, 0.18], [0.95, 0.5], [1.0, 0.74], [0.93, 0.9], [0.6, 0.99], [0.32, 1.03]].map(([x, y]) => new THREE.Vector2(x, y)), 16);
+  // a greatcoat skirt, flaring from the waist to below the knee
+  GEO.skirt = new THREE.LatheGeometry([[0.82, 0], [0.9, 0.3], [1.0, 0.7], [1.08, 1.0]].map(([x, y]) => new THREE.Vector2(x, -y)), 16);
   GEO.limb = {};
   return GEO;
 }
-function limbGeo(ratio) { const G0 = geo(), k = ratio.toFixed(2); if (!G0.limb[k]) G0.limb[k] = new THREE.CylinderGeometry(ratio, 1, 1, 8, 1); return G0.limb[k]; }
+function limbGeo(ratio) { const G0 = geo(), k = ratio.toFixed(2); if (!G0.limb[k]) G0.limb[k] = new THREE.CylinderGeometry(ratio, 1, 1, 12, 1); return G0.limb[k]; }
 function own(x) { R3.own.push(x); return x; }
 function part(parent, g, hex, x, y, z, sx, sy, sz, cast = true) {
   const m = new THREE.Mesh(g, typeof hex === 'object' ? hex : lmat(hex));
@@ -2583,19 +2996,93 @@ function initR3(canvas) {
     r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
     R3.renderer = r;
+    R3.Q = QUALITY[(typeof SAVE !== 'undefined' && SAVE.gfx) || 'alta'] || QUALITY.alta;
   } catch (e) { return false; }
   _v = new THREE.Vector3(); _q = new THREE.Quaternion(); _e = new THREE.Euler(); _s = new THREE.Vector3(); _p = new THREE.Vector3();
   geo();
   R3.scene = new THREE.Scene();
   R3.camera = new THREE.OrthographicCamera(-10, 10, 10, -10, 1, 400);
   R3.raycaster = new THREE.Raycaster();
+  if (R3.Q.post) r3PostInit();
   R3.ok = true;
   return true;
 }
+// the drawing buffer: the screen's own pixel density, or more (supersampling) on Ultra, within a pixel budget
+function r3PixelRatio() {
+  const Q = r3Quality(), dpr = window.devicePixelRatio || 1;
+  const want = Math.min(Q.pr, dpr * Q.ss), cap = Math.sqrt(Q.budget / Math.max(1, V.w * V.h));
+  return Math.max(0.75, Math.min(want, cap));
+}
 function r3Resize() {
-  V.dpr = Math.min(2, window.devicePixelRatio || 1);
   V.w = window.innerWidth; V.h = window.innerHeight;
-  if (R3.renderer) { R3.renderer.setPixelRatio(V.dpr); R3.renderer.setSize(V.w, V.h, false); }
+  V.dpr = r3PixelRatio();
+  if (R3.renderer) { R3.renderer.setPixelRatio(V.dpr); R3.renderer.setSize(V.w, V.h, false); r3PostSize(); }
+}
+/* ---------- the final pass: sharpening, colour grading, vignette and the lightning flash ---------- */
+const POST_VS = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
+const POST_FS = `
+uniform sampler2D tDiffuse; uniform vec2 uRes; uniform float uSharp, uSat, uContrast, uVig, uFlash; uniform vec3 uLift, uGain;
+varying vec2 vUv;
+void main() {
+  vec2 px = 1.0 / uRes;
+  vec3 c = texture2D(tDiffuse, vUv).rgb;
+  vec3 n = texture2D(tDiffuse, vUv + vec2(px.x, 0.0)).rgb + texture2D(tDiffuse, vUv - vec2(px.x, 0.0)).rgb
+         + texture2D(tDiffuse, vUv + vec2(0.0, px.y)).rgb + texture2D(tDiffuse, vUv - vec2(0.0, px.y)).rgb;
+  c = max(c + (c * 4.0 - n) * uSharp, 0.0);
+  float l = dot(c, vec3(0.299, 0.587, 0.114));
+  c = mix(vec3(l), c, uSat);
+  c = (c - 0.5) * uContrast + 0.5;
+  c = c * uGain + uLift;
+  vec2 q = vUv - 0.5; c *= 1.0 - dot(q, q) * uVig;
+  c += uFlash * vec3(0.82, 0.88, 1.0) * (0.35 + 0.65 * l);
+  gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0);
+}`;
+function r3PostInit() {
+  const r = R3.renderer;
+  if (R3.post || !r.capabilities.isWebGL2) return !!R3.post;
+  try {
+    const rt = new THREE.WebGLMultisampleRenderTarget(4, 4, { format: THREE.RGBAFormat, stencilBuffer: false });
+    rt.samples = 4;
+    const mat = new THREE.ShaderMaterial({
+      vertexShader: POST_VS, fragmentShader: POST_FS, depthTest: false, depthWrite: false,
+      uniforms: { tDiffuse: { value: rt.texture }, uRes: { value: new THREE.Vector2(4, 4) }, uSharp: { value: 0.2 }, uSat: { value: 1.06 }, uContrast: { value: 1.06 },
+        uVig: { value: 0.35 }, uFlash: { value: 0 }, uLift: { value: new THREE.Vector3(0, 0, 0) }, uGain: { value: new THREE.Vector3(1, 1, 1) } },
+    });
+    const sc = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+    const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; sc.add(quad);
+    R3.rt = rt; R3.post = { sc, cam, mat, U: mat.uniforms };
+    r3PostSize();
+    return true;
+  } catch (e) { R3.post = null; R3.rt = null; return false; }
+}
+function r3PostSize() {
+  if (!R3.rt) return;
+  const v = new THREE.Vector2(); R3.renderer.getDrawingBufferSize(v);
+  R3.rt.setSize(Math.max(4, v.x), Math.max(4, v.y)); R3.post.U.uRes.value.set(Math.max(4, v.x), Math.max(4, v.y));
+}
+// colour grading per light and weather: a little lift in the shadows, a tint in the highlights
+function r3Grade(G) {
+  if (!R3.post) return;
+  const U = R3.post.U, kind = G.wx ? G.wx.kind : 'clear', lt = G.M.light;
+  let sat = 1.07, con = 1.07, lift = [0, 0, 0], gain = [1, 1, 1], vig = 0.42;
+  if (lt === 'dawn') { gain = [1.03, 0.99, 0.96]; lift = [0.012, 0.008, 0.02]; }
+  if (lt === 'dusk') { gain = [1.02, 0.96, 0.98]; lift = [0.012, 0.01, 0.03]; sat = 0.98; vig = 0.55; }
+  if (lt === 'night') { gain = [0.92, 0.98, 1.1]; lift = [0.004, 0.01, 0.03]; sat = 0.9; con = 1.1; vig = 0.6; }
+  if (kind === 'rain') { sat *= 0.88; gain = gain.map((g, i) => g * [0.97, 0.99, 1.03][i]); }
+  if (kind === 'storm') { sat *= 0.8; con *= 1.08; gain = gain.map((g, i) => g * [0.94, 0.97, 1.04][i]); vig = 0.62; }
+  if (kind === 'snow') { sat *= 0.86; gain = gain.map((g, i) => g * [0.98, 1.0, 1.05][i]); lift = [0.02, 0.025, 0.035]; con = 1.04; }
+  if (kind === 'fog') { sat *= 0.72; con *= 0.9; lift = [0.05, 0.05, 0.05]; gain = [0.93, 0.94, 0.95]; vig = 0.3; }
+  if (kind === 'ash') { sat *= 0.82; gain = [1.0, 0.97, 0.93]; }
+  U.uSat.value = sat; U.uContrast.value = con; U.uVig.value = vig;
+  U.uLift.value.set(...lift); U.uGain.value.set(...gain);
+  U.uSharp.value = r3Quality() === QUALITY.ultra ? 0.24 : 0.16;
+}
+function setQuality(key) {
+  R3.Q = QUALITY[key] || QUALITY.alta;
+  if (!R3.renderer) return;
+  r3Resize();
+  if (R3.Q.post) r3PostInit();
+  R3.G = null; // rebuild the scene with the new shadows and ground detail
 }
 /* ---------- tiles, also past the map edge ---------- */
 const isWaterCh = ch => ch === '~' || ch === '|' || ch === '_';
@@ -2683,7 +3170,8 @@ function groundY(wx, wz) {
 // the walkable surface: the water level over rivers, the ground elsewhere
 function surfY(G, wx, wz) {
   const g = groundY(wx, wz);
-  return isWaterCh(vch(G, Math.floor(wx), Math.floor(wz))) ? Math.max(g, -0.13) : g;
+  const ch = vch(G, Math.floor(wx), Math.floor(wz));
+  return ch === '|' ? Math.max(g, 0.04) : isWaterCh(ch) ? Math.max(g, -0.13) : g;
 }
 
 /* ---------- ground texture ---------- */
@@ -2704,6 +3192,14 @@ function paintTile3D(G, ctx, c, r) {
     return;
   }
   paintTileGround(G, ctx, c, r);
+  // puddles on the trodden ground when it rains
+  const wk = G.wx ? G.wx.kind : 'clear';
+  if ((wk === 'rain' || wk === 'storm') && (ch === ',' || ch === 'r' || ch === '.') && HASH(c, r, 88) < (ch === '.' ? 0.08 : 0.32)) {
+    const px = x + 6 + HASH(c, r, 89) * 20, py = y + 6 + HASH(c, r, 90) * 20, rx = 4 + HASH(c, r, 91) * 7, ry = 3 + HASH(c, r, 92) * 4, a = HASH(c, r, 93) * Math.PI;
+    ctx.fillStyle = 'rgba(52,60,66,.55)'; ctx.beginPath(); ctx.ellipse(px, py, rx + 1.5, ry + 1.5, a, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(120,136,150,.5)'; ctx.beginPath(); ctx.ellipse(px, py, rx, ry, a, 0, TAU); ctx.fill();
+    ctx.fillStyle = 'rgba(200,214,224,.25)'; ctx.beginPath(); ctx.ellipse(px - rx * 0.3, py - ry * 0.3, rx * 0.45, ry * 0.3, a, 0, TAU); ctx.fill();
+  }
 }
 function buildGround(G, root) {
   buildHeights(G);
@@ -2723,31 +3219,68 @@ function buildGround(G, root) {
   g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
   g.setIndex(idx); g.computeVertexNormals(); own(g);
   // texture: painted with the 2D map painters, over the whole extended area
-  const Wt = G.W + 2 * EXT, Ht = G.H + 2 * EXT;
-  GK = Math.min(1.5, 3200 / (Wt * TILE), 3200 / (Ht * TILE));
+  const Wt = G.W + 2 * EXT, Ht = G.H + 2 * EXT, Q = r3Quality();
+  GK = Math.min(Q.gk, Q.gtex / (Wt * TILE), Q.gtex / (Ht * TILE));
+  setGroundPal(G);
   const cv = document.createElement('canvas');
   cv.width = Math.round(Wt * TILE * GK); cv.height = Math.round(Ht * TILE * GK);
   const ctx = cv.getContext('2d'); ctx.scale(GK, GK); ctx.translate(EXT * TILE, EXT * TILE);
   for (let r = -EXT; r < G.H + EXT; r++) for (let c = -EXT; c < G.W + EXT; c++) paintTile3D(G, ctx, c, r);
   // the land past the edge fades into shadow, like the dark border of a campaign map
   const T = TILE, E = EXT * T;
-  const band = (x0, y0, x1, y1, gx0, gy0, gx1, gy1) => { const gr = ctx.createLinearGradient(gx0, gy0, gx1, gy1); gr.addColorStop(0, 'rgba(8,8,6,.10)'); gr.addColorStop(1, 'rgba(8,8,6,.55)'); ctx.fillStyle = gr; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); };
+  const edgeC = R3.snow ? '40,50,62' : '8,8,6';
+  const band = (x0, y0, x1, y1, gx0, gy0, gx1, gy1) => { const gr = ctx.createLinearGradient(gx0, gy0, gx1, gy1); gr.addColorStop(0, `rgba(${edgeC},.10)`); gr.addColorStop(1, `rgba(${edgeC},${R3.snow ? 0.4 : 0.55})`); ctx.fillStyle = gr; ctx.fillRect(x0, y0, x1 - x0, y1 - y0); };
   band(-E, -E, G.W * T + E, 0, 0, 0, 0, -E);
   band(-E, G.H * T, G.W * T + E, G.H * T + E, 0, G.H * T, 0, G.H * T + E);
   band(-E, 0, 0, G.H * T, 0, 0, -E, 0);
   band(G.W * T, 0, G.W * T + E, G.H * T, G.W * T, 0, G.W * T + E, 0);
   const tex = own(new THREE.CanvasTexture(cv));
-  tex.anisotropy = Math.min(8, R3.renderer.capabilities.getMaxAnisotropy());
+  tex.anisotropy = Math.min(Q.aniso, R3.renderer.capabilities.getMaxAnisotropy());
   R3.gCanvas = cv; R3.gCtx = ctx; R3.gTex = tex;
   const mat = own(new THREE.MeshLambertMaterial({ map: tex }));
+  if (Q.detail) groundDetail(mat, Wt, Ht);
   const mesh = new THREE.Mesh(g, mat); mesh.receiveShadow = true;
   root.add(mesh); R3.ground = mesh;
-  // a dark skirt beyond the scenery
-  const om = lmat(0x161812), F = 300, x0 = -EXT, z0 = -EXT, x1 = G.W + EXT, z1 = G.H + EXT;
+  // a dark skirt beyond the scenery (pale on the snow)
+  const om = lmat(R3.snow ? 0x8a929a : 0x161812), F = 300, x0 = -EXT, z0 = -EXT, x1 = G.W + EXT, z1 = G.H + EXT;
   for (const [a, b, c, d] of [[x0 - F, z0 - F, x1 + F, z0], [x0 - F, z1, x1 + F, z1 + F], [x0 - F, z0, x0, z1], [x1, z0, x1 + F, z1]]) {
     const o = new THREE.Mesh(own(new THREE.PlaneGeometry(c - a, d - b).rotateX(-Math.PI / 2)), om);
     o.position.set((a + c) / 2, 1.2, (b + d) / 2); root.add(o);
   }
+}
+
+// fine grain over the painted ground, so it stays crisp however close the camera comes
+function detailTex() {
+  let t = R3.sprTex.get('detail'); if (t) return t;
+  const S = 256, cv = document.createElement('canvas'); cv.width = cv.height = S;
+  const g = cv.getContext('2d'), im = g.createImageData(S, S);
+  const vn = (x, y, s, o) => { const n = S / s, xs = x / s, ys = y / s, xi = Math.floor(xs), yi = Math.floor(ys), fx = xs - xi, fy = ys - yi, u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+    const H = (a, b) => HASH(((a % n) + n) % n, ((b % n) + n) % n, o);
+    return (H(xi, yi) * (1 - u) + H(xi + 1, yi) * u) * (1 - v) + (H(xi, yi + 1) * (1 - u) + H(xi + 1, yi + 1) * u) * v; };
+  for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
+    const v = 0.5 + (vn(x, y, 32, 1) - 0.5) * 0.35 + (vn(x, y, 8, 2) - 0.5) * 0.3 + (HASH(x, y, 3) - 0.5) * 0.22;
+    const k = (y * S + x) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = clamp(v, 0, 1) * 255; im.data[k + 3] = 255;
+  }
+  g.putImageData(im, 0, 0);
+  // pebbles and blades: small darker and lighter specks
+  for (let i = 0; i < 900; i++) {
+    const x = HASH(i, 1, 9) * S, y = HASH(i, 2, 9) * S, r = 0.6 + HASH(i, 3, 9) * 1.6, l = HASH(i, 4, 9) < 0.5;
+    g.fillStyle = l ? 'rgba(255,255,255,.22)' : 'rgba(0,0,0,.22)'; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+  }
+  t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = Math.min(r3Quality().aniso, R3.renderer.capabilities.getMaxAnisotropy());
+  R3.sprTex.set('detail', t); return t;
+}
+function groundDetail(mat, Wt, Ht) {
+  const U = { tDetail: { value: detailTex() }, uDetRep: { value: new THREE.Vector2(Wt / 1.6, Ht / 1.6) }, uDetK: { value: R3.snow ? 0.32 : 0.5 } };
+  mat.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, U);
+    sh.fragmentShader = 'uniform sampler2D tDetail; uniform vec2 uDetRep; uniform float uDetK;\n' + sh.fragmentShader.replace('#include <map_fragment>', `#include <map_fragment>
+  vec3 dtl = texture2D(tDetail, vUv * uDetRep).rgb;
+  vec3 dtl2 = texture2D(tDetail, vUv * uDetRep * 3.7 + 0.37).rgb;
+  diffuseColor.rgb *= mix(vec3(1.0), dtl * dtl2 * 4.0, uDetK);`);
+  };
+  mat.customProgramCacheKey = () => 'arditi-ground-detail';
 }
 
 /* ---------- water ---------- */
@@ -2813,17 +3346,17 @@ function buildWater(G, root, L) {
 
 /* ---------- vegetation, rocks, walls, trenches: instanced ---------- */
 // leaves and grass move in the wind: a small vertex offset, stronger towards the top of each shape
-const SWAY = new Set(['ico', 'cone', 'sph', 'tuft']);
+const SWAY = new Set(['ico', 'ico1', 'cone', 'sph', 'tuft']);
 function swayMat() {
   if (R3.swayMat) return R3.swayMat;
   const m = new THREE.MeshLambertMaterial({ color: 0xffffff });
   m.onBeforeCompile = sh => {
-    sh.uniforms.uWind = R3.windU;
-    sh.vertexShader = 'uniform float uWind;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+    sh.uniforms.uWind = R3.windU; sh.uniforms.uWindK = R3.windK;
+    sh.vertexShader = 'uniform float uWind; uniform float uWindK;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
 #ifdef USE_INSTANCING
   float ph = instanceMatrix[3][0] * 0.37 + instanceMatrix[3][2] * 0.53;
-  float k = max(0.0, position.y + 0.6);
-  transformed.x += (sin(uWind * 1.7 + ph) + 0.4 * sin(uWind * 3.1 + ph * 2.0)) * 0.05 * k;
+  float k = max(0.0, position.y + 0.6) * uWindK;
+  transformed.x += (sin(uWind * 1.7 + ph) + 0.4 * sin(uWind * 3.1 + ph * 2.0) + 0.6) * 0.05 * k;
   transformed.z += cos(uWind * 1.3 + ph * 1.3) * 0.04 * k;
 #endif`);
   };
@@ -2839,7 +3372,8 @@ class Inst {
   }
   flush(root) {
     const G0 = geo(), out = [];
-    const GEOM = { box: G0.box, ico: G0.ico, dod: G0.dod, cyl: G0.cyl6, cyl8: G0.cyl8, cone: G0.cone7, sph: G0.sph6, tuft: G0.tuft, stone: G0.oct, bag: G0.bag, torus: G0.torus };
+    const sm = r3Quality().smooth;
+    const GEOM = { box: G0.box, ico: sm ? G0.ico1 : G0.ico, ico1: G0.ico1, dod: G0.dod, cyl: sm ? G0.cyl : G0.cyl6, cyl8: G0.cyl8, cone: sm ? G0.cone : G0.cone7, sph: sm ? G0.sph : G0.sph6, tuft: G0.tuft, stone: G0.oct, bag: G0.bag, torus: G0.torus };
     for (const k in this.L) {
       const key = k.split('|')[0], base = key.split(':')[0], noShadow = key.endsWith(':ns'), list = this.L[k];
       let cx = 0, cy = 0, cz = 0; for (const it of list) { cx += it.x; cy += it.y; cz += it.z; }
@@ -2859,6 +3393,9 @@ function treeKind(G, c, r) {
   if (st === 'mulberry') return h < 0.6 ? 'mulberry' : 'mix';
   return 'mix';
 }
+// on the snow fields everything wears a white coat
+const SNOWC = 0xf1f4f7;
+function snowy(hex, k) { if (!R3.snow) return hex; const a = new THREE.Color(hex); a.lerp(new THREE.Color(SNOWC), k); return a.getHex(); }
 function plantTree(I, G, kind, cx, cz, gy, c, r, big) {
   const hs = k => HASH(c, r, k), sc = (0.85 + hs(3) * 0.4) * (big ? 1.15 : 1), ox = (hs(1) - 0.5) * 0.3, oz = (hs(2) - 0.5) * 0.3;
   const x = cx + ox, z = cz + oz;
@@ -2868,6 +3405,12 @@ function plantTree(I, G, kind, cx, cz, gy, c, r, big) {
     I.push('cone', x, gy + 1.05 * sc, z, 0, hs(4) * 6, 0, 0.78 * sc, 1.25 * sc, 0.78 * sc, g);
     I.push('cone', x, gy + 1.65 * sc, z, 0, hs(6) * 6, 0, 0.6 * sc, 1.05 * sc, 0.6 * sc, shadeHex(g, 0.08));
     I.push('cone', x, gy + 2.2 * sc, z, 0, hs(7) * 6, 0, 0.38 * sc, 0.85 * sc, 0.38 * sc, shadeHex(g, 0.16));
+    if (R3.snow) {
+      // snow lying on each tier of branches
+      I.push('cone', x, gy + 1.22 * sc, z, 0, hs(4) * 6 + 0.4, 0, 0.66 * sc, 0.9 * sc, 0.66 * sc, SNOWC);
+      I.push('cone', x, gy + 1.8 * sc, z, 0, hs(6) * 6 + 0.4, 0, 0.5 * sc, 0.76 * sc, 0.5 * sc, SNOWC);
+      I.push('cone', x, gy + 2.36 * sc, z, 0, hs(7) * 6 + 0.4, 0, 0.3 * sc, 0.6 * sc, 0.3 * sc, 0xf7f9fb);
+    }
   } else if (kind === 'dead') {
     const lean = (hs(8) - 0.5) * 0.3, hgt = (0.9 + hs(9) * 1.3) * sc, col = hs(10) < 0.4 ? 0x2c2622 : 0x5a4b3c;
     I.push('cyl', x, gy + hgt / 2, z, lean, hs(11) * 6, (hs(12) - 0.5) * 0.3, 0.075, hgt, 0.075, col);
@@ -2915,6 +3458,7 @@ function buildDecor(G, root) {
         const s = 0.55 + hs(k) * 0.35, hy = (edge ? 0.9 : 0.6) + hs(k + 3) * (edge ? 1.0 : 0.9);
         const base = lime ? 0x948f80 : 0x6d695f, tone = shadeHex(base, (hs(k + 7) - 0.5) * 0.35);
         I.push('dod', cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.3, cz + (hs(k + 13) - 0.5) * 0.5, hs(k + 1) * 3, hs(k + 2) * 6, hs(k + 4) * 3, s, hy * 0.62, s, tone);
+        if (R3.snow) I.push('bag', cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.62, cz + (hs(k + 13) - 0.5) * 0.5, 0, hs(k + 2) * 6, 0, s * 0.8, hy * 0.16, s * 0.8, SNOWC);
       }
     } else if (ch === 'T') {
       plantTree(I, G, treeKind(G, c, r), cx, cz, gy, c, r, !inside);
@@ -2922,7 +3466,7 @@ function buildDecor(G, root) {
       const dead = st.tree === 'dead';
       for (let k = 0; k < 3; k++) {
         const s = 0.28 + hs(k) * 0.16;
-        I.push('ico', cx + (hs(k + 4) - 0.5) * 0.5, gy + s * 0.6, cz + (hs(k + 8) - 0.5) * 0.5, hs(k + 1) * 3, hs(k + 2) * 6, 0, s * 1.15, s * 0.95, s * 1.15, shadeHex(dead ? 0x6b6a4a : 0x48612f, (hs(k + 12) - 0.5) * 0.35));
+        I.push('ico', cx + (hs(k + 4) - 0.5) * 0.5, gy + s * 0.6, cz + (hs(k + 8) - 0.5) * 0.5, hs(k + 1) * 3, hs(k + 2) * 6, 0, s * 1.15, s * 0.95, s * 1.15, snowy(shadeHex(dead ? 0x6b6a4a : st.tree === 'conifer' ? 0x34482c : 0x48612f, (hs(k + 12) - 0.5) * 0.35), 0.55));
       }
     } else if (ch === 'd') {
       for (let k = 0; k < 2; k++) {
@@ -2951,7 +3495,7 @@ function buildDecor(G, root) {
       const tone = shadeHex(wall.col, (hs(2) - 0.5) * 0.16);
       if (wall.logs) {
         for (let k = 0; k < 4; k++) I.push('cyl', cx, gy + 0.13 + k * 0.25, cz, 0, 0, Math.PI / 2, 0.13, 1.02, 0.13, shadeHex(tone, (hs(k + 3) - 0.5) * 0.2));
-        I.push('box', cx, gy + 1.1, cz, 0, 0, 0, 1.02, 0.12, 1.02, 0x4a3d2c);
+        I.push('box', cx, gy + 1.1, cz, 0, 0, 0, 1.02, 0.12, 1.02, snowy(0x4a3d2c, 0.85));
       } else {
         I.push('box', cx, gy + hgt / 2 - 0.3, cz, 0, 0, 0, 1.0, hgt + 0.6, 1.0, tone);
         if (wall.ruin && hs(4) < 0.5) I.push('dod', cx + (hs(5) - 0.5) * 0.6, gy + 0.12, cz + 0.6 * (hs(6) - 0.5), hs(7), hs(8), 0, 0.22, 0.14, 0.22, tone);
@@ -2969,9 +3513,9 @@ function buildDecor(G, root) {
         if (layer === 2 && row === 1) continue;
         const along = -0.25 + k * 0.5 + (layer % 2 ? 0.12 : 0), across = -0.18 + row * 0.36;
         const px = horiz ? along : across, pz = horiz ? across : along;
-        I.push('bag', cx + px, gy + 0.1 + layer * 0.16, cz + pz, 0, horiz ? 0 : Math.PI / 2, (hs(layer * 4 + k + row) - 0.5) * 0.12, 0.26, 0.1, 0.17, shadeHex(0xa8976f, (hs(layer * 7 + k * 3 + row) - 0.5) * 0.2));
+        I.push('bag', cx + px, gy + 0.1 + layer * 0.16, cz + pz, 0, horiz ? 0 : Math.PI / 2, (hs(layer * 4 + k + row) - 0.5) * 0.12, 0.26, 0.1, 0.17, snowy(shadeHex(0xa8976f, (hs(layer * 7 + k * 3 + row) - 0.5) * 0.2), layer === 2 ? 0.7 : 0.25));
       }
-    } else if (ch === '|' && inside) {
+    } else if (ch === '|' && inside && st.bridge !== 'iron') {
       const alongZ = isWaterCh(T(c - 1, r)) || isWaterCh(T(c + 1, r)) || !(isWaterCh(T(c, r - 1)) || isWaterCh(T(c, r + 1)));
       const ry = alongZ ? 0 : Math.PI / 2, sx = alongZ ? 1 : 0, sz = alongZ ? 0 : 1;
       if (st.bridge === 'pontoon') {
@@ -3006,7 +3550,10 @@ function buildDecor(G, root) {
       }
     }
     // ground cover: tufts of grass and loose stones, near the action only
-    if (near && (ch === '.' || ch === ',' || ch === ':' || ch === 'g')) {
+    if (near && R3.snow && (ch === '.' || ch === ':')) {
+      // drifts and lumps in the snow
+      if (hs(40) < 0.35) { const x = c + hs(42), z = r + hs(44); I.push('bag:ns', x, groundY(x, z) - 0.01, z, 0, hs(46) * 6, 0, 0.18 + hs(47) * 0.22, 0.035 + hs(48) * 0.03, 0.12 + hs(49) * 0.14, 0xf4f6f9); }
+    } else if (near && (ch === '.' || ch === ',' || ch === ':' || ch === 'g')) {
       const n = ch === '.' ? 2 : 1;
       for (let k = 0; k < n; k++) {
         if (hs(40 + k) > (ch === '.' ? 0.7 : 0.4)) continue;
@@ -3045,10 +3592,11 @@ function footY(x0, z0, w, d) {
   for (const [x, z] of [[x0, z0], [x0 + w, z0], [x0, z0 + d], [x0 + w, z0 + d], [x0 + w / 2, z0 + d / 2]]) m = Math.min(m, groundY(x, z));
   return m;
 }
-function roofOn(K, cx, cz, len, span, alongX, y, rh, roofC, wallC) {
+function roofOn(K, cx, cz, len, span, alongX, y, rh, roofC, wallC, broken) {
   const G0 = geo(), slope = Math.atan2(rh, span / 2), sl = Math.hypot(span / 2, rh) + 0.24;
+  roofC = snowy(roofC, 0.82);
   K.add(G0.prism, wallC, cx, y, cz, len - 0.06, rh, span - 0.06, 0, alongX ? 0 : Math.PI / 2, 0);
-  for (const s of [-1, 1]) {
+  for (const s of broken ? [-1] : [-1, 1]) {
     const off = s * (span / 4 + 0.03), yy = y + rh / 2 + 0.04;
     if (alongX) K.add(G0.box, roofC, cx, yy, cz + off, len + 0.32, 0.07, sl, s * slope, 0, 0);
     else K.add(G0.box, roofC, cx + off, yy, cz, sl, 0.07, len + 0.32, 0, 0, -s * slope);
@@ -3098,12 +3646,21 @@ function buildProps(G, root) {
     let anim = null;
     if (p.t === 'house' || p.t === 'mill') {
       const stone = p.t === 'mill';
-      const wallC = stone ? 0x9b927f : [0xd9c9a3, 0xcfae7a, 0xd6b8a0, 0xe0d4b8][Math.floor(hs(1) * 4)], roofC = shadeHex(0xa25438, (hs(2) - 0.5) * 0.2);
+      const wallC = p.col || (stone ? 0x9b927f : [0xd9c9a3, 0xcfae7a, 0xd6b8a0, 0xe0d4b8][Math.floor(hs(1) * 4)]), roofC = shadeHex(0xa25438, (hs(2) - 0.5) * 0.2);
       const floors = 2, flH = 1.2, H = floors * flH;
       K.add(G0.box, wallC, cx, y0 + H / 2 - 0.4, cz, w - 0.08, H + 0.8, d - 0.08);
       K.add(G0.box, shadeHex(wallC, -0.28), cx, y0 + 0.05, cz, w - 0.03, 0.5, d - 0.03);
+      // corner stones and a string course between the floors
+      for (const sx of [-1, 1]) for (const sz of [-1, 1]) K.add(G0.box, shadeHex(wallC, -0.12), cx + sx * (w / 2 - 0.06), y0 + H / 2, cz + sz * (d / 2 - 0.06), 0.14, H, 0.14);
+      K.add(G0.box, shadeHex(wallC, -0.08), cx, y0 + flH, cz, w + 0.02, 0.08, d + 0.02);
       openings(K, cx, cz, len, span, alongX, y0, floors, flH, stone ? null : 0x3e5a3a, true);
-      roofOn(K, cx, cz, len, span, alongX, y0 + H, Math.min(1.0, span * 0.36), roofC, wallC);
+      roofOn(K, cx, cz, len, span, alongX, y0 + H, Math.min(1.0, span * 0.36), roofC, wallC, p.ruin);
+      if (p.ruin) {
+        // shell damage: a smashed roof, scorched holes in the walls, rubble at the foot
+        for (let k = 0; k < 4; k++) K.add(G0.box, 0x1c1916, cx + (hs(k + 20) - 0.5) * (w - 0.6), y0 + 0.6 + hs(k + 24) * (H - 0.8), alongX ? cz - d / 2 - 0.005 : cz + (hs(k + 28) - 0.5) * (d - 0.6), 0.22 + hs(k + 30) * 0.2, 0.18 + hs(k + 32) * 0.2, 0.03);
+        for (let k = 0; k < 7; k++) K.add(G0.dod, shadeHex(wallC, -0.2 - hs(k + 40) * 0.3), cx + (hs(k + 41) - 0.5) * (w + 0.8), y0 + 0.08, cz + (alongX ? -1 : 1) * (d / 2 + 0.25 + hs(k + 42) * 0.3), hs(k), hs(k + 1), 0, 0.18 + hs(k + 43) * 0.16, 0.12, 0.16);
+        for (let k = 0; k < 5; k++) K.beam(0x3a2c20, cx + (hs(k + 50) - 0.5) * len * 0.6, y0 + H, cz + 0.2, cx + (hs(k + 51) - 0.5) * len * 0.6, y0 + H + 0.6, cz - 0.1, 0.06, 0.06);
+      }
       K.add(G0.box, shadeHex(wallC, -0.1), cx + (alongX ? len * 0.28 : 0.3), y0 + H + 0.75, cz + (alongX ? 0.3 : len * 0.28), 0.22, 0.7, 0.22);
       if (stone) {
         // the water wheel turning in the mill race
@@ -3143,16 +3700,17 @@ function buildProps(G, root) {
       K.add(G0.pyr, 0x7e4330, cx, y0 + H + 0.7, cz, w * 0.78, 1.4, d * 0.78, 0, Math.PI / 4, 0);
       K.add(G0.box, 0x2a2622, cx, y0 + H + 1.6, cz, 0.04, 0.5, 0.04); K.add(G0.box, 0x2a2622, cx, y0 + H + 1.7, cz, 0.24, 0.04, 0.04);
     } else if (p.t === 'shed' || p.t === 'hut' || p.t === 'bunker') {
-      const timber = p.t === 'hut', bunker = p.t === 'bunker';
-      const wallC = timber ? 0x6a5236 : bunker ? 0x8b8a83 : 0x8f8a7c, H = bunker ? 0.8 : timber ? 1.3 : 1.15;
+      const timber = p.t === 'hut' && !p.stone, bunker = p.t === 'bunker';
+      const wallC = p.stone ? 0x8d877b : timber ? 0x6a5236 : bunker ? 0x8b8a83 : 0x8f8a7c, H = bunker ? 0.8 : timber ? 1.3 : p.stone ? 1.45 : 1.15;
       K.add(G0.box, wallC, cx, y0 + H / 2 - 0.3, cz, w - 0.08, H + 0.6, d - 0.08);
+      if (p.stone) for (let k = 0; k < 18; k++) K.add(G0.box, shadeHex(wallC, (hs(k + 60) - 0.5) * 0.3), cx + (hs(k + 61) - 0.5) * (w - 0.3), y0 + 0.15 + hs(k + 62) * (H - 0.3), cz + (k % 2 ? 1 : -1) * (d / 2 - 0.03), 0.3, 0.16, 0.04);
       if (timber) for (let k = 0; k <= Math.round(len * 3); k++) { const o = -len / 2 + k / 3; if (alongX) { K.add(G0.box, 0x4e3c28, cx + o, y0 + H / 2, cz + d / 2 - 0.03, 0.03, H, 0.02); K.add(G0.box, 0x4e3c28, cx + o, y0 + H / 2, cz - d / 2 + 0.03, 0.03, H, 0.02); } }
       if (bunker) {
         K.add(G0.dod, 0x5a4a36, cx, y0 + H + 0.05, cz, w * 0.55, 0.3, d * 0.75);
         K.add(G0.box, 0x111111, cx, y0 + H * 0.65, cz + d / 2 - 0.02, w * 0.6, 0.08, 0.05);
       } else {
         openings(K, cx, cz, len, span, alongX, y0, 1, H, null, true);
-        roofOn(K, cx, cz, len, span, alongX, y0 + H, span * (timber ? 0.24 : 0.3), timber ? 0x3a3632 : 0x5a5650, wallC);
+        roofOn(K, cx, cz, len, span, alongX, y0 + H, span * (timber ? 0.24 : p.stone ? 0.34 : 0.3), timber ? 0x3a3632 : p.stone ? 0x4c4740 : 0x5a5650, wallC);
       }
     } else if (p.t === 'tent') {
       const canvas = shadeHex(0xa99b74, (hs(1) - 0.5) * 0.12);
@@ -3188,6 +3746,23 @@ function buildProps(G, root) {
       for (let k = 0; k < 2; k++) { K.add(G0.box, 0x3e2f22, cx, y0 + 0.14 + k * 0.28, cz, 1.3, 0.26, 0.52, 0, 0.1 * k, 0); K.add(G0.cone7, 0x3e2f22, cx + 0.75, y0 + 0.14 + k * 0.28, cz, 0.26, 0.3, 0.26, 0, 0, -Math.PI / 2); }
       for (let k = 0; k < 5; k++) K.add(G0.box, shadeHex(0x7b6243, (hs(k) - 0.5) * 0.3), cx - 0.1, y0 + 0.65 + k * 0.05, cz + 0.05, 1.4, 0.04, 0.16, 0, (hs(k + 5) - 0.5) * 0.2, 0);
       K.add(G0.torus, 0xbba67a, cx + 0.4, y0 + 0.92, cz, 0.18, 0.18, 0.9, Math.PI / 2, 0, 0);
+    } else if (p.t === 'cart') {
+      // a farm cart left behind in the retreat, some of them tipped over
+      const tip = hs(1) < 0.5, ry = hs(2) * TAU, M = mtx(cx, y0, cz, 0, ry, tip ? 0.5 : 0, 1, 1, 1), sub = (g, col, x, y, z, sx, sy, sz, rx = 0, ryy = 0, rz = 0) => K.m(g, col, M.clone().multiply(mtx(x, y, z, rx, ryy, rz, sx, sy, sz)));
+      sub(G0.box, 0x6a5238, 0, 0.42, 0, 1.1, 0.06, 0.62);
+      for (const s2 of [-1, 1]) sub(G0.box, 0x5a4530, 0, 0.56, s2 * 0.3, 1.1, 0.26, 0.04);
+      sub(G0.box, 0x5a4530, 0.55, 0.56, 0, 0.04, 0.26, 0.6);
+      for (const s2 of [-1, 1]) { sub(G0.wheel, 0x3a2c1e, -0.1, 0.32, s2 * 0.36, 0.32, 0.32, 0.32); sub(G0.cyl8, 0x2a2622, -0.1, 0.32, s2 * 0.36, 0.05, 0.08, 0.05, Math.PI / 2); }
+      for (const s2 of [-1, 1]) sub(G0.box, 0x5a4530, -0.95, 0.36, s2 * 0.18, 0.9, 0.05, 0.05, 0, 0, 0.25);
+      for (let k = 0; k < 4; k++) sub(k % 2 ? G0.box : G0.cyl8, k % 2 ? 0x7a6646 : 0x8a7d62, -0.3 + k * 0.2, 0.62, (hs(k + 5) - 0.5) * 0.3, 0.22, 0.2, 0.2);
+    } else if (p.t === 'well') {
+      K.add(G0.cyl, 0x8c867a, cx, y0 + 0.3, cz, 0.36, 0.6, 0.36);
+      K.add(G0.cyl, 0x1a1816, cx, y0 + 0.58, cz, 0.28, 0.06, 0.28);
+      for (const s2 of [-1, 1]) K.add(G0.box, 0x4a3a28, cx + s2 * 0.32, y0 + 0.85, cz, 0.06, 0.9, 0.06);
+      K.add(G0.cyl8, 0x4a3a28, cx, y0 + 1.15, cz, 0.04, 0.7, 0.04, 0, 0, Math.PI / 2);
+      K.add(G0.prism, snowy(0x7e4330, 0.8), cx, y0 + 1.28, cz, 0.8, 0.3, 0.6);
+    } else if (p.t === 'ironbridge') {
+      buildIronBridge(G, root, p); continue;
     } else if (p.t === 'cavemouth') {
       const [dx, dz] = openSide(G, p.c, p.r), fx = cx + dx * 0.5, fz = cz + dz * 0.5, ry = Math.atan2(dx, dz);
       const M = mtx(fx, y0, fz, 0, ry, 0, 1, 1, 1), sub = (g, col, x, y, z, sx, sy, sz) => K.m(g, col, M.clone().multiply(mtx(x, y, z, 0, 0, 0, sx, sy, sz)));
@@ -3197,6 +3772,66 @@ function buildProps(G, root) {
       for (const s of [-1, 1]) sub(G0.sph6, 0xa8976f, s * 0.55, 0.12, 0.12, 0.2, 0.12, 0.14);
     }
     if (!K.empty) { const m = K.mesh(true, true); root.add(m); }
+  }
+}
+
+/* ---------- the iron bridge over the Piave: stone piers, riveted trusses, a deck per carriageway ---------- */
+function buildIronBridge(G, root, p) {
+  const G0 = geo(), iron = 0x4b524c, ironD = 0x363b37, stone = 0x8a8476, z0 = p.r + 1, z1 = p.r + p.h - 1, deckY = 0.04;
+  const cuts = [z0]; for (let z = z0 + 3; z < z1 - 1; z += 3) cuts.push(z); cuts.push(z1);
+  const piers = new Kit();
+  // abutments on each bank, piers in the stream
+  for (const zz of [z0 - 0.3, z1 + 0.3]) piers.add(G0.box, stone, p.c + p.w / 2, -0.55, zz, p.w + 0.5, 1.2, 0.7);
+  for (let i = 1; i < cuts.length - 1; i++) {
+    const zz = cuts[i];
+    piers.add(G0.box, stone, p.c + p.w / 2, -0.75, zz, p.w + 0.3, 1.5, 0.5);
+    for (const s of [-1, 1]) piers.add(G0.cone, shadeHex(stone, -0.05), p.c + p.w / 2 + s * (p.w / 2 + 0.3), -0.75, zz, 0.25, 1.5, 0.25, 0, 0, 0);
+    piers.add(G0.box, shadeHex(stone, 0.1), p.c + p.w / 2, -0.02, zz, p.w + 0.36, 0.08, 0.58);
+  }
+  root.add(piers.mesh(true, true));
+  R3.bridge = { spans: [] };
+  for (let col = p.c; col < p.c + p.w; col++) {
+    const outer = col === p.c ? -1 : col === p.c + p.w - 1 ? 1 : 0;
+    for (let i = 0; i + 1 < cuts.length; i++) {
+      const a = cuts[i], b = cuts[i + 1], len = b - a, K = new Kit(), grp = new THREE.Group();
+      grp.position.set(col + 0.5, 0, (a + b) / 2); root.add(grp);
+      // deck: cross girders, stringers and planking
+      K.add(G0.box, 0x5e4a34, 0, deckY - 0.04, 0, 0.98, 0.07, len - 0.02);
+      for (let k = 0; k < Math.round(len * 4); k++) K.add(G0.box, shadeHex(0x6e5840, (HASH(col, k + i * 20, 5) - 0.5) * 0.25), 0, deckY - 0.005, -len / 2 + (k + 0.5) / 4, 0.96, 0.012, 0.22);
+      for (const sx of [-0.35, 0.35]) K.add(G0.box, ironD, sx, deckY - 0.16, 0, 0.08, 0.16, len);
+      for (let k = 0; k <= len; k++) K.add(G0.box, ironD, 0, deckY - 0.12, -len / 2 + k, 1.0, 0.1, 0.07);
+      if (outer) {
+        const x = outer * 0.48, H = 1.1, n = Math.round(len * 1.5);
+        K.add(G0.box, iron, x, deckY + 0.05, 0, 0.1, 0.12, len);
+        K.add(G0.box, iron, x, deckY + H, 0, 0.12, 0.12, len - 0.3);
+        for (let k = 0; k <= n; k++) {
+          const z = -len / 2 + k * len / n;
+          K.add(G0.box, iron, x, deckY + H / 2, z, 0.08, H, 0.07);
+          if (k < n) { const z2 = -len / 2 + (k + 1) * len / n; K.beam(iron, x, deckY + (k % 2 ? 0.08 : H), z, x, deckY + (k % 2 ? H : 0.08), z2, 0.05, 0.05); }
+        }
+        // rivet plates at the joints, the railing hand rope
+        for (let k = 0; k <= n; k += 2) K.add(G0.box, ironD, x + outer * 0.05, deckY + H, -len / 2 + k * len / n, 0.02, 0.2, 0.2);
+        K.add(G0.box, ironD, x - outer * 0.1, deckY + 0.55, 0, 0.03, 0.03, len);
+      } else K.add(G0.box, iron, 0.48, deckY + 0.05, 0, 0.06, 0.08, len);
+      // overhead bracing between the two trusses (carried on the west deck)
+      if (col === p.c) for (let k = 0; k <= len; k++) K.add(G0.box, ironD, p.w / 2 - 0.5, deckY + 1.12, -len / 2 + k, p.w - 0.04, 0.06, 0.06);
+      const m = K.mesh(true, true); grp.add(m);
+      const sp = { grp, col, a, b, fallen: false };
+      R3.bridge.spans.push(sp);
+      // a span already down (after a reload) lies in the river
+      let gone = false; for (let r = Math.ceil(a); r < b; r++) if (inMap(G, col, r) && G.map[r][col] === '~') gone = true;
+      if (gone) { sp.fallen = true; grp.position.y = -0.95; grp.rotation.x = (i % 2 ? 1 : -1) * 0.16; grp.rotation.z = (col - p.c - 0.5) * 0.2; }
+    }
+  }
+  for (let y = p.r; y < p.r + p.h; y++) for (let x = p.c; x < p.c + p.w; x++) R3.propTiles.add(x + ',' + y);
+}
+// the charges go off: every span over the fallen tiles drops into the river
+function r3Collapse(G, c, rows) {
+  if (!R3.bridge) return;
+  for (const sp of R3.bridge.spans) {
+    if (sp.fallen || sp.col !== c || sp.b <= rows[0] || sp.a > rows[1]) continue;
+    sp.fallen = true;
+    R3.anim.push({ k: 'fall', o: sp.grp, t: 0, d: 0.15 + Math.random() * 0.25, rx: (Math.random() < 0.5 ? 1 : -1) * (0.12 + Math.random() * 0.12), rz: (c % 2 ? 1 : -1) * (0.1 + Math.random() * 0.15) });
   }
 }
 /* ---------- soldiers: jointed bodies, period uniforms, animation ---------- */
@@ -3212,19 +3847,22 @@ const HAIRS = [0x2a1d14, 0x3b2a1c, 0x1d1712, 0x4a3522, 0x2f261f, 0x564030];
 const METAL = 0x2c2e2e, WOOD = 0x5b3f26, STEEL = 0xb4b6b0;
 function idSeed(a) { let s = 7; for (const ch of String(a.name || a.id || '')) s = (s * 31 + ch.charCodeAt(0)) | 0; return s; }
 function actorSpec(G, a, isUnit) {
-  const sd = idSeed(a), h = k => HASH(sd, k, 13), era = G.M.era || 1918;
-  const sp = { skin: SKINS[Math.floor(h(1) * SKINS.length)], hair: HAIRS[Math.floor(h(2) * HAIRS.length)], must: h(3) < 0.62, beard: h(4) < 0.1, hgt: 0.95 + h(5) * 0.1, bulk: 0.95 + h(6) * 0.1, seed: sd };
+  const sd = idSeed(a), h = k => HASH(sd, k, 13), era = G.M.era || 1918, winter = !!G.M.winter;
+  const sp = { skin: SKINS[Math.floor(h(1) * SKINS.length)], hair: HAIRS[Math.floor(h(2) * HAIRS.length)], must: h(3) < 0.62, beard: h(4) < 0.1, hgt: 0.95 + h(5) * 0.1, bulk: (0.95 + h(6) * 0.1) * (winter ? 1.06 : 1), seed: sd,
+    mstyle: h(8) < 0.5 ? 'brush' : h(8) < 0.8 ? 'handlebar' : 'walrus', stubble: h(9) < 0.45, winter, gloves: winter, nose: 0.85 + h(10) * 0.35, brow: (h(11) - 0.5) * 0.3 };
   if (isUnit) {
-    if (a.role === 'caimano') Object.assign(sp, { kind: 'cai', hat: 'bare', hand: 'knife', skin: shadeHex(sp.skin, -0.12), mud: true });
+    if (a.role === 'caimano') Object.assign(sp, { kind: 'cai', hat: 'bare', hand: 'knife', skin: shadeHex(sp.skin, -0.12), mud: true, winter: false, gloves: false });
     else Object.assign(sp, {
-      kind: 'it', flames: true, dagger: true, under: era >= 1918 ? 'tie' : 'sweater',
-      hat: G.M.id === 'sdricca' ? 'cap' : era >= 1918 ? 'fez' : 'adrian',
+      kind: 'it', flames: true, dagger: true, under: era >= 1918 ? 'tie' : 'sweater', canteen: true, mask: true,
+      hat: G.M.hat || (G.M.id === 'sdricca' ? 'cap' : era >= 1918 ? 'fez' : 'adrian'),
       hand: { pugnale: 'carbine', petardiere: 'knife', guastatore: 'knife', mitragliere: 'vp', lanciafiamme: 'flamer' }[a.role],
       bombs: a.role === 'petardiere', pliers: a.role === 'guastatore', tanks: a.role === 'lanciafiamme', cacc: true,
     });
   } else if (a.trainer) Object.assign(sp, { kind: 'itOff', hat: 'berretto', hand: 'stick', flames: true, under: 'tie', strap: true, officer: true });
-  else if (a.type === 'officer') Object.assign(sp, { kind: 'auOff', hat: 'kappe', hand: null, strap: true, holster: true, officer: true, must: h(3) < 0.8 });
-  else Object.assign(sp, { kind: 'au', hat: 'stahl', hand: a.type === 'mg' ? null : 'rifle', pack: a.type !== 'mg', bread: true });
+  else if (a.type === 'officer') Object.assign(sp, { kind: 'auOff', hat: 'kappe', hand: null, strap: true, holster: true, officer: true, must: h(3) < 0.8, mstyle: 'handlebar' });
+  else Object.assign(sp, { kind: 'au', hat: 'stahl', hand: a.type === 'mg' ? null : 'rifle', pack: a.type !== 'mg', bread: true, mask: true, spade: h(12) < 0.6, canteen: true });
+  // after dark some sentries carry a lantern
+  if (!isUnit && a.lantern) sp.lantern = true;
   return sp;
 }
 function col3(hex) { return new THREE.Color(hex); }
@@ -3272,10 +3910,14 @@ function buildHuman(sp) {
     const Kn = new THREE.Group(); Kn.position.y = -0.235; Tg.add(Kn); B.kn.push(Kn);
     const An = new THREE.Group(); An.position.y = -0.215; Kn.add(An); B.an.push(An);
   }
-  // pelvis and the skirt of the jacket
+  // pelvis and the skirt of the jacket (a long greatcoat in winter)
   const kP = new Kit();
   kP.add(G0.sph6, trou, 0, -0.02, 0, 0.125 * bk, 0.085, 0.09 * bk);
   if (!cai) kP.add(G0.fez, coat, 0, -0.03, 0, 0.13 * bk, 0.11, 0.095 * bk);
+  if (sp.winter && !cai) {
+    kP.add(G0.skirt, coat, 0, 0.0, 0, 0.13 * bk, 0.25, 0.098 * bk);
+    for (const sx of [-1, 1]) kP.add(G0.box, coatD, sx * 0.012, -0.13, 0.1 * bk, 0.006, 0.24, 0.012, -0.12, 0, 0);
+  }
   hips.add(kP.mesh());
   // legs
   for (let i = 0; i < 2; i++) {
@@ -3312,6 +3954,9 @@ function buildHuman(sp) {
     if (sp.pliers) kS.add(G0.box, 0x2a2a2a, -0.12 * bk, -0.02, 0.04, 0.02, 0.1, 0.03, 0, 0, -0.2);
     if (sp.tanks) { for (const s of [-1, 1]) kS.add(G0.cyl8, 0x3e4034, s * 0.062, 0.17, -0.155, 0.056, 0.33, 0.056); kS.add(G0.sph6, 0x2e3028, 0, 0.32, -0.155, 0.04, 0.04, 0.04); }
     if (sp.strap) kS.beam(belt, -0.13, 0.31, 0.06, 0.1, 0.04, 0.09, 0.022, 0.008);
+    if (sp.canteen) { kS.add(G0.cyl8, 0x55553f, -0.11 * bk, -0.005, -0.055, 0.034, 0.075, 0.034, 0, 0, 0.1); kS.add(G0.cyl8, 0x2a2a26, -0.11 * bk, 0.04, -0.055, 0.01, 0.02, 0.01); }
+    // the gas mask in its tin, slung on the left hip
+    if (sp.mask) { kS.add(G0.cyl8, 0x5d6248, 0.105 * bk, 0.02, -0.07, 0.03, 0.1, 0.03, 0.12, 0, 0); kS.beam(0x4a4a36, 0.105, 0.07, -0.07, -0.12, 0.31, 0.05, 0.012, 0.006); }
   } else if (sp.kind === 'au' || sp.kind === 'auOff') {
     kS.add(G0.cyl8, coat, 0, 0.33, 0.004, 0.054, 0.045, 0.052);
     for (let j = 0; j < 4; j++) kS.add(G0.tiny, 0x2e2e2a, 0, 0.1 + j * 0.055, 0.1 * bk, 0.008, 0.008, 0.006);
@@ -3325,6 +3970,10 @@ function buildHuman(sp) {
       kS.add(G0.cyl8, 0x56584c, 0, 0.12, -0.185 * bk, 0.045, 0.06, 0.03, Math.PI / 2, 0, 0);
     }
     if (sp.bread) kS.add(G0.box, 0x857a5f, 0.125 * bk, 0.0, 0.0, 0.04, 0.09, 0.11);
+    // the ribbed gas-mask tin on its strap, the short spade, the canteen
+    if (sp.mask) { kS.add(G0.cyl, 0x5b6058, -0.075 * bk, 0.16, 0.11 * bk, 0.034, 0.1, 0.034); for (const yy of [0.13, 0.19]) kS.add(G0.cyl8, 0x4a4f48, -0.075 * bk, yy, 0.11 * bk, 0.037, 0.008, 0.037); kS.beam(0x3a3228, -0.07, 0.21, 0.11, 0.13, 0.33, 0.04, 0.012, 0.005); }
+    if (sp.spade) { kS.add(G0.box, 0x4a4a44, 0.1 * bk, -0.06, -0.08, 0.012, 0.075, 0.06, 0, 0, 0.15); kS.add(G0.box, WOOD, 0.1 * bk, 0.03, -0.085, 0.014, 0.11, 0.016, 0, 0, 0.15); }
+    if (sp.canteen) kS.add(G0.cyl8, 0x3f4440, -0.12 * bk, -0.01, -0.04, 0.03, 0.07, 0.03);
     if (sp.strap) kS.beam(belt, 0.13, 0.31, 0.06, -0.1, 0.04, 0.09, 0.022, 0.008);
     if (sp.holster) kS.add(G0.box, belt, -0.125 * bk, 0.0, 0.03, 0.035, 0.09, 0.06);
   } else if (cai) {
@@ -3332,20 +3981,40 @@ function buildHuman(sp) {
     kS.add(G0.box, dark, 0.11, 0.0, 0.05, 0.018, 0.11, 0.024, 0, 0, 0.25);
     kS.add(G0.box, pouch, -0.08, 0.04, 0.085, 0.07, 0.05, 0.03);
   }
+  if (sp.winter && !cai) { kS.add(G0.cyl, sp.kind === 'it' ? 0x4c4f3c : 0x4b5257, 0, 0.335, 0.004, 0.06, 0.05, 0.058); kS.add(G0.box, sp.kind === 'it' ? 0x4c4f3c : 0x4b5257, 0.03, 0.27, 0.1, 0.03, 0.09, 0.012, -0.15, 0, 0.1); }
   spine.add(kS.mesh());
   // neck and head
-  const kN = new Kit(); kN.add(G0.cyl8, skin, 0, 0.005, 0, 0.039, 0.07, 0.041); neck.add(kN.mesh());
-  const kH = new Kit(), sk2 = skin.clone().multiplyScalar(0.94);
-  kH.add(G0.sph, skin, 0, 0.08, 0, 0.068, 0.08, 0.074);
-  kH.add(G0.sph6, sp.beard ? hair : skin, 0, 0.045, 0.012, 0.058, 0.046, 0.06);
-  kH.add(G0.box, sk2, 0, 0.074, 0.077, 0.016, 0.03, 0.022, -0.2, 0, 0);
+  const kN = new Kit(); kN.add(G0.cyl8, skin, 0, 0.005, 0, 0.041, 0.075, 0.043); kN.add(G0.box, skin.clone().multiplyScalar(0.9), 0, -0.005, 0.03, 0.022, 0.035, 0.012, 0.2, 0, 0); neck.add(kN.mesh());
+  const kH = new Kit(), sk2 = skin.clone().multiplyScalar(0.92), sk3 = skin.clone().multiplyScalar(0.8);
+  const jaw = sp.stubble && !cai ? skin.clone().lerp(hair, 0.22) : skin, lip = skin.clone().lerp(col3(0x8a3a32), 0.35);
+  // skull, jaw and chin, cheekbones
+  kH.add(G0.head, skin, 0, 0.083, -0.002, 0.066, 0.078, 0.072);
+  kH.add(G0.sph, sp.beard ? hair : jaw, 0, 0.044, 0.014, 0.055, 0.043, 0.057);
+  kH.add(G0.sph6, sp.beard ? hair : jaw, 0, 0.024, 0.052, 0.022, 0.018, 0.019);
+  for (const s of [-1, 1]) kH.add(G0.sph6, skin, s * 0.035, 0.069, 0.05, 0.022, 0.016, 0.02);
+  // nose: bridge and tip
+  const nk = sp.nose;
+  kH.add(G0.box, sk2, 0, 0.077, 0.074, 0.014, 0.034 * nk, 0.016, -0.28, 0, 0);
+  kH.add(G0.sph6, sk2, 0, 0.061, 0.083 + 0.004 * (nk - 1), 0.012, 0.011, 0.012 * nk);
+  // eyes in their sockets, under the brows
   for (const s of [-1, 1]) {
-    kH.add(G0.tiny, sk2, s * 0.068, 0.078, 0.004, 0.012, 0.022, 0.016);
-    kH.add(G0.tiny, 0x1a1410, s * 0.025, 0.09, 0.067, 0.011, 0.008, 0.006);
-    kH.add(G0.box, hair, s * 0.026, 0.104, 0.067, 0.03, 0.008, 0.012, 0, 0, s * 0.12);
+    kH.add(G0.sph6, sk3, s * 0.025, 0.088, 0.064, 0.017, 0.009, 0.006);
+    kH.add(G0.sph6, 0xe8e2d4, s * 0.025, 0.088, 0.0675, 0.0082, 0.0058, 0.004);
+    kH.add(G0.sph6, 0x2a2018, s * 0.025, 0.088, 0.0712, 0.0042, 0.0045, 0.0026);
+    kH.add(G0.box, hair, s * 0.027, 0.101, 0.069, 0.03, 0.0085, 0.012, 0, 0, s * (0.14 + sp.brow));
+    // ears
+    kH.add(G0.sph6, sk2, s * 0.066, 0.079, 0.002, 0.009, 0.021, 0.015);
+    kH.add(G0.sph6, sk3, s * 0.07, 0.079, 0.004, 0.003, 0.012, 0.008);
   }
-  kH.add(G0.box, 0x6a3a30, 0, 0.042, 0.07, 0.024, 0.004, 0.006);
-  if (sp.must) { kH.add(G0.box, hair, 0, 0.054, 0.073, 0.054, 0.013, 0.016); for (const s of [-1, 1]) kH.add(G0.tiny, hair, s * 0.026, 0.049, 0.07, 0.01, 0.012, 0.01); }
+  // mouth
+  kH.add(G0.box, lip, 0, 0.044, 0.07, 0.025, 0.0055, 0.008);
+  kH.add(G0.box, lip.clone().multiplyScalar(0.92), 0, 0.037, 0.068, 0.02, 0.006, 0.008);
+  if (sp.must && !cai) {
+    const ms = sp.mstyle;
+    kH.add(G0.box, hair, 0, 0.053, 0.075, ms === 'walrus' ? 0.062 : 0.05, ms === 'walrus' ? 0.016 : 0.012, 0.014);
+    if (ms === 'handlebar') for (const s of [-1, 1]) kH.add(G0.box, hair, s * 0.033, 0.058, 0.072, 0.022, 0.007, 0.008, 0, 0, s * 0.55);
+    else for (const s of [-1, 1]) kH.add(G0.tiny, hair, s * 0.027, 0.047, 0.072, 0.01, ms === 'walrus' ? 0.018 : 0.012, 0.01);
+  }
   if (sp.hat !== 'stahl' && sp.hat !== 'adrian') kH.add(G0.sph, cai ? hair.clone().multiplyScalar(0.6) : hair, 0, 0.097, -0.014, 0.071, 0.068, 0.075);
   else kH.add(G0.box, hair, 0, 0.09, -0.05, 0.12, 0.05, 0.05);
   const hatK = new Kit();
@@ -3391,7 +4060,10 @@ function buildHuman(sp) {
     kF.add(G0.sph6, coat, 0, 0, 0, 0.04, 0.04, 0.04);
     kF.add(limbGeo(1.22), coat, 0, -0.085, 0, 0.031, 0.17, 0.033);
     if (!cai) kF.add(G0.cyl8, coatD, 0, -0.163, 0, 0.035, 0.026, 0.037);
-    kF.add(G0.sph6, skin, 0, -0.205, 0.004, 0.03, 0.042, 0.034);
+    const hc = sp.gloves ? col3(0x4e4638) : skin, s = i ? 1 : -1;
+    kF.add(G0.box, hc, 0, -0.198, 0.004, 0.034, 0.044, 0.02);
+    kF.add(G0.box, hc.clone().multiplyScalar(0.94), 0, -0.226, 0.013, 0.032, 0.022, 0.024, 0.5, 0, 0);
+    kF.add(G0.box, hc, -s * 0.019, -0.196, 0.016, 0.011, 0.032, 0.013, 0.35, 0, -s * 0.45);
     B.el[i].add(kF.mesh());
   }
   root.scale.setScalar(sp.hgt);
@@ -3413,6 +4085,16 @@ function mountWeapons(B, sp) {
     W.back = mk(); W.back.position.set(0.0, 0.17, -0.13); W.back.rotation.set(-Math.PI / 2, 0, 0.75); B.spine.add(W.back); W.back.visible = false;
   }
   return W;
+}
+function makeLantern() {
+  const G0 = geo(), K = new Kit(), g = new THREE.Group();
+  K.add(G0.box, 0x2a2622, 0, 0.0, 0, 0.06, 0.012, 0.06); K.add(G0.box, 0x2a2622, 0, 0.1, 0, 0.065, 0.014, 0.065);
+  for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) K.add(G0.box, 0x2a2622, x * 0.028, 0.05, z * 0.028, 0.008, 0.1, 0.008);
+  K.add(G0.torus, 0x2a2622, 0, 0.13, 0, 0.03, 0.03, 0.03, Math.PI / 2, 0, 0);
+  g.add(K.mesh(false));
+  const glass = new THREE.Mesh(G0.box, new THREE.MeshBasicMaterial({ color: 0xffcf72 })); glass.scale.set(0.046, 0.075, 0.046); glass.position.y = 0.05; g.add(glass);
+  const glow = makeSprite(softDot(), 0.7, 0.7, true, true); glow.material.color.setHex(0xffb24a); glow.material.opacity = 0.75; glow.position.y = 0.05; g.add(glow);
+  return { g, glow };
 }
 function makeDummy() {
   const G0 = geo(), K = new Kit(), root = new THREE.Group();
@@ -3445,7 +4127,13 @@ function actorModel(G, a, isUnit) {
     if (a.type === 'mg') { M.mg = makeMGun(); M.mg.position.set(0, 0, 0.5); M.root.add(M.mg); M.kneel = true; }
   }
   // soldiers stay visible through trees and walls as a tinted silhouette (drawn in a second pass)
-  M.layer = isUnit ? 1 : 2; M.root.traverse(o => { if (o.isMesh) o.layers.enable(M.layer); });
+  M.layer = isUnit ? 1 : 2; M.root.traverse(o => { if (o.isMesh) { o.layers.enable(M.layer); if (o.material === vcMat()) o.material = isUnit ? R3.actorMatU : R3.actorMatE; } });
+  if (M.sp && M.sp.lantern) {
+    // a lantern in the free hand, and the pool of light it throws on the ground
+    const L = makeLantern(); L.g.position.set(0, -0.24, 0.02); M.B.el[1].add(L.g); M.lantern = L;
+    const pool = new THREE.Mesh(geo().disc, new THREE.MeshBasicMaterial({ map: softDot(), color: 0xffa040, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false }));
+    pool.renderOrder = 2; pool.scale.set(1.9, 1, 1.9); R3.root.add(pool); M.pool = pool;
+  }
   M.tag = makeSprite(null, 0.62, 0.62); M.tag.visible = false; R3.root.add(M.tag);
   M.blood = new THREE.Mesh(geo().disc, own(new THREE.MeshBasicMaterial({ color: 0x4a120c, transparent: true, opacity: 0.6, depthWrite: false })));
   M.blood.visible = false; M.blood.renderOrder = 2; R3.root.add(M.blood);
@@ -3455,12 +4143,12 @@ function actorModel(G, a, isUnit) {
 
 /* ---------- poses ---------- */
 function poseIdle() {
-  return { hy: 0.5, hpz: 0, hx: 0, hrz: 0, sx: 0.02, sy: 0, sz: 0, nx: 0, ny: 0,
+  return { hy: 0.5, hpz: 0, hx: 0, hrz: 0, hyw: 0, sx: 0.02, sy: 0, sz: 0, nx: 0, ny: 0,
     rsx: 0.02, rsz: -0.08, rex: -0.18, lsx: 0.02, lsz: 0.08, lex: -0.18,
     rtx: 0, rtz: -0.03, rkx: 0.04, rax: 0, ltx: 0, ltz: 0.03, lkx: 0.04, lax: 0 };
 }
 function applyPose(B, P) {
-  B.hips.position.set(0, P.hy, P.hpz); B.hips.rotation.set(P.hx, 0, P.hrz);
+  B.hips.position.set(0, P.hy, P.hpz); B.hips.rotation.set(P.hx, P.hyw, P.hrz);
   B.spine.rotation.set(P.sx, P.sy, P.sz);
   B.head.rotation.set(P.nx, P.ny, 0);
   B.sh[0].rotation.set(P.rsx, 0, P.rsz); B.el[0].rotation.x = P.rex;
@@ -3474,7 +4162,8 @@ function gait(P, ph, run, amp = 1) {
   P.rkx = 0.08 + Kb * Math.max(0, c); P.lkx = 0.08 + Kb * Math.max(0, -c);
   P.rax = 0.3 * Math.max(0, c) * amp - 0.15 * Math.max(0, -c); P.lax = 0.3 * Math.max(0, -c) * amp - 0.15 * Math.max(0, c);
   P.hy = (run ? 0.475 : 0.495) + (run ? 0.03 : 0.012) * Math.abs(Math.cos(ph)) * amp;
-  P.sx = run ? 0.22 : 0.06; P.sy = (run ? 0.14 : 0.1) * s * amp; P.nx = -P.sx * 0.6;
+  P.sx = run ? 0.22 : 0.06; P.hyw = -(run ? 0.12 : 0.09) * s * amp; P.sy = (run ? 0.26 : 0.19) * s * amp; P.nx = -P.sx * 0.6; P.ny = -P.sy * 0.5;
+  P.hrz = (run ? 0.05 : 0.035) * c * amp;
   P.rsx = (run ? 0.7 : 0.42) * s * amp; P.lsx = -(run ? 0.7 : 0.42) * s * amp;
   P.rex = run ? -1.35 : -0.3 - 0.25 * Math.max(0, -s); P.lex = run ? -1.35 : -0.3 - 0.25 * Math.max(0, s);
 }
@@ -3508,6 +4197,8 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
   const walking = M.spd > 0.12, swim = t.water && isUnit, crawl = isUnit && a.crawl && !swim;
   const run = walking && (isUnit ? !crawl && !a.carrying && M.spd > 1.7 : M.spd > 2.2);
   let blend = 16, weapon = 'hand';
+  // the lantern's pool of light follows its bearer, and goes out when he falls
+  if (M.pool) { M.pool.visible = a.alive; M.lantern.glow.visible = a.alive; if (a.alive) { const lf = 0.92 + 0.08 * Math.sin(T * 13 + M.phase) * Math.sin(T * 7.3); M.pool.position.set(wx + Math.sin(M.yaw) * 0.25, y + 0.04, wz + Math.cos(M.yaw) * 0.25); M.pool.material.opacity = 0.32 * lf; M.lantern.glow.material.opacity = 0.75 * lf; } }
   // dead or carried
   if (!a.alive) {
     M.tag.visible = false;
@@ -3556,8 +4247,12 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
   } else {
     if (walking) gait(P, ph, run, a.carrying ? 0.7 : 1);
     else {
-      P.sx = 0.02 + 0.012 * Math.sin(T * 1.6 + M.phase); P.hrz = 0.025 * Math.sin(T * 0.5 + M.phase);
-      if (!isUnit && (a.state === 'idle' || a.state === 'returning')) P.ny = 0.35 * Math.sin(T * 0.45 + M.phase);
+      // breathing, a slow shift of weight from one leg to the other, a look around
+      const br = Math.sin(T * (a.state === 'combat' || a.state === 'alert' ? 3.2 : 1.6) + M.phase), ws = Math.sin(T * 0.31 + M.phase * 1.7);
+      P.sx = 0.02 + 0.014 * br; P.hrz = 0.03 * ws; P.rtz = -0.03 - 0.03 * ws; P.ltz = 0.03 - 0.03 * ws; P.rkx = 0.04 + Math.max(0, ws) * 0.12; P.lkx = 0.04 + Math.max(0, -ws) * 0.12;
+      P.hyw = 0.06 * Math.sin(T * 0.23 + M.phase); P.sy = -P.hyw * 0.5;
+      if (!isUnit && (a.state === 'idle' || a.state === 'returning')) P.ny = 0.35 * Math.sin(T * 0.45 + M.phase) + 0.25 * Math.max(0, Math.sin(T * 0.13 + M.phase * 3)) * Math.sin(T * 0.9);
+      if (sp.winter) { P.lsz = 0.16; P.rsz = -0.16; P.lsx = -0.15; P.rsx = -0.15; P.lex = -0.9; P.rex = -0.9; }
     }
     // what the hands do
     const enemyCalm = !isUnit && (a.state === 'idle' || a.state === 'returning');
@@ -3577,6 +4272,8 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     else if (twoHand) { P.sx += 0.06; }
     if (M.fire > 0) P.sx -= M.fire * 0.5;
   }
+  // a man who is hit jerks back
+  if (isUnit && a.hitT > 0 && !swim) { const k = a.hitT / 0.35; P.sx -= 0.45 * k; P.nx -= 0.4 * k; P.hrz += 0.12 * k; P.hy -= 0.03 * k; }
   if (M.throwT > 0 && !swim) {
     const k = 1 - M.throwT / 0.45;
     if (k < 0.4) { P.rsx = 0.7; P.rsz = -0.3; P.rex = -1.3; P.sy = -0.35; } else { P.rsx = -2.7; P.rsz = 0; P.rex = -0.15; P.sy = 0.35; P.sx = 0.25; }
@@ -3588,8 +4285,22 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     if (!crawl) { P.rtx = -0.6; P.rkx = 0.6; P.hy = 0.46; }
   }
   if (M.mg) M.mg.visible = true;
+  // footprints in the snow, a breath of steam in the cold
+  if (R3.snow) {
+    if (walking && !swim && (ch === '.' || ch === ',' || ch === ':' || ch === 'r')) {
+      M.stepD = (M.stepD || 0) + moved;
+      if (M.stepD > 0.42) { M.stepD = 0; r3Footprint(a.x, a.y, a.facing); }
+    }
+    M.breathT = (M.breathT || HASH(sp.seed, 5, 5) * 2) - dt;
+    if (M.breathT <= 0) {
+      M.breathT = (a.state === 'combat' || run ? 0.9 : 2.2) + Math.random() * 0.8;
+      const hy = y + 0.95 * sp.hgt * (crawl ? 0.25 : M.kneel || busy ? 0.7 : 1);
+      spawnParticle({ x: wx + Math.sin(M.yaw) * 0.12, y: hy, z: wz + Math.cos(M.yaw) * 0.12, vx: Math.sin(M.yaw) * 0.25 + 0.15, vy: 0.08, vz: Math.cos(M.yaw) * 0.25, T: 1.1, s0: 0.05, s1: 0.28, col: 0xf2f5f8, a0: 0.4, add: false });
+    }
+  }
   // dust kicked up by running feet on dry ground
-  if (run && !swim && G.M.light !== 'night' && !(G.M.style && G.M.style.weather === 'rain') && (ch === ',' || ch === ':' || ch === 'g' || ch === 'r' || ch === '=')) {
+  const wet = G.wx && (G.wx.kind === 'rain' || G.wx.kind === 'storm' || G.wx.kind === 'snow' || G.wx.kind === 'fog');
+  if (run && !swim && G.M.light !== 'night' && !wet && (ch === ',' || ch === ':' || ch === 'g' || ch === 'r' || ch === '=')) {
     M.dustT = (M.dustT || 0) - dt;
     if (M.dustT <= 0) { M.dustT = 0.22; spawnParticle({ x: wx - Math.sin(M.yaw) * 0.15, y: y + 0.06, z: wz - Math.cos(M.yaw) * 0.15, vx: 0, vy: 0.25, vz: 0, T: 0.8, s0: 0.12, s1: 0.45, col: ch === ':' || ch === 'g' ? 0xb5ab98 : 0x9a8a6c, a0: 0.35, add: false }); }
   }
@@ -3708,6 +4419,13 @@ function buildObjects(G, root) {
       sub(G0.cyl, 0x2e302c, 0, 0.42, 0.18, 0.05, 0.6, 0.05, Math.PI / 2);
       sub(G0.box, 0x3b3e38, 0, 0.42, -0.02, 0.36, 0.28, 0.04);
       for (const s of [-1, 1]) sub(G0.sph6, 0xa8976f, s * 0.32, 0.12, 0.25, 0.2, 0.12, 0.14);
+    } else if (o.type === 'mine') {
+      // the demolition chamber on the pier: crates of explosive, the cut detonator wire
+      grp.position.y = surfY(G, ox, oz);
+      for (let k = 0; k < 3; k++) K.add(G0.box, k === 2 ? 0x7a3a26 : 0x6a5534, -0.12 + (k % 2) * 0.24, 0.1 + (k === 2 ? 0.2 : 0), (k === 2 ? 0 : 0.05), 0.24, 0.2, 0.3, 0, 0.1 * k, 0);
+      K.add(G0.box, 0xc8402f, 0, 0.11, 0.21, 0.5, 0.04, 0.012);
+      K.add(G0.torus, 0x2a2622, 0.3, 0.06, -0.1, 0.14, 0.14, 0.5, Math.PI / 2, 0, 0);
+      K.beam(0x2a2622, 0.3, 0.06, -0.1, 0.42, 0.05, -0.6, 0.012, 0.012);
     } else if (o.type === 'flag') {
       const pole = part(grp, G0.cyl, 0x3a2c1c, 0, 0.9, 0, 0.025, 1.8, 0.025); v.parts.pole = pole;
       const cloth = new THREE.Group(); cloth.position.set(0.02, 1.62, 0); grp.add(cloth);
@@ -3729,6 +4447,7 @@ function syncObjects(G, T, dt) {
       if (o.raised) v.parts.cloth.rotation.y = Math.sin(T * 3) * 0.25; else v.parts.ring.scale.set(0.4 + Math.sin(T * 3) * 0.04, 1, 0.4 + Math.sin(T * 3) * 0.04);
       continue;
     }
+    if (o.type === 'mine') { if (o.destroyed) v.grp.visible = false; continue; }
     if (o.destroyed && !v.dead) {
       v.dead = true;
       v.grp.traverse(m => { if (m.isMesh) m.material = lmat(0x221f1c); });
@@ -3981,7 +4700,7 @@ function syncFx(G, dt) {
         for (let i = 0; i < 12; i++) { const a = Math.random() * TAU, sp = 0.6 + Math.random() * 1.4; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 0.9 + Math.random() * 1.2, vz: Math.sin(a) * sp, T: 1.6 + Math.random(), s0: 0.5, s1: 1.8 + Math.random(), col: 0x48433d, a0: 0.75, add: false }); }
         for (let i = 0; i < 10; i++) { const a = Math.random() * TAU, sp = 2 + Math.random() * 3; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 2.5 + Math.random() * 3, vz: Math.sin(a) * sp, T: 0.8, s0: 0.12, s1: 0.08, col: 0x2a2520, a0: 1, add: false, grav: true }); }
         if (isWaterCh(vch(G, Math.floor(x), Math.floor(z)))) for (let i = 0; i < 14; i++) { const a = Math.random() * TAU, sp = 0.5 + Math.random(); spawnParticle({ x, y: -0.1, z, vx: Math.cos(a) * sp, vy: 3 + Math.random() * 2.5, vz: Math.sin(a) * sp, T: 1.0, s0: 0.25, s1: 0.4, col: 0xdfeaec, a0: 0.9, add: false, grav: true }); }
-        r3Scorch(f.x, f.y, f.r * 0.8); R3.texDirtyT = 0;
+        r3Scorch(f.x, f.y, f.r * 0.8); r3TexDirty(f.x - f.r, f.y - f.r, f.x + f.r, f.y + f.r);
         const dc = Math.hypot(x - R3.cam.tx, z - R3.cam.tz);
         R3.shake = Math.max(R3.shake, (f.r / TILE > 1.5 ? 0.42 : 0.3) * clamp(1.2 - dc / 14, 0.15, 1));
       }
@@ -4048,6 +4767,37 @@ function syncFx(G, dt) {
   }
   for (const [t, s] of R3.textVis) if (!seenT.has(t)) { R3.root.remove(s); s.material.map.dispose(); s.material.dispose(); R3.textVis.delete(t); }
 }
+/* ---------- partial updates of the painted ground: only the changed patch goes to the GPU ---------- */
+function r3TexDirty(x0, y0, x1, y1) {
+  const d = R3.dirtyRect;
+  if (!d) R3.dirtyRect = { x0, y0, x1, y1, t: 0 };
+  else { d.x0 = Math.min(d.x0, x0); d.y0 = Math.min(d.y0, y0); d.x1 = Math.max(d.x1, x1); d.y1 = Math.max(d.y1, y1); }
+}
+function r3TexFlush(dt, force) {
+  const d = R3.dirtyRect; if (!d || !R3.gTex) return;
+  d.t += dt; if (d.t < 0.12 && !force) return;
+  R3.dirtyRect = null;
+  const cv = R3.gCanvas, k = GK, o = EXT * TILE;
+  const cx0 = clamp(Math.floor((d.x0 + o) * k) - 2, 0, cv.width), cy0 = clamp(Math.floor((d.y0 + o) * k) - 2, 0, cv.height);
+  const cx1 = clamp(Math.ceil((d.x1 + o) * k) + 2, 0, cv.width), cy1 = clamp(Math.ceil((d.y1 + o) * k) + 2, 0, cv.height);
+  const w = cx1 - cx0, h = cy1 - cy0; if (w <= 0 || h <= 0) return;
+  try {
+    if (!R3.gTex.__webglTexture && !R3.renderer.properties.get(R3.gTex).__webglTexture) { R3.gTex.needsUpdate = true; return; }
+    const pc = document.createElement('canvas'); pc.width = w; pc.height = h;
+    pc.getContext('2d').drawImage(cv, cx0, cy0, w, h, 0, 0, w, h);
+    const src = new THREE.CanvasTexture(pc);
+    R3.renderer.copyTextureToTexture(new THREE.Vector2(cx0, cv.height - cy0 - h), src, R3.gTex);
+    src.dispose();
+  } catch (e) { R3.gTex.needsUpdate = true; }
+}
+// footprints in the snow, a pair at every stride
+function r3Footprint(x, y, yaw) {
+  const ctx = R3.gCtx; if (!ctx) return;
+  const sx = Math.cos(yaw) * 3.2, sy = -Math.sin(yaw) * 3.2;
+  ctx.fillStyle = 'rgba(120,132,150,.32)';
+  for (const s of [-1, 1]) { ctx.beginPath(); ctx.ellipse(x + s * sx, y + s * sy, 1.7, 2.6, -yaw, 0, TAU); ctx.fill(); }
+  r3TexDirty(x - 6, y - 6, x + 6, y + 6);
+}
 function r3Scorch(x, y, r) {
   const ctx = R3.gCtx; if (!ctx) return;
   const g = ctx.createRadialGradient(x, y, 0, x, y, r);
@@ -4056,26 +4806,27 @@ function r3Scorch(x, y, r) {
 }
 function r3RepaintDirty(G) {
   if (!G.dirtyTiles.length) return;
-  const ctx = R3.gCtx; let wire = false;
+  const ctx = R3.gCtx; let wire = false; setGroundPal(G);
   for (const [c, r] of G.dirtyTiles) {
     ctx.save(); ctx.beginPath(); ctx.rect(c * TILE, r * TILE, TILE, TILE); ctx.clip();
     paintTile3D(G, ctx, c, r); ctx.restore(); wire = true;
+    r3TexDirty(c * TILE, r * TILE, (c + 1) * TILE, (r + 1) * TILE);
   }
-  G.dirtyTiles.length = 0; R3.texDirtyT = 0;
+  G.dirtyTiles.length = 0;
   if (wire) buildWire(G);
 }
 
 /* ---------- atmosphere: chimney and battle smoke, distant guns, mountain mist ---------- */
 function buildAmbient(G, root) {
-  const st = G.M.style || {};
-  for (const [c, r] of st.smoke || []) R3.emitters.push({ x: c + 0.5, y: groundY(c + 0.5, r + 0.5) + 0.3, z: r + 0.5, every: 0.28, t: Math.random(), col: 0x3e3a36, s0: 0.5, s1: 2.6, a0: 0.5, big: true });
+  const st = G.M.style || {}, wk = G.wx ? G.wx.kind : 'clear';
+  for (const [c, r] of st.smoke || []) R3.emitters.push({ x: c + 0.5, y: groundY(c + 0.5, r + 0.5) + 0.3, z: r + 0.5, every: 0.28, t: Math.random(), col: G.M.winter ? 0x4a4d52 : 0x3e3a36, s0: 0.5, s1: 2.6, a0: 0.5, big: true });
   R3.mist = [];
-  if (st.mist) {
-    const river = st.mist === 'river', col = river ? 0xb8c6d8 : 0xf2f2ec;
-    for (let i = 0, tries = 0; i < (river ? 22 : 16) && tries < 400; tries++) {
-      const x = HASH(tries, 1, 61) * G.W, z = river ? HASH(tries, 2, 61) * G.H : G.H * 0.35 + HASH(tries, 2, 61) * G.H * 0.7;
+  if (st.mist || wk === 'fog') {
+    const river = st.mist === 'river', col = river ? 0xb8c6d8 : 0xf2f2ec, n = river ? 22 : wk === 'fog' ? 34 : 16;
+    for (let i = 0, tries = 0; i < n && tries < 600; tries++) {
+      const x = HASH(tries, 1, 61) * G.W, z = river || wk === 'fog' ? HASH(tries, 2, 61) * G.H : G.H * 0.35 + HASH(tries, 2, 61) * G.H * 0.7;
       if (river && !isWaterCh(vch(G, Math.floor(x), Math.floor(z)))) continue;
-      const s = makeSprite(softDot(), 1, 1, true, false); s.material.color.setHex(col); s.material.opacity = river ? 0.2 : 0.16; s.renderOrder = 10;
+      const s = makeSprite(softDot(), 1, 1, true, false); s.material.color.setHex(col); s.material.opacity = river ? 0.2 : wk === 'fog' ? 0.24 : 0.16; s.renderOrder = 10;
       const sc = (river ? 5 : 7) + HASH(tries, 3, 61) * 6;
       s.position.set(x, (river ? 0.15 : groundY(x, z) + 0.6), z); s.scale.set(sc, sc * 0.4, 1); root.add(s); R3.mist.push({ s, x, z, v: (river ? 0.08 : 0.15) + HASH(tries, 4, 61) * 0.15, river });
       i++;
@@ -4085,7 +4836,7 @@ function buildAmbient(G, root) {
   R3.boomT = 3 + Math.random() * 4;
   // a few birds wheel over the field by day: crows over the San Gabriele
   R3.birds = [];
-  if (G.M.light !== 'night' && !(st.weather === 'rain')) {
+  if (G.M.light !== 'night' && G.M.light !== 'dusk' && (wk === 'clear' || wk === 'ash')) {
     const crow = st.tree === 'dead', n = crow ? 5 : 7, G0 = geo();
     const wingK = new Kit(); wingK.add(G0.box, crow ? 0x141414 : 0x2a2622, 0.13, 0, 0, 0.26, 0.012, 0.09); const wg = wingK.geo(); own(wg);
     const bodyK = new Kit(); bodyK.add(G0.sph6, crow ? 0x141414 : 0x2a2622, 0, 0, 0, 0.05, 0.04, 0.12); const bg = bodyK.geo(); own(bg);
@@ -4102,7 +4853,8 @@ function stepAmbient(G, dt, T) {
     e.t -= dt;
     if (e.t <= 0) {
       e.t = e.every * (0.7 + Math.random() * 0.6);
-      spawnParticle({ x: e.x + (Math.random() - 0.5) * 0.15, y: e.y, z: e.z + (Math.random() - 0.5) * 0.15, vx: 0.18 + Math.random() * 0.1, vy: e.big ? 0.7 : 0.45, vz: 0.05, T: e.big ? 5 : 3.2, s0: e.s0, s1: e.s1, col: e.col, a0: e.a0, add: false });
+      const wv = (R3.windK.value - 0.6) * 0.45;
+      spawnParticle({ x: e.x + (Math.random() - 0.5) * 0.15, y: e.y, z: e.z + (Math.random() - 0.5) * 0.15, vx: 0.18 + wv + Math.random() * 0.1, vy: (e.big ? 0.7 : 0.45) / (1 + wv * 0.5), vz: 0.05, T: e.big ? 5 : 3.2, s0: e.s0, s1: e.s1, col: e.col, a0: e.a0, add: false });
     }
   }
   for (const m of R3.mist) {
@@ -4126,56 +4878,134 @@ function stepAmbient(G, dt, T) {
     R3.boomT -= dt;
     if (R3.boomT <= 0) { R3.boomT = 2.5 + Math.random() * 6; R3.skyFlash = 0.18; if (R3.onFlash) R3.onFlash(); }
     R3.skyFlash = Math.max(0, (R3.skyFlash || 0) - dt);
-    R3.hemi.intensity = R3.L.hemi * (1 + (R3.skyFlash > 0 ? 0.55 * R3.skyFlash / 0.18 : 0));
   }
   for (const a of R3.anim) {
     if (a.k === 'spin') a.o.rotation.z -= a.v * dt;
-    else if (a.k === 'flag') a.o.rotation.y = Math.sin(T * 2.6) * 0.3 + 0.2;
+    else if (a.k === 'flag') a.o.rotation.y = Math.sin(T * 2.6) * 0.3 + 0.2 + (R3.windK.value - 1) * 0.15 * Math.sin(T * 7);
+    else if (a.k === 'fall' && !a.done) {
+      // a bridge span drops into the river
+      a.t += dt; const k = clamp((a.t - a.d) / 1.1, 0, 1), e = k * k;
+      if (k > 0 && !a.splashed) {
+        a.splashed = true; const o = a.o.position;
+        for (let i = 0; i < 26; i++) { const an = Math.random() * TAU, sp = 0.6 + Math.random() * 1.6; spawnParticle({ x: o.x + Math.cos(an) * 0.6, y: -0.1, z: o.z + (Math.random() - 0.5) * 2.4, vx: Math.cos(an) * sp, vy: 3 + Math.random() * 3, vz: Math.sin(an) * sp, T: 1.3, s0: 0.35, s1: 0.6, col: 0xdfe8ea, a0: 0.9, add: false, grav: true }); }
+        for (let i = 0; i < 8; i++) spawnParticle({ x: o.x, y: 0.4, z: o.z + (Math.random() - 0.5) * 2, vx: (Math.random() - 0.5) * 0.5, vy: 0.5, vz: 0, T: 3, s0: 0.8, s1: 2.6, col: 0x5a5650, a0: 0.5, add: false });
+      }
+      a.o.position.y = -0.95 * e; a.o.rotation.x = a.rx * e; a.o.rotation.z = a.rz * e;
+      if (k >= 1) a.done = true;
+    }
   }
 }
 
-/* ---------- weather: rain on the Piave, ash on the San Gabriele ---------- */
+/* ---------- weather: rain, storm, snow, fog and ash, all pushed about by the wind ---------- */
+function snowFlake() {
+  return cachedTex('flake', (g, w, h) => {
+    const gr = g.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, w / 2);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.5, 'rgba(255,255,255,.8)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  }, 32, 32);
+}
+// a tileable sheet of drifting fog, seen from above
+function fogTex() {
+  return cachedTex('fogsheet', (g, w, h) => {
+    const im = g.createImageData(w, h), N = 8;
+    const hv = (x, y, o) => HASH(((x % N) + N) % N, ((y % N) + N) % N, o);
+    const vn = (x, y, s, o) => { const xs = x / s, ys = y / s, xi = Math.floor(xs), yi = Math.floor(ys), fx = xs - xi, fy = ys - yi, u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
+      const n = N * 32 / s, H = (a, b) => HASH(((a % n) + n) % n, ((b % n) + n) % n, o);
+      return (H(xi, yi) * (1 - u) + H(xi + 1, yi) * u) * (1 - v) + (H(xi, yi + 1) * (1 - u) + H(xi + 1, yi + 1) * u) * v; };
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      let a = vn(x, y, 64, 3) * 0.55 + vn(x, y, 32, 5) * 0.3 + vn(x, y, 16, 7) * 0.15;
+      a = smooth(a, 0.32, 0.78);
+      const k = (y * w + x) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = 255; im.data[k + 3] = a * 255;
+    }
+    g.putImageData(im, 0, 0);
+  }, 256, 256);
+}
 function buildWeather(G, root) {
-  const w = G.M.style && G.M.style.weather; R3.weather = null;
-  if (w === 'rain') {
-    const N = 1500, pos = new Float32Array(N * 6), g = own(new THREE.BufferGeometry());
+  const kind = G.wx ? G.wx.kind : 'clear', wind = G.wx ? G.wx.wind : 0.3, Q = r3Quality(); R3.weather = null; R3.fogSheet = null;
+  const W = { kind, wind, init: false, gustT: 0, gust: 0, debrisT: 0 };
+  if (kind === 'rain' || kind === 'storm') {
+    const storm = kind === 'storm', N = Math.round((storm ? 2300 : 1600) * Q.drops), pos = new Float32Array(N * 6), g = own(new THREE.BufferGeometry());
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const m = own(new THREE.LineBasicMaterial({ color: 0xcfd8de, transparent: true, opacity: 0.34, depthWrite: false, fog: false }));
+    const m = own(new THREE.LineBasicMaterial({ color: storm ? 0xc4ccd6 : 0xcfd8de, transparent: true, opacity: storm ? 0.4 : 0.34, depthWrite: false, fog: false }));
     const L = new THREE.LineSegments(g, m); L.frustumCulled = false; L.renderOrder = 11; root.add(L);
-    const drops = []; for (let i = 0; i < N; i++) drops.push({ x: Math.random(), y: Math.random() * 14, z: Math.random(), v: 10 + Math.random() * 4 });
-    R3.weather = { kind: 'rain', obj: L, drops, pos, splashT: 0, init: false };
-  } else if (w === 'ash') {
-    const N = 520, pos = new Float32Array(N * 3), g = own(new THREE.BufferGeometry());
+    const drops = []; for (let i = 0; i < N; i++) drops.push({ x: Math.random(), y: Math.random() * 14, z: Math.random(), v: (storm ? 13 : 10) + Math.random() * 4 });
+    Object.assign(W, { obj: L, drops, pos, splashT: 0, rain: true, len: storm ? 0.55 : 0.42 });
+  } else if (kind === 'snow') {
+    const N = Math.round(2200 * Q.drops), pos = new Float32Array(N * 3), g = own(new THREE.BufferGeometry());
     g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-    const m = own(new THREE.PointsMaterial({ color: 0x9c958a, size: 3.6, sizeAttenuation: false, transparent: true, opacity: 0.8, depthWrite: false, fog: false }));
+    const m = own(new THREE.PointsMaterial({ color: 0xffffff, map: snowFlake(), size: 4.2 * V.dpr, sizeAttenuation: false, transparent: true, opacity: 0.92, depthWrite: false, fog: false }));
+    const P = new THREE.Points(g, m); P.frustumCulled = false; P.renderOrder = 11; root.add(P);
+    const drops = []; for (let i = 0; i < N; i++) drops.push({ x: Math.random(), y: Math.random() * 12, z: Math.random(), v: 0.9 + Math.random() * 0.9, ph: Math.random() * 6 });
+    Object.assign(W, { obj: P, drops, pos });
+  } else if (kind === 'ash') {
+    const N = Math.round(520 * Q.drops), pos = new Float32Array(N * 3), g = own(new THREE.BufferGeometry());
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const m = own(new THREE.PointsMaterial({ color: 0x9c958a, size: 3.6 * V.dpr / 2, sizeAttenuation: false, transparent: true, opacity: 0.8, depthWrite: false, fog: false }));
     const P = new THREE.Points(g, m); P.frustumCulled = false; P.renderOrder = 11; root.add(P);
     const drops = []; for (let i = 0; i < N; i++) drops.push({ x: Math.random(), y: Math.random() * 10, z: Math.random(), v: 0.35 + Math.random() * 0.45, ph: Math.random() * 6 });
-    R3.weather = { kind: 'ash', obj: P, drops, pos, init: false };
+    Object.assign(W, { obj: P, drops, pos });
   }
+  if (kind === 'fog' || kind === 'snow') {
+    // two layers of drifting fog over the whole field, above the soldiers' heads and below the tree tops
+    const sheets = [];
+    for (const [hgt, op, sc] of kind === 'fog' ? [[1.4, 0.5, 1], [2.6, 0.36, 1.7]] : [[2.2, 0.16, 1.3]]) {
+      const tex = fogTex().clone(); tex.needsUpdate = true; tex.wrapS = tex.wrapT = THREE.RepeatWrapping; own(tex);
+      const span = 160; tex.repeat.set(span / (14 * sc), span / (14 * sc));
+      const m = own(new THREE.MeshBasicMaterial({ map: tex, color: kind === 'fog' ? 0xdfe2e0 : 0xf2f5f8, transparent: true, opacity: op, depthWrite: false, fog: false }));
+      const mesh = new THREE.Mesh(own(new THREE.PlaneGeometry(span, span).rotateX(-Math.PI / 2)), m);
+      mesh.renderOrder = 12; mesh.frustumCulled = false; root.add(mesh);
+      sheets.push({ mesh, tex, hgt, sp: 0.012 / sc, span });
+    }
+    R3.fogSheet = sheets;
+  }
+  R3.weather = W;
 }
 function stepWeather(G, dt) {
   const W = R3.weather; if (!W) return;
-  const c = R3.cam, ext = c.size * 2.4 + 5, cy = c.ty || 0, rain = W.kind === 'rain', p = W.pos;
-  if (!W.init) { W.init = true; for (const d of W.drops) { d.x = c.tx + (d.x * 2 - 1) * ext; d.z = c.tz + (d.z * 2 - 1) * ext; d.y += cy; } }
-  const wind = rain ? 2.2 : 0.5, H = rain ? 14 : 10;
-  for (let i = 0; i < W.drops.length; i++) {
-    const d = W.drops[i];
-    d.y -= d.v * dt; d.x += wind * dt * (rain ? 1 : 0.6 + 0.4 * Math.sin(R3.lastT * 0.7 + d.ph));
-    if (!rain) d.z += Math.cos(R3.lastT * 0.5 + d.ph) * 0.2 * dt;
-    if (d.y < cy - 1.5) d.y += H;
-    if (d.x - c.tx > ext) d.x -= 2 * ext; else if (c.tx - d.x > ext) d.x += 2 * ext;
-    if (d.z - c.tz > ext) d.z -= 2 * ext; else if (c.tz - d.z > ext) d.z += 2 * ext;
-    if (rain) { const k = i * 6; p[k] = d.x; p[k + 1] = d.y; p[k + 2] = d.z; p[k + 3] = d.x - wind * 0.035; p[k + 4] = d.y + 0.42; p[k + 5] = d.z; }
-    else { const k = i * 3; p[k] = d.x; p[k + 1] = d.y; p[k + 2] = d.z; }
+  const c = R3.cam, ext = c.size * 2.4 + 5, cy = c.ty || 0, p = W.pos, T = R3.lastT;
+  // the wind comes in gusts
+  W.gustT -= dt; if (W.gustT <= 0) { W.gustT = 3 + Math.random() * 6; W.gustTo = Math.random() < 0.45 ? 1 : 0; }
+  W.gust += ((W.gustTo || 0) - W.gust) * Math.min(1, dt * 1.5);
+  const wk = W.wind * (0.7 + 0.8 * W.gust);
+  R3.windK.value = 0.6 + wk * 2.2;
+  if (R3.fogSheet) for (const s of R3.fogSheet) {
+    s.mesh.position.set(c.tx, cy + s.hgt, c.tz);
+    s.tex.offset.x = (c.tx / s.span * s.tex.repeat.x) + T * s.sp * (0.6 + wk);
+    s.tex.offset.y = -(c.tz / s.span * s.tex.repeat.y) + T * s.sp * 0.3;
   }
-  W.obj.geometry.attributes.position.needsUpdate = true;
-  if (rain) {
-    // little splashes on the ground and the water
+  if (W.drops) {
+    if (!W.init) { W.init = true; for (const d of W.drops) { d.x = c.tx + (d.x * 2 - 1) * ext; d.z = c.tz + (d.z * 2 - 1) * ext; d.y += cy; } }
+    const wx = W.rain ? 1.2 + wk * 3.2 : W.kind === 'snow' ? 0.6 + wk * 3.4 : 0.5, H = W.rain ? 14 : W.kind === 'snow' ? 12 : 10;
+    for (let i = 0; i < W.drops.length; i++) {
+      const d = W.drops[i];
+      d.y -= d.v * dt;
+      if (W.rain) d.x += wx * dt;
+      else { d.x += wx * dt * (0.6 + 0.4 * Math.sin(T * 0.7 + d.ph)); d.z += Math.cos(T * 0.5 + d.ph) * (W.kind === 'snow' ? 0.5 : 0.2) * dt; }
+      if (d.y < cy - 1.5) d.y += H;
+      if (d.x - c.tx > ext) d.x -= 2 * ext; else if (c.tx - d.x > ext) d.x += 2 * ext;
+      if (d.z - c.tz > ext) d.z -= 2 * ext; else if (c.tz - d.z > ext) d.z += 2 * ext;
+      if (W.rain) { const k = i * 6; p[k] = d.x; p[k + 1] = d.y; p[k + 2] = d.z; p[k + 3] = d.x - wx * 0.035; p[k + 4] = d.y + W.len; p[k + 5] = d.z; }
+      else { const k = i * 3; p[k] = d.x; p[k + 1] = d.y; p[k + 2] = d.z; }
+    }
+    W.obj.geometry.attributes.position.needsUpdate = true;
+  }
+  if (W.rain) {
+    // little splashes on the ground and rings on the water
     W.splashT -= dt;
     while (W.splashT <= 0) {
-      W.splashT += 0.03;
+      W.splashT += W.kind === 'storm' ? 0.018 : 0.03;
       const x = c.tx + (Math.random() * 2 - 1) * ext * 0.6, z = c.tz + (Math.random() * 2 - 1) * ext * 0.6;
       spawnParticle({ x, y: surfY(G, x, z) + 0.04, z, vx: 0, vy: 0.15, vz: 0, T: 0.25, s0: 0.05, s1: 0.16, col: 0xdfe6ea, a0: 0.55, add: false });
+    }
+  }
+  // what the wind carries along the ground: leaves in the rain, spindrift on the snow, grit in the smoke
+  if (wk > 0.35 && W.kind !== 'fog') {
+    W.debrisT -= dt * wk;
+    while (W.debrisT <= 0) {
+      W.debrisT += W.kind === 'snow' ? 0.05 : 0.12;
+      const x = c.tx - ext * 0.7 + Math.random() * ext * 0.4, z = c.tz + (Math.random() * 2 - 1) * ext * 0.6, y = surfY(G, x, z);
+      if (W.kind === 'snow') spawnParticle({ x, y: y + 0.15, z, vx: 2.2 + wk * 3, vy: 0.08, vz: (Math.random() - 0.5) * 0.6, T: 2.4, s0: 0.5, s1: 1.6, col: 0xf4f7fa, a0: 0.32, add: false });
+      else spawnParticle({ x, y: y + 0.25 + Math.random() * 0.6, z, vx: 2.5 + wk * 3, vy: (Math.random() - 0.3) * 0.5, vz: (Math.random() - 0.5) * 0.8, T: 2.2, s0: 0.07, s1: 0.06, col: W.kind === 'ash' ? 0x4a4642 : 0x6a5a34, a0: 0.9, add: false });
     }
   }
 }
@@ -4187,19 +5017,25 @@ function disposeOwn() {
 function r3Build(G) {
   const S = R3.scene;
   if (R3.root) { S.remove(R3.root); disposeOwn(); }
+  R3.dirtyRect = null; R3.bridge = null;
   R3.models = new Map(); R3.cones = new Map(); R3.fxVis = new Map(); R3.projVis = new Map(); R3.chargeVis = new Map(); R3.textVis = new Map();
   R3.particles = []; R3.wire = null; R3.water = null; R3.zone = null; R3.zoneKey = ''; R3.anim = []; R3.emitters = []; R3.mist = [];
   const root = new THREE.Group(); R3.root = root; S.add(root); R3.G = G;
-  let L = L3[G.M.light] || L3.day;
-  // rain: an overcast sky, flat light and a closer horizon
-  if (G.M.style && G.M.style.weather === 'rain') L = Object.assign({}, L, { sun: 0xd9d6cf, sunI: L.sunI * 0.5, hemi: L.hemi * 1.12, sky: 0xbfc4c8, gnd: 0x4a4a44, bg: 0x1e2124, fog: [L.fog[0] - 8, L.fog[1] - 24], spark: L.spark * 0.6 });
-  R3.L = L;
+  const L = wxLight(L3[G.M.light] || L3.day, G.wx ? G.wx.kind : 'clear', G.M.light);
+  // in the dark, soldiers keep a faint light of their own so the player can always read them
+  const darkK = (G.M.light === 'night' ? 1 : G.M.light === 'dusk' ? 0.8 : 0) + (G.wx && G.wx.kind === 'storm' ? 0.7 : G.wx && G.wx.kind === 'rain' ? 0.3 : 0);
+  if (!R3.actorMatU) { R3.actorMatU = new THREE.MeshLambertMaterial({ vertexColors: true }); R3.actorMatE = new THREE.MeshLambertMaterial({ vertexColors: true }); }
+  R3.actorMatU.emissive.setRGB(0.13, 0.12, 0.1).multiplyScalar(clamp(darkK, 0, 1));
+  R3.actorMatE.emissive.setRGB(0.09, 0.09, 0.1).multiplyScalar(clamp(darkK, 0, 1));
+  R3.L = L; R3.snow = !!G.M.winter; R3.lanterns = [];
+  R3.windK.value = 0.6 + (G.wx ? G.wx.wind : 0.3) * 1.8;
   S.background = new THREE.Color(L.bg);
-  S.fog = new THREE.Fog(L.bg, L.fog[0], L.fog[1]);
+  S.fog = new THREE.Fog(L.fogC || L.bg, L.fog[0], L.fog[1]);
   const hemi = new THREE.HemisphereLight(L.sky, L.gnd, L.hemi); root.add(hemi); R3.hemi = hemi;
   const sun = new THREE.DirectionalLight(L.sun, L.sunI);
   root.add(sun); root.add(sun.target); R3.sun = sun;
-  sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  const Q = r3Quality();
+  sun.castShadow = true; sun.shadow.mapSize.set(Q.shadow, Q.shadow); R3.shadowRes = Q.shadow;
   Object.assign(sun.shadow.camera, { left: -20, right: 20, top: 20, bottom: -20, near: 1, far: 160 });
   sun.shadow.camera.updateProjectionMatrix(); sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.03;
   R3.flash = new THREE.PointLight(0xffa050, 0, 9, 2); root.add(R3.flash);
@@ -4209,9 +5045,20 @@ function r3Build(G) {
   }
   buildGround(G, root); buildWater(G, root, L); buildProps(G, root); buildDecor(G, root); buildWire(G); buildObjects(G, root); buildDyn(); buildAmbient(G, root);
   G.dirtyTiles.length = 0;
+  r3Grade(G);
   R3.cam.ty = groundY(R3.cam.tx, R3.cam.tz);
 }
 
+// the weather changes the light: overcast for rain, near darkness under a storm, a white glare off the snow, a grey wall of fog
+function wxLight(L, kind, light) {
+  const o = Object.assign({}, L), dark = light === 'night' || light === 'dusk';
+  if (kind === 'rain') Object.assign(o, { sun: 0xd9d6cf, sunI: L.sunI * 0.5, hemi: L.hemi * 1.12, sky: dark ? 0x7d8794 : 0xbfc4c8, gnd: 0x4a4a44, bg: dark ? 0x121418 : 0x1e2124, fog: [L.fog[0] - 8, L.fog[1] - 24], spark: L.spark * 0.6 });
+  if (kind === 'storm') Object.assign(o, { sun: 0xb4bcc8, sunI: L.sunI * 0.32, hemi: L.hemi * 0.95, sky: 0x8692a2, gnd: 0x34362f, bg: 0x111317, fog: [L.fog[0] - 14, L.fog[1] - 34], spark: L.spark * 0.5, cone: L.cone * 1.15 });
+  if (kind === 'snow') Object.assign(o, { sun: 0xf6f4ee, sunI: L.sunI * 0.62, hemi: 1.02, sky: 0xe2e8f0, gnd: 0xb8c0c8, bg: 0x9aa3ac, fogC: 0xc6ced6, fog: [L.fog[0] - 16, L.fog[1] - 30], spark: L.spark * 0.8, cone: L.cone * 1.1 });
+  if (kind === 'fog') Object.assign(o, { sun: 0xe8e6e0, sunI: L.sunI * 0.34, hemi: L.hemi * 1.18, sky: 0xd4d8d8, gnd: 0x6a6a62, bg: 0x8d9290, fogC: 0xa9aeac, fog: [52, 96], spark: L.spark * 0.4, cone: L.cone * 1.2 });
+  if (kind === 'ash') Object.assign(o, { fog: [L.fog[0] - 4, L.fog[1] - 10] });
+  return o;
+}
 /* ---------- camera ---------- */
 function r3UpdateCamera() {
   const c = R3.cam, cam = R3.camera, aspect = V.w / Math.max(1, V.h);
@@ -4227,7 +5074,7 @@ function r3Sun() {
   const aspect = V.w / Math.max(1, V.h), ext = Math.min(70, c.size * Math.max(aspect, 1) * 1.3 + 3), D = 50;
   const n = Math.hypot(...L.dir), ty = c.ty || 0;
   // snap to shadow texels so edges do not crawl while panning
-  const tex = 2 * ext / 2048, sx = Math.round(c.tx / tex) * tex, sz = Math.round(c.tz / tex) * tex;
+  const tex = 2 * ext / (R3.shadowRes || 2048), sx = Math.round(c.tx / tex) * tex, sz = Math.round(c.tz / tex) * tex;
   sun.target.position.set(sx, ty, sz);
   sun.position.set(sx + L.dir[0] / n * D, ty + L.dir[1] / n * D, sz + L.dir[2] / n * D);
   const sc = sun.shadow.camera;
@@ -4300,9 +5147,10 @@ function r3Render(G, UI, T) {
   const sk = R3.shake * R3.shake * 1.6; R3.shakeX = (Math.random() - 0.5) * sk; R3.shakeZ = (Math.random() - 0.5) * sk;
   R3.windU.value = T;
   r3UpdateCamera(); r3Sun();
+  r3Bolt(G, dt);
   R3.shakeX = R3.shakeZ = 0;
   r3RepaintDirty(G);
-  if (R3.texDirtyT >= 0) { R3.texDirtyT += dt; if (R3.texDirtyT > 0.05) { R3.gTex.needsUpdate = true; R3.texDirtyT = -1; } }
+  r3TexFlush(dt);
   const selSet = new Set(UI ? UI.sel : []);
   for (const e of G.enemies) syncActor(G, e, false, dt, T, selSet);
   for (const u of G.units) syncActor(G, u, true, dt, T, selSet);
@@ -4316,7 +5164,8 @@ function r3Render(G, UI, T) {
     R3.water.tex.offset.set(T * 0.035, Math.sin(T * 0.4) * 0.02);
     R3.water.glint.offset.set(-T * 0.02 + Math.sin(T * 0.7) * 0.03, T * 0.012);
   }
-  const r = R3.renderer, cam = R3.camera, S = R3.scene;
+  const r = R3.renderer, cam = R3.camera, S = R3.scene, post = R3.post && r3Quality().post;
+  if (post) r.setRenderTarget(R3.rt);
   r.render(S, cam);
   // second pass: hidden soldiers show through what covers them
   if (UI && UI.G === G) {
@@ -4325,6 +5174,17 @@ function r3Render(G, UI, T) {
     cam.layers.set(1); S.overrideMaterial = R3.silU; r.render(S, cam);
     S.overrideMaterial = null; S.background = bg; cam.layers.enableAll(); r.autoClear = true; r.shadowMap.autoUpdate = true;
   }
+  if (post) { r.setRenderTarget(null); R3.post.U.uFlash.value = R3.boltFx || 0; r.render(R3.post.sc, R3.post.cam); }
+}
+// lightning: the sky and the ground blaze white for an instant, in two or three flickers
+function r3Bolt(G, dt) {
+  const b = G.bolt || 0;
+  if (b > 0.98 && !R3.boltOn) { R3.boltOn = true; R3.boltFlick = 0; }
+  if (b <= 0) R3.boltOn = false;
+  const fl = b > 0 ? b * (0.65 + 0.35 * Math.abs(Math.sin(b * 23))) : 0;
+  R3.boltFx = fl * 0.42;
+  if (R3.hemi) R3.hemi.intensity = R3.L.hemi * (1 + (R3.skyFlash > 0 ? 0.55 * R3.skyFlash / 0.18 : 0)) + fl * 1.25;
+  if (R3.sun) R3.sun.intensity = R3.L.sunI + fl * 0.9;
 }
 function r3Attract(G, T) {
   const c = R3.cam;
@@ -4387,9 +5247,11 @@ function hitScreen(list, sx, sy, rPx, h) {
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SAVE_KEY = 'arditi-save-v1';
-const SAVE = { done: {}, diff: 'ardito', sound: true };
+const SAVE = { done: {}, diff: 'ardito', sound: true, gfx: null };
 try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s && typeof s === 'object') Object.assign(SAVE, s); } catch (e) { }
 if (!DIFF[SAVE.diff]) SAVE.diff = 'ardito';
+// graphics: Ultra on a computer with a big screen, Alta on phones and tablets (the player can change it)
+if (!QUALITY[SAVE.gfx]) SAVE.gfx = (window.matchMedia && matchMedia('(pointer: fine)').matches && Math.max(screen.width, screen.height) >= 1200) ? 'ultra' : 'alta';
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); } catch (e) { } }
 
 const UI = {
@@ -4460,6 +5322,13 @@ function sfx(kind, x, y) {
       case 'click': tone(t, 880, 0.04, 'sine', 0.06); break;
       case 'splash': nz(t, 0.45, 'lowpass', 900, 0.7, 0.5 * v); break;
       case 'fall': tone(t, 220, 0.35, 'sine', 0.12 * v, 110); break;
+      case 'thunder': {
+        // the crack, then the long roll, a moment after the flash
+        const d = 0.35 + Math.random() * 1.2;
+        nz(t + d, 0.25, 'highpass', 1800, 0.6, 0.35); nz(t + d + 0.05, 2.8, 'lowpass', 260, 0.6, 1.1); nz(t + d + 0.5, 3.4, 'lowpass', 120, 0.5, 0.9); tone(t + d, 55, 2.4, 'sine', 0.35, 30);
+        break;
+      }
+      case 'collapse': nz(t, 2.2, 'lowpass', 300, 0.6, 1.3 * v); for (let i = 0; i < 6; i++) tone(t + 0.1 + i * 0.13, 300 - i * 30, 0.25, 'square', 0.05 * v, 90); nz(t + 0.9, 1.8, 'lowpass', 900, 0.7, 0.8 * v); break;
       case 'obj': [523, 659, 784].forEach((f, i) => tone(t + i * 0.1, f, 0.2, 'triangle', 0.13)); break;
       case 'win': [392, 523, 659, 784, 659, 784].forEach((f, i) => tone(t + i * 0.16, f, i === 5 ? 0.7 : 0.2, 'square', 0.06)); break;
       case 'lose': [330, 294, 262, 196].forEach((f, i) => tone(t + i * 0.26, f, 0.38, 'triangle', 0.12)); break;
@@ -4479,9 +5348,12 @@ function ambStart(M) {
   try {
     AMB.M = M; AMB.t = 0; AMB.nextBird = 1.5; AMB.nextBoom = 2.5; AMB.nextCricket = 0.5;
     AMB.out = AU.ctx.createGain(); AMB.out.gain.value = 0; AMB.out.connect(AU.master);
-    AMB.wind = loopNoise('lowpass', M.id === 'moschin' ? 520 : 360, 0.6, 0.04);
+    const wx = UI.G.wx || { kind: 'clear', wind: 0.3 }; AMB.wx = wx;
+    AMB.wind = loopNoise('lowpass', M.id === 'moschin' || wx.kind === 'snow' ? 520 : 360, 0.6, 0.04);
+    AMB.howl = wx.kind === 'snow' || wx.kind === 'storm' ? loopNoise('bandpass', 700, 6, 0) : null;
     AMB.water = /~/.test(UI.G.map.map(r => r.join('')).join('')) ? loopNoise('bandpass', 1050, 0.35, 0) : null;
-    AMB.rain = M.style && M.style.weather === 'rain' ? [loopNoise('highpass', 2600, 0.3, 0.05), loopNoise('bandpass', 700, 0.5, 0.025)] : null;
+    const storm = wx.kind === 'storm';
+    AMB.rain = wx.kind === 'rain' || storm ? [loopNoise('highpass', 2600, 0.3, storm ? 0.075 : 0.05), loopNoise('bandpass', 700, 0.5, storm ? 0.04 : 0.025), loopNoise('lowpass', 300, 0.4, storm ? 0.03 : 0.012)] : null;
     if (typeof R3 !== 'undefined') R3.onFlash = () => { AMB.nextBoom = Math.min(AMB.nextBoom, 0.4 + Math.random() * 0.9); };
   } catch (e) { ambStop(); }
 }
@@ -4500,7 +5372,9 @@ function ambTick(dt) {
   const on = SAVE.sound && G && !G.over;
   AMB.out.gain.setTargetAtTime(on ? (G.paused && !UI.intro ? 0.45 : 1) : 0, t, 0.4);
   if (!on) return;
-  AMB.wind.g.gain.setTargetAtTime(0.03 + 0.035 * (0.5 + 0.5 * Math.sin(AMB.t * 0.23) * Math.sin(AMB.t * 0.11 + 1)), t, 0.6);
+  const gust = 0.5 + 0.5 * Math.sin(AMB.t * 0.23) * Math.sin(AMB.t * 0.11 + 1), wind = AMB.wx ? AMB.wx.wind : 0.3;
+  AMB.wind.g.gain.setTargetAtTime((0.03 + 0.035 * gust) * (0.6 + wind * 1.4), t, 0.6);
+  if (AMB.howl) { AMB.howl.g.gain.setTargetAtTime(0.012 * wind * (0.3 + gust), t, 0.8); AMB.howl.f.frequency.setTargetAtTime(500 + 500 * gust, t, 1.2); }
   if (AMB.water) {
     let near = 0.35;
     if (VIEW.mode === '3d' && R3.wdist) near = clamp(1 - R3.wdist(Math.floor(R3.cam.tx), Math.floor(R3.cam.tz)) / 9, 0, 1);
@@ -4508,7 +5382,8 @@ function ambTick(dt) {
   }
   const night = M.light === 'night', grim = M.id === 'gabriele';
   AMB.nextBird -= dt;
-  if (AMB.nextBird <= 0 && !night && !(M.style && M.style.weather === 'rain')) {
+  const wk = AMB.wx ? AMB.wx.kind : 'clear';
+  if (AMB.nextBird <= 0 && !night && M.light !== 'dusk' && (wk === 'clear' || wk === 'ash')) {
     AMB.nextBird = grim ? 6 + Math.random() * 9 : 1.8 + Math.random() * 4.5;
     if (grim) { for (let i = 0; i < 2; i++) { const o = t + i * 0.32; tone(o, 520, 0.22, 'sawtooth', 0.012, 380); } }
     else {
@@ -4525,7 +5400,7 @@ function ambTick(dt) {
   if (AMB.nextBoom <= 0) {
     const sdricca = M.id === 'sdricca';
     AMB.nextBoom = sdricca ? 25 + Math.random() * 30 : M.light === 'day' ? 6 + Math.random() * 9 : 9 + Math.random() * 10;
-    rumble(sdricca ? 0.35 : grim ? 1 : 0.7);
+    rumble((sdricca ? 0.35 : grim ? 1 : 0.7) * (wk === 'fog' || wk === 'snow' ? 0.6 : 1));
   }
 }
 function syncSoundButtons() {
@@ -4536,6 +5411,27 @@ function syncSoundButtons() {
   }
 }
 function toggleSound() { SAVE.sound = !SAVE.sound; persist(); auInit(); syncSoundButtons(); sfx('click'); }
+function syncGfxButtons() {
+  for (const id of ['#bGfxTitle', '#bGfxPause']) { const b = $(id); if (!b) continue; b.hidden = VIEW.mode !== '3d'; b.querySelector('span').textContent = 'Grafica: ' + QUALITY[SAVE.gfx].label; }
+}
+function setGfx(k, quiet) {
+  SAVE.gfx = k; persist();
+  if (VIEW.mode === '3d') { setQuality(k); if (UI.bg) R3.G = null; }
+  syncGfxButtons(); if (!quiet) toast('Grafica: ' + QUALITY[k].label + (k === 'ultra' ? ' (risoluzione aumentata, ombre e terreno in alta definizione)' : ''), 'info');
+}
+function cycleGfx() { auInit(); sfx('click'); setGfx(QUALITY_ORDER[(QUALITY_ORDER.indexOf(SAVE.gfx) + 1) % QUALITY_ORDER.length]); }
+// if Ultra is too heavy for this device, step down once, early in the first mission
+function perfWatch(dt) {
+  if (UI.perfDone || VIEW.mode !== '3d' || UI.intro || !UI.G || UI.G.paused || UI.G.over || document.hidden) return;
+  const P = UI.perf || (UI.perf = { t: 0, n: 0, sum: 0 });
+  P.t += dt; if (P.t < 1.5) return;
+  P.n++; P.sum += dt;
+  if (P.t > 5.5) {
+    UI.perfDone = true;
+    const avg = P.sum / P.n, i = QUALITY_ORDER.indexOf(SAVE.gfx);
+    if (avg > 1 / 26 && i < QUALITY_ORDER.length - 1) { setGfx(QUALITY_ORDER[i + 1], true); toast('Grafica ridotta a «' + QUALITY[SAVE.gfx].label + '» per mantenere il gioco fluido. Puoi cambiarla dal menu di pausa.', 'info'); }
+  }
+}
 
 /* ---------------- toasts & screens ---------------- */
 function toast(text, kind = 'info') {
@@ -4588,7 +5484,7 @@ function showMissions() {
     const d = SAVE.done[M.id];
     return `<li><button class="mcard" data-i="${i}">
       <span class="mnum">${i === 0 ? 'A' : esc(M.num)}</span>
-      <span class="mtext"><span class="mname">${esc(M.name)}</span><span class="mmeta">${esc(M.date)} · ${esc(M.place)}</span><span class="mmeta">${esc(M.context)}</span></span>
+      <span class="mtext"><span class="mname">${esc(M.name)}</span><span class="mmeta">${esc(M.date)} · ${esc(M.place)}</span><span class="mmeta">${esc(M.context)}${missionWx(M).kind !== 'clear' ? ' · ' + esc(WEATHER[missionWx(M).kind].label) : ''}</span></span>
       ${d != null ? `<span class="stamp">Compiuta<br>${esc(DIFF[DIFF_ORDER[d]].label)}</span>` : ''}
     </button></li>`;
   }).join('');
@@ -4617,6 +5513,7 @@ function showBrief(mi) {
     <div class="thumbwrap"><canvas class="thumb" id="thumb" aria-label="Mappa della zona d’operazione"></canvas></div>
     <div class="legend"><span><i style="background:#d6aa4c"></i>La tua squadra</span><span><i style="background:#b0574a"></i>Nemico</span><span><i style="background:#e24a33"></i>Mitragliatrice</span><span><i style="background:#e9e0c8;border-radius:0"></i>Bersaglio</span><span>Tratteggio: area dell’obiettivo</span></div>
     ${M.brief.map(p => `<p>${esc(p)}</p>`).join('')}
+    ${briefWeather(M)}
     <h3>Obiettivi</h3>
     <ol class="olist">${M.objectives.map(o => `<li>${esc(o.text)}</li>`).join('')}</ol>
     <h3>La squadra</h3>
@@ -4636,6 +5533,17 @@ function showBrief(mi) {
   show('brief');
 }
 
+function briefWeather(M) {
+  const wx = missionWx(M), W = WEATHER[wx.kind], L = { day: 'Giorno', dawn: 'Alba', dusk: 'Tramonto', night: 'Notte' }[M.light] || 'Giorno';
+  const wind = wx.wind > 0.7 ? 'vento forte' : wx.wind > 0.45 ? 'vento' : 'vento debole';
+  const pct = v => Math.round((1 - v) * 100);
+  const fx = [];
+  const vis = (LIGHT[M.light] || LIGHT.day).vis * W.sight; if (vis < 0.98) fx.push(`le sentinelle vedono il ${pct(vis)}% più vicino`);
+  const noise = W.noise * (1 - 0.18 * wx.wind); if (noise < 0.97) fx.push(`spari ed esplosioni si sentono il ${pct(0.45 + 0.55 * noise)}% meno lontano`);
+  if (W.walk < 0.99) fx.push(`si cammina il ${pct(W.walk)}% più piano`);
+  const lamp = M.light === 'night' || M.light === 'dusk' ? ' Alcune sentinelle hanno una lanterna: vedono più lontano, ma si vedono da lontano.' : '';
+  return `<div class="wxbox"><b>Condizioni: ${esc(L)}, ${esc(W.label.toLowerCase())}, ${esc(wind)}.</b>${W.note ? ' ' + esc(W.note) : ''}${lamp}${fx.length ? `<span>${esc(fx.join(' · '))}</span>` : ''}</div>`;
+}
 /* ---------------- game start / end ---------------- */
 function startMission(mi, restart) {
   auInit();
@@ -4701,6 +5609,8 @@ function measureInsets() {
 function onGameEvent(k, d) {
   if (k === 'msg') toast(d.text, d.kind);
   else if (k === 'sfx') sfx(d.kind, d.x, d.y);
+  else if (k === 'bolt') sfx('thunder');
+  else if (k === 'collapse') { if (VIEW.mode === '3d') r3Collapse(UI.G, d.c, d.rows); const o = UI.G.objects.find(b => b.type === 'mine'); sfx('collapse', o ? o.x : null, o ? o.y : null); }
   else if (k === 'objective') { toast('Obiettivo raggiunto: ' + d.text, 'good'); sfx('obj'); UI.sig = ''; }
   else if (k === 'end') {
     sfx(d.result === 'win' ? 'win' : 'lose');
@@ -4824,7 +5734,7 @@ function refreshHud(force) {
 }
 function hudTick(dt) {
   const G = UI.G;
-  $('#hClock').textContent = fmtTime(G.time);
+  $('#hClock').textContent = fmtTime(G.time) + (G.wx && G.wx.kind !== 'clear' ? ' · ' + WEATHER[G.wx.kind].short : '');
   $('#hud').classList.toggle('alarm', G.alarmFlash > 0);
   $('#hud').classList.toggle('paused', G.paused);
   UI.sigT -= dt;
@@ -4863,7 +5773,7 @@ function onAbility(a) {
 const PORTRAITS = new Map();
 function hatFor(u) {
   const M = UI.G ? UI.G.M : MISSIONS[0];
-  return u.role === 'caimano' ? 'bare' : M.id === 'sdricca' ? 'cap' : (M.era || 1918) >= 1918 ? 'fez' : 'adrian';
+  return u.role === 'caimano' ? 'bare' : M.hat || (M.id === 'sdricca' ? 'cap' : (M.era || 1918) >= 1918 ? 'fez' : 'adrian');
 }
 function portrait(u) {
   const key = u.name + '|' + u.role + '|' + hatFor(u);
@@ -4895,6 +5805,12 @@ function drawFace(g, u, W, H) {
   }
   // neck & head
   g.fillStyle = '#9d7253'; g.fillRect(hx - 12, hy + 18, 24, 24);
+  // winter: the greatcoat's turned-up collar and a wool scarf
+  if (UI.G && UI.G.M.winter && !caim) {
+    g.fillStyle = '#5f6345'; g.beginPath(); g.moveTo(28, 112); g.lineTo(40, 92); g.lineTo(60, 104); g.lineTo(80, 92); g.lineTo(92, 112); g.closePath(); g.fill();
+    g.fillStyle = '#3e4232'; g.beginPath(); g.ellipse(hx, hy + 30, 19, 8, 0, 0, TAU); g.fill();
+    g.fillStyle = '#4a4e3a'; g.fillRect(hx + 4, hy + 32, 9, 20);
+  }
   const fg = g.createRadialGradient(hx - 8, hy - 8, 4, hx, hy, 34); fg.addColorStop(0, skin); fg.addColorStop(1, '#8a5f43');
   g.fillStyle = fg; g.beginPath(); g.ellipse(hx, hy, 23, 29, 0, 0, TAU); g.fill();
   g.fillStyle = '#a77a58'; g.beginPath(); g.ellipse(hx - 23, hy + 2, 4, 7, 0, 0, TAU); g.ellipse(hx + 23, hy + 2, 4, 7, 0, 0, TAU); g.fill();
@@ -5177,7 +6093,8 @@ const ARCHIVE = [
     <p>Gli arditi provenienti dalla fanteria indossavano una giubba con il bavero aperto, derivata da quella dei bersaglieri ciclisti, con le <b>fiamme nere</b> sul bavero. Quelli provenienti dagli alpini portavano le <b>fiamme verdi</b>, quelli dai bersaglieri le <b>fiamme cremisi</b>.</p>
     <p>Sotto la giubba c’era un maglione verde scuro a collo alto; nel 1918 si aggiunsero camicie grigioverdi con cravatta nera. In testa portavano un <b>fez nero</b> con fiocco nero, uguale a quello dei bersaglieri (che però era cremisi). Gli arditi provenienti dagli alpini spesso tenevano il cappello alpino. Il fez era il copricapo abituale fuori servizio; all’assalto era comune l’elmetto d’acciaio.</p>
     <p>Sulla manica sinistra gli arditi portavano il loro distintivo, con il monogramma reale <b>VE</b> di Vittorio Emanuele III. Perché il nero? Si dice che Bassi lo scelse in memoria del suo antenato Fortunato Calvi, uno dei martiri di Belfiore, che portava una cravatta nera come segno di riconoscimento tra i patrioti veneti.</p>
-    <p>Il fez nero arrivò solo nel 1918: nel 1917 gli arditi portavano il berretto di fanteria con il distintivo del reparto e, all’assalto, l’elmetto Adrian dipinto in grigioverde. Nel gioco è così: berretto alla Sdricca, elmetto sul Monte Fratta e sul San Gabriele, fez sul Grappa e sul Piave. I Caimani del Piave nuotavano quasi nudi, sporchi di fango per non farsi vedere.</p>` },
+    <p>Il fez nero arrivò solo nel 1918: nel 1917 gli arditi portavano il berretto di fanteria con il distintivo del reparto e, all’assalto, l’elmetto Adrian dipinto in grigioverde. Nel gioco è così: berretto alla Sdricca, elmetto sul Monte Fratta, sul San Gabriele, alla Priula e nella neve dei Tre Monti, fez sul Montello, sul Grappa e sul Piave. D’inverno sopra la giubba si portava il pastrano. I Caimani del Piave nuotavano quasi nudi, sporchi di fango per non farsi vedere.</p>
+    <p>Ogni ardito portava la borraccia e la maschera antigas nel suo astuccio; i fanti austro-ungarici avevano la scatola cilindrica della maschera sul petto e la vanghetta al cinturone. Di notte le sentinelle giravano spesso con una lanterna.</p>` },
   { id: 'weapons', label: 'Armi', html: () => `
     <div class="kit-grid">
       ${kit('knife', 'Pugnale', '', 'Ogni ardito portava un pugnale, che divenne il simbolo del corpo. I Caimani del Piave preferivano la resolza sarda (il coltello di Pattada), la cui lama sottile passava oltre il colletto rigido della giubba austro-ungarica.', 'Nel gioco: silenzioso. Avvicinati a un nemico senza farti vedere e cadrà senza un suono. Ce l’ha ogni ardito.')}
@@ -5209,6 +6126,11 @@ const ARCHIVE = [
       <li><a href="https://www.storiaememoriadibologna.it/archivio/organizzazioni/arditi" target="_blank" rel="noopener">Arditi, Storia e Memoria di Bologna</a></li>
       <li><a href="https://lombardiabeniculturali.it/militaria/schede-complete/SO100-00380" target="_blank" rel="noopener">Petardo offensivo Thévenot, Lombardia Beni Culturali</a></li>
       <li><a href="https://en.wikipedia.org/wiki/Battle_of_Vittorio_Veneto" target="_blank" rel="noopener">Battaglia di Vittorio Veneto, Wikipedia (inglese)</a></li>
+      <li><a href="https://www.arditigrandeguerra.it/storia-reparti-assalto/10-reparto-assalto/" target="_blank" rel="noopener">Storia del X Reparto d’assalto (Col del Rosso e Tre Monti), Arditi Grande Guerra</a></li>
+      <li><a href="https://www.arditigrandeguerra.it/storia-reparti-assalto/27-reparto-assalto/" target="_blank" rel="noopener">Storia del XXVII Reparto d’assalto (Montello, Casa Bianca), Arditi Grande Guerra</a></li>
+      <li><a href="https://www.arditigrandeguerra.it/storia-reparti-assalto/9-reparto-assalto/" target="_blank" rel="noopener">Storia del IX Reparto d’assalto (Col della Berretta), Arditi Grande Guerra</a></li>
+      <li><a href="https://www.storiaememoriadibologna.it/sites/default/files/2024-01/RetroguardiaTagliamento.pdf" target="_blank" rel="noopener">La retroguardia sul Tagliamento, Storia e Memoria di Bologna</a></li>
+      <li><a href="https://www.museionline.info/veneto-musei-monumenti/museo-delle-battaglia-dei-tre-monti-a-sasso-di-asiago" target="_blank" rel="noopener">Museo della Battaglia dei Tre Monti, Sasso di Asiago</a></li>
     </ul>` },
 ];
 function showArchive(tab) {
@@ -5227,7 +6149,7 @@ function loop(ts) {
     if (UI.screen === 'game' && UI.G) {
       if (UI.intro) stepIntro(dt);
       step(UI.G, dt);
-      ambTick(dt);
+      ambTick(dt); perfWatch(dt);
       VIEW.render(UI.G, UI, T);
       hudTick(dt);
       if (UI.G.over && UI.G.overT <= 0 && !UI.debriefShown) showDebrief();
@@ -5245,6 +6167,7 @@ function wire() {
   $('#bArchiveBack').onclick = () => show('title');
   $('#mlist').onclick = e => { const b = e.target.closest('.mcard'); if (b) { auInit(); sfx('click'); showBrief(+b.dataset.i); } };
   $('#bSoundTitle').onclick = toggleSound; $('#bSoundPause').onclick = toggleSound;
+  $('#bGfxTitle').onclick = cycleGfx; $('#bGfxPause').onclick = cycleGfx;
   $('#bHelpTitle').onclick = () => { $('#help').hidden = false; $('#bHelpClose').focus(); };
   $('#bHelpPause').onclick = () => { $('#help').hidden = false; $('#bHelpClose').focus(); };
   $('#bHelpClose').onclick = () => { $('#help').hidden = true; };
@@ -5261,7 +6184,7 @@ function wire() {
   $('#objPanel').onclick = () => { $('#objPanel').hidden = true; $('#bObj').setAttribute('aria-expanded', 'false'); };
   $('#bHintClose').onclick = () => { const c = UI.currentObjective(UI.G); UI.hintClosedFor = c ? c.id : null; refreshHud(true); };
   $('#bModeCancel').onclick = () => { UI.mode = 'move'; refreshHud(true); };
-  syncSoundButtons();
+  syncSoundButtons(); syncGfxButtons();
   addEventListener('resize', () => { VIEW.resize(); if (UI.screen === 'game') measureInsets(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden && UI.screen === 'game' && UI.G && !UI.G.paused && !UI.G.over) togglePause(); });
 }
