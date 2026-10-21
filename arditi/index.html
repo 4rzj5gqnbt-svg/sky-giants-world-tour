@@ -155,7 +155,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .hb.wide { width: auto; border-radius: 22px; padding: 0 14px; display: flex; gap: 6px; font-weight: 700; font-size: 18px; letter-spacing: .04em; font-variant-numeric: tabular-nums; }
 .hud-title { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; line-height: 1.1; pointer-events: none; }
 #hMission { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--f-display); font-style: italic; font-weight: 700; font-size: 19px; }
-#hClock { font-family: var(--f-type); font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; }
+#hClock { font-family: var(--f-type); font-size: 12px; color: var(--ink-dim); font-variant-numeric: tabular-nums; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .hint { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 64px); left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); max-width: 560px; margin: 0 auto;
   background: rgba(235,225,200,.95); color: var(--paper-ink); border-radius: 3px; padding: 9px 44px 10px 12px; box-shadow: 0 8px 22px rgba(0,0,0,.35); pointer-events: auto; }
 .hint p { margin: 0; font-family: var(--f-type); font-size: 13.5px; line-height: 1.45; }
@@ -204,7 +204,8 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .none { margin: 0; font-family: var(--f-type); font-size: 13px; color: var(--ink-dim); padding: 16px 0; }
 #alarmEdge { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 0 0 rgba(200,40,30,0); transition: box-shadow .25s; }
 #hud.alarm #alarmEdge { box-shadow: inset 0 0 70px 12px rgba(200,40,30,.5); }
-#hud.paused .hud-title::after { content: 'In pausa · gli ordini funzionano'; font-family: var(--f-type); font-size: 11px; color: var(--oro); letter-spacing: .08em; text-transform: uppercase; }
+#hud.paused .hud-title::after { content: 'In pausa · gli ordini funzionano'; font-family: var(--f-type); font-size: 11px; color: var(--oro); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 480px) { #hud.paused .hud-title::after { content: 'In pausa'; } }
 
 /* ---------- modals ---------- */
 .modal { position: fixed; inset: 0; z-index: 30; display: grid; place-items: center; background: rgba(9,11,7,.72);
@@ -282,6 +283,14 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 #intro::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 300px; transform: translateY(-50%); z-index: -1; pointer-events: none;
   background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(12,14,10,.62) 0%, rgba(12,14,10,.38) 55%, rgba(12,14,10,0) 100%); }
 #intro .i-date, #intro .i-place, #intro .i-skip { text-shadow: 0 1px 6px rgba(0,0,0,.8); }
+/* medals: on the debrief, and small beside each completed action */
+.medalrow { display: flex; align-items: center; gap: 14px; margin: 14px 0 6px; font-family: var(--f-type); font-size: 14px; line-height: 1.45; }
+.medalrow b { display: block; font-family: var(--f-ui); font-size: 18px; letter-spacing: .06em; text-transform: uppercase; }
+.medalrow span { color: var(--paper-dim); }
+.medalrow .medal { flex: none; filter: drop-shadow(0 2px 3px rgba(0,0,0,.35)); animation: medalIn .7s cubic-bezier(.2,1.4,.4,1) both; }
+@keyframes medalIn { from { transform: translateY(-14px) rotate(-12deg) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.mright { display: flex; align-items: center; gap: 8px; flex: none; }
+.mright .medal { filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
 </style>
 </head>
 <body>
@@ -311,6 +320,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M19 12a7 7 0 1 1-2.05-4.95"/><path d="M19.6 3.6v4.8h-4.8"/></symbol>
     <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4.5h11l3 3v12H5Z"/><path d="M8 4.5v5h7v-5M8 19.5v-6h8v6"/></symbol>
     <symbol id="i-load" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 3.8v4.6h4.6"/><path d="M12 8v4.4l3 1.8"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5.5l11-2.5v12.5"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="17.5" cy="15.5" r="2.6" fill="currentColor"/><path d="M9 9l11-2.5"/></symbol>
     <symbol id="i-gfx" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16.5V20"/><path d="M8.5 12.5l2.5-3 2 2 2.5-3.5" stroke-width="1.6"/></symbol>
     <symbol id="i-center" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></symbol>
     <symbol id="i-emblem" viewBox="0 0 64 64"><path d="M32 3c3.4 7.6 11.6 10.4 11.6 19.6 0 4.3-2.1 7.4-5.2 9.4 1-4.2 0-7.2-2.1-9.5 0 5.2-3 7.6-4.3 9.7-1.2-2.1-4.3-4.5-4.3-9.7-2.1 2.3-3.1 5.3-2.1 9.5-3.1-2-5.2-5.1-5.2-9.4C20.4 13.4 28.6 10.6 32 3Z" fill="currentColor" stroke="none"/><rect x="26" y="29.5" width="12" height="4.5" rx="1" fill="currentColor" stroke="none"/><circle cx="32" cy="47" r="14.5" fill="currentColor" stroke="none"/><path d="M19 47h26" stroke="#131610" stroke-width="2"/></symbol>
@@ -358,6 +368,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <div class="actions">
       <button class="linkbtn" id="bHelpTitle">Come si gioca</button>
       <button class="linkbtn" id="bSoundTitle"><svg class="ic"><use href="#i-sound"/></svg><span>Audio sì</span></button>
+      <button class="linkbtn" id="bMusicTitle"><svg class="ic"><use href="#i-music"/></svg><span>Musica sì</span></button>
       <button class="linkbtn" id="bGfxTitle"><svg class="ic"><use href="#i-gfx"/></svg><span>Grafica</span></button>
     </div>
     <p class="fine">I membri della squadra sono inventati. Reparti, comandanti, luoghi, date, uniformi e armi sono storici.</p>
@@ -399,6 +410,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <button class="btn" id="bRestart">Ricomincia la missione</button>
     <button class="btn" id="bHelpPause">Come si gioca</button>
     <button class="btn" id="bSoundPause"><svg class="ic"><use href="#i-sound"/></svg><span>Audio sì</span></button>
+    <button class="btn" id="bMusicPause"><svg class="ic"><use href="#i-music"/></svg><span>Musica sì</span></button>
     <button class="btn" id="bGfxPause"><svg class="ic"><use href="#i-gfx"/></svg><span>Grafica</span></button>
     <button class="btn" id="bQuit">Torna alla campagna</button>
   </div>
@@ -416,6 +428,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
         Ogni cono è ciò che quel nemico vede. Un anello si riempie intorno a lui mentre ti nota: quando si chiude, dà l’allarme. Strisciando ti vede solo a metà distanza. Dentro un cespuglio sei invisibile, a meno che non ti stia accanto. Trincee, crateri e acqua ti rendono ancora più difficile da scorgere.</dd></div>
       <div><dt>Rumore</dt><dd>Spari ed esplosioni richiamano ogni nemico a portata d’orecchio. Un sasso lanciato attira le sentinelle vicine a controllare, e può aprirti la strada.</dd></div>
       <div><dt>Meteo</dt><dd>Pioggia, temporale e vento coprono il rumore degli spari; nebbia, buio e neve accorciano la vista delle sentinelle, e nella neve si cammina più piano. Nei temporali un lampo illumina per un istante tutto il campo: quando lampeggia, stai giù. Le condizioni di ogni missione sono nel briefing.</dd></div>
+      <div><dt>Medaglie</dt><dd>Vinci senza perdere arditi e quasi senza allarmi per la medaglia d’oro; con al massimo un caduto e cinque allarmi per quella d’argento. Ogni vittoria vale almeno il bronzo. La medaglia migliore resta segnata accanto alla missione.</dd></div>
       <div><dt>Corpi</dt><dd>Una guardia che trova un corpo dà l’allarme. Porta i corpi tra i cespugli o lasciali nel fiume.</dd></div>
       <div><dt>Pausa e salvataggi</dt><dd>Puoi mettere in pausa quando vuoi: gli ordini dati in pausa vengono eseguiti alla ripresa. Dal menu di pausa salvi il punto in cui sei e, se qualcosa va storto, riprendi da lì. Come in Commandos, salva spesso.</dd></div>
       <div><dt>Tastiera</dt><dd>1–6 seleziona · A tutti · C striscia · K pugnale · F fuoco · G petardo · X pinze · E carica · S sasso · B prendi o posa · Frecce sposta la visuale · Q/R ruota · Spazio pausa · F5 salva · F9 riprendi · Esc annulla</dd></div>
@@ -1503,7 +1516,7 @@ function createGame(mi, diffKey, opts = {}) {
   const M = MISSIONS[mi], diff = DIFF[diffKey] || DIFF.ardito;
   const G = {
     M, mi, diffKey, diff, map: buildMap(M), W: M.w, H: M.h, light: (LIGHT[M.light] || LIGHT.day).vis,
-    wx: missionWx(M), noiseK: 1, walkK: 1, bolt: 0, boltT: 0, bolts: 0,
+    wx: missionWx(M), noiseK: 1, walkK: 1, bolt: 0, boltT: 0, bolts: 0, flares: [], flareT: 0, flareN: 0,
     units: [], enemies: [], objects: [], fx: [], proj: [], charges: [], noises: [], texts: [],
     time: 0, paused: false, over: false, result: null, reason: '', overT: 0,
     waves: 0, lastWaveT: -999, pendingWave: null, wireCut: 0, alarmFlash: 0, whistleT: 0, msgT: {},
@@ -1517,6 +1530,8 @@ function createGame(mi, diffKey, opts = {}) {
   const W = WEATHER[G.wx.kind];
   G.light *= W.sight; G.noiseK = W.noise * (1 - 0.18 * G.wx.wind); G.walkK = W.walk;
   if (W.bolts) G.boltT = 5 + Math.random() * 5;
+  // at night the enemy sends up star shells
+  if (M.light === 'night' || M.light === 'dusk') G.flareT = 16 + Math.random() * 12;
   G.objectives = G.attract ? [] : M.objectives.map(o => Object.assign({}, o, { done: false }));
   return G;
 }
@@ -1544,7 +1559,10 @@ function makeEnemy(G, d) {
   };
   // after dark some sentries walk with a lantern: they see farther, and they can be seen from afar
   const dark = G.M.light === 'night' || G.M.light === 'dusk';
-  if (dark && (d.t === 'sentry' || d.t === 'officer')) { let h = 7; for (const ch of String(d.id)) h = (h * 31 + ch.charCodeAt(0)) | 0; e.lantern = ((h >>> 0) % 100) < 50; }
+  if (dark && (d.t === 'sentry' || d.t === 'officer')) {
+    let h = 2166136261; for (const ch of String(d.id) + G.M.id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    h ^= h >>> 13; h = Math.imul(h, 1274126177); h ^= h >>> 16; e.lantern = ((h >>> 0) % 100) < 50;
+  }
   if (e.patrol) e.facing = e.wantFace = Math.atan2(e.patrol[1 % e.patrol.length].y - e.y, e.patrol[1 % e.patrol.length].x - e.x);
   return e;
 }
@@ -1559,10 +1577,11 @@ function bark(e, t) { e.bark = t; e.barkT = 1.6; }
 function floatText(G, x, y, txt, color) { G.texts.push({ x, y, txt, color, t: 0, T: 1.1 }); }
 function sound(G, kind, x, y) { if (!G.attract) G.onEvent('sfx', { kind, x, y }); }
 
-function effRange(G, e) {
+function effRange(G, e, lit) {
   const hot = e.state === 'alert' || e.state === 'combat';
-  // a flash of lightning shows the whole field for an instant
-  const light = G.bolt > 0 ? G.light + (Math.max(1, G.light) - G.light) * G.bolt : G.light;
+  // a flash of lightning shows the whole field for an instant; under a star shell it is day
+  let light = G.bolt > 0 ? G.light + (Math.max(1, G.light) - G.light) * G.bolt : G.light;
+  if (lit) light = Math.max(light, 1);
   return e.T.range * TILE * G.diff.vision * light * (hot ? 1.15 : 1) * (e.wary ? 1.1 : 1) * (e.lantern ? 1.2 : 1);
 }
 function effFov(e) {
@@ -1867,6 +1886,7 @@ function raiseAlarm(G, e, pt, radiusT, why) {
   if (e.type === 'officer' || G.time - G.whistleT > 4) { sound(G, 'whistle', e.x, e.y); G.whistleT = G.time; }
   msg(G, why, 'bad', 'alarm', 3);
   scheduleWave(G, pt);
+  if (G.flareT && !G.flares.some(f => f.t < 6) && Math.random() < 0.7) fireFlare(G, e, pt.x + (Math.random() - 0.5) * TILE * 2, pt.y + (Math.random() - 0.5) * TILE * 2);
 }
 function scheduleWave(G, pt) {
   const R = G.M.reinforce;
@@ -1891,9 +1911,11 @@ function spawnWave(G) {
 
 /* ---------- enemy perception ---------- */
 function visibleUnits(G, e) {
-  const R = effRange(G, e), fov = effFov(e), out = [];
+  const R0 = effRange(G, e), fov = effFov(e), out = [];
+  const RL = G.flares.length ? effRange(G, e, true) : R0;
   for (const u of G.units) {
     if (!u.alive) continue;
+    const R = RL !== R0 && flareLit(G, u.x, u.y) ? RL : R0;
     const d = Math.hypot(u.x - e.x, u.y - e.y);
     if (d > R) continue;
     const t = tileAt(G, u.x, u.y);
@@ -2142,7 +2164,34 @@ function endGame(G, result, reason) {
   for (const u of G.units) { u.order = null; u.path = []; }
   G.onEvent('end', { result, reason });
 }
+/* ---------- star shells: a flare hangs over the field and lights it like day ---------- */
+function flareLight(f) { return f.t < 0.9 ? 0 : f.t > f.T - 1.2 ? Math.max(0, (f.T - f.t) / 1.2) : 1; }
+function flareLit(G, x, y) {
+  for (const f of G.flares) { const k = flareLight(f); if (k > 0.3 && Math.hypot(x - f.x, y - f.y) < f.r * (0.6 + 0.4 * k)) return true; }
+  return false;
+}
+function fireFlare(G, e, x, y) {
+  if (G.attract && G.flares.length > 1) return;
+  G.flares.push({ x0: e.x, y0: e.y, x: clamp(x, TILE, (G.W - 1) * TILE), y: clamp(y, TILE, (G.H - 1) * TILE), t: 0, T: 9.5, r: 5.5 * TILE, id: ++G.flareN });
+  sound(G, 'flare', e.x, e.y);
+  if (G.flareN === 1) msg(G, 'Un razzo illuminante! Sotto la sua luce le sentinelle ti vedono come di giorno: stai fuori dal cerchio o resta immobile al riparo.', 'warn');
+}
+function stepFlares(G, dt) {
+  for (const f of G.flares) f.t += dt;
+  G.flares = G.flares.filter(f => f.t < f.T);
+  if (!G.flareT) return;
+  G.flareT -= dt;
+  if (G.flareT <= 0) {
+    G.flareT = 24 + Math.random() * 20;
+    const shooters = G.enemies.filter(e => e.alive && !e.dummy && !e.trainer && (e.type === 'sentry' || e.type === 'officer'));
+    if (shooters.length) {
+      const e = shooters[Math.floor(Math.random() * shooters.length)], d = (6 + Math.random() * 4) * TILE, a = e.facing + (Math.random() - 0.5) * 0.8;
+      fireFlare(G, e, e.x + Math.cos(a) * d, e.y + Math.sin(a) * d);
+    }
+  }
+}
 function simWeather(G, dt) {
+  stepFlares(G, dt);
   if (G.bolt > 0) G.bolt = Math.max(0, G.bolt - dt * 2.4);
   if (!G.boltT) return;
   G.boltT -= dt;
@@ -2663,6 +2712,7 @@ function render(G, UI, T) {
   ctx.drawImage(V.terr, 0, 0, G.W * TILE, G.H * TILE);
   const tint = (LIGHT[G.M.light] || {}).tint;
   if (tint) { ctx.fillStyle = tint; ctx.fillRect(0, 0, G.W * TILE, G.H * TILE); }
+  for (const f of G.flares || []) { const k = flareLight(f); if (k <= 0) continue; const g = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r); g.addColorStop(0, `rgba(230,245,210,${0.35 * k})`); g.addColorStop(1, 'rgba(230,245,210,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, TAU); ctx.fill(); }
   const wk = G.wx ? G.wx.kind : 'clear';
   if (wk === 'fog' || wk === 'snow') { ctx.fillStyle = wk === 'fog' ? 'rgba(200,204,202,.32)' : 'rgba(230,236,242,.12)'; ctx.fillRect(0, 0, G.W * TILE, G.H * TILE); }
   const vx0 = V.cam.x - 300, vy0 = V.cam.y - 300, vx1 = V.cam.x + V.w / z + 300, vy1 = V.cam.y + V.h / z + 300;
@@ -2817,7 +2867,7 @@ const R3 = {
   models: new Map(), cones: new Map(), fxVis: new Map(), projVis: new Map(), chargeVis: new Map(), textVis: new Map(),
   own: [], sprTex: new Map(), particles: [], wire: null, lastT: 0, zoneKey: '', zone: null, flash: null, dyn: null,
   sun: null, hemi: null, base: null, wdist: null, anim: [], emitters: [], mist: [], boomT: 0, propTiles: new Set(),
-  windU: { value: 0 }, windK: { value: 1 }, swayMat: null, shake: 0, weather: null, onFlash: null,
+  windU: { value: 0 }, windK: { value: 1 }, cloudK: { value: 0 }, rainK: { value: 0 }, sheenK: { value: 1 }, wetK: { value: 0 }, swayMat: null, shake: 0, weather: null, onFlash: null,
   post: null, rt: null, Q: null, snow: false, lanterns: [], bridge: null,
 };
 /* graphics quality: 'ultra' renders above the screen's own resolution and sharpens the result */
@@ -2834,7 +2884,7 @@ const L3 = {
   day:   { bg: 0x1a1e16, sky: 0xe4ecf0, gnd: 0x5c5a44, hemi: 0.82, sun: 0xfff0d8, sunI: 1.15, dir: [-0.45, 1, 0.55], water: 0x5f97a6, foam: 0xe6eee4, wEm: 0x000000, spark: 0.4, fog: [78, 130], cone: 0.18 },
   dawn:  { bg: 0x1c1922, sky: 0xcfb9dd, gnd: 0x4a4036, hemi: 0.72, sun: 0xffb27a, sunI: 1.12, dir: [0.9, 0.5, 0.3], water: 0x6f8aa6, foam: 0xf2dccb, wEm: 0x0b0d16, spark: 0.34, fog: [74, 124], cone: 0.2 },
   dusk:  { bg: 0x121119, sky: 0x8a7ea6, gnd: 0x2c2724, hemi: 0.6, sun: 0xff9a5c, sunI: 0.78, dir: [0.95, 0.34, -0.25], water: 0x5a6a80, foam: 0xd0c4c0, wEm: 0x0a0c14, spark: 0.3, fog: [70, 118], cone: 0.22 },
-  night: { bg: 0x080b12, sky: 0x4a5c8c, gnd: 0x151515, hemi: 0.52, sun: 0xa4b8ff, sunI: 0.52, dir: [-0.3, 1, -0.45], water: 0x46648a, foam: 0x9fb4cc, wEm: 0x0d1a2c, spark: 0.2, fog: [66, 112], cone: 0.24 },
+  night: { bg: 0x080b12, sky: 0x4a5c8c, gnd: 0x151515, hemi: 0.52, sun: 0xa4b8ff, sunI: 0.52, dir: [-0.3, 1, -0.45], water: 0x34507a, foam: 0x9fb4cc, wEm: 0x0d1a2c, spark: 0.2, fog: [66, 112], cone: 0.24 },
 };
 // the river's own colour where it is famous for it
 const WATER_STYLE = {
@@ -2852,8 +2902,49 @@ function lmat(hex, opts) {
   if (!m) { m = new THREE.MeshLambertMaterial(Object.assign({ color: hex }, opts || {})); MAT.set(key, m); }
   return m;
 }
-let VCM = null;
-function vcMat() { if (!VCM) VCM = new THREE.MeshLambertMaterial({ vertexColors: true }); return VCM; }
+/* ---------- shared material touches: a grain in world space so no surface is flat, and cloud shadows sliding over the field ---------- */
+const NOISE_GLSL = `
+float h3(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float vn3(vec3 x) { vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(h3(i), h3(i + vec3(1.0, 0.0, 0.0)), f.x), mix(h3(i + vec3(0.0, 1.0, 0.0)), h3(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),
+             mix(mix(h3(i + vec3(0.0, 0.0, 1.0)), h3(i + vec3(1.0, 0.0, 1.0)), f.x), mix(h3(i + vec3(0.0, 1.0, 1.0)), h3(i + vec3(1.0, 1.0, 1.0)), f.x), f.y), f.z); }
+float vn2(vec2 x) { return vn3(vec3(x, 0.5)); }
+`;
+function enhanceMat(mat, grit, key) {
+  const U = { uTimeE: R3.windU, uCloud: R3.cloudK, uGrit: { value: grit }, uWet: R3.wetK }, prev = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey && mat.customProgramCacheKey !== THREE.Material.prototype.customProgramCacheKey ? mat.customProgramCacheKey() : '';
+  mat.onBeforeCompile = (sh, r) => {
+    if (prev) prev(sh, r);
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = 'varying vec3 vWorldG;\n' + sh.vertexShader.replace('#include <project_vertex>', `#include <project_vertex>
+  { vec4 wg = vec4(transformed, 1.0);
+  #ifdef USE_INSTANCING
+    wg = instanceMatrix * wg;
+  #endif
+    vWorldG = (modelMatrix * wg).xyz; }`);
+    sh.fragmentShader = 'varying vec3 vWorldG;\nuniform float uTimeE, uCloud, uGrit, uWet;\n' + NOISE_GLSL + sh.fragmentShader.replace('#include <color_fragment>', `#include <color_fragment>
+  { float gn = vn3(vWorldG * 5.0) * 0.6 + vn3(vWorldG * 19.0) * 0.4;
+    diffuseColor.rgb *= (1.0 + (gn - 0.5) * uGrit) * (1.0 - 0.16 * uWet);
+    if (uCloud > 0.0) { vec2 cp = vWorldG.xz * 0.045 + vec2(uTimeE * 0.012, uTimeE * 0.004);
+      float cl = vn2(cp) * 0.65 + vn2(cp * 2.3 + 7.0) * 0.35; diffuseColor.rgb *= 1.0 - uCloud * smoothstep(0.42, 0.72, cl); } }`);
+  };
+  mat.customProgramCacheKey = () => 'enh-' + key + '-' + prevKey;
+  return mat;
+}
+let VCM = null, IMAT = null;
+function vcMat() { if (!VCM) VCM = enhanceMat(new THREE.MeshLambertMaterial({ vertexColors: true }), 0.14, 'vc'); return VCM; }
+// instanced scenery: white base, colour per instance, and the baked shading of each shape in its vertex colours
+function instMat() { if (!IMAT) IMAT = enhanceMat(new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true }), 0.16, 'inst'); return IMAT; }
+// shapes darken toward their base, as if the light could not get under them
+const AO_GEO = new Map();
+function aoGeo(base, g) {
+  let a = AO_GEO.get(base + g.uuid); if (a) return a;
+  a = g.clone(); a.computeBoundingBox();
+  const P = a.attributes.position, bb = a.boundingBox, h = Math.max(1e-4, bb.max.y - bb.min.y), col = new Float32Array(P.count * 3);
+  const lo = { ico: 0.5, ico1: 0.5, sph: 0.5, cone: 0.55, dod: 0.62, tuft: 0.45, bag: 0.62, box: 0.78, cyl: 0.72, cyl8: 0.75, stone: 0.7, torus: 1 }[base] || 0.8;
+  for (let i = 0; i < P.count; i++) { const k = (P.getY(i) - bb.min.y) / h, v = lo + (1 - lo) * smooth(k, 0, 0.85); col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = v; }
+  a.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  AO_GEO.set(base + g.uuid, a); return a;
+}
 const GEO = {};
 function prismGeo() {
   // unit gable prism: x ∈ [-.5,.5], base z ∈ [-.5,.5] at y = 0, ridge at y = 1, z = 0
@@ -3021,7 +3112,7 @@ function r3Resize() {
 /* ---------- the final pass: sharpening, colour grading, vignette and the lightning flash ---------- */
 const POST_VS = 'varying vec2 vUv; void main() { vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }';
 const POST_FS = `
-uniform sampler2D tDiffuse; uniform vec2 uRes; uniform float uSharp, uSat, uContrast, uVig, uFlash; uniform vec3 uLift, uGain;
+uniform sampler2D tDiffuse, tBloom, tBlur; uniform vec2 uRes; uniform float uSharp, uSat, uContrast, uVig, uFlash, uBloom, uTilt; uniform vec3 uLift, uGain;
 varying vec2 vUv;
 void main() {
   vec2 px = 1.0 / uRes;
@@ -3029,6 +3120,10 @@ void main() {
   vec3 n = texture2D(tDiffuse, vUv + vec2(px.x, 0.0)).rgb + texture2D(tDiffuse, vUv - vec2(px.x, 0.0)).rgb
          + texture2D(tDiffuse, vUv + vec2(0.0, px.y)).rgb + texture2D(tDiffuse, vUv - vec2(0.0, px.y)).rgb;
   c = max(c + (c * 4.0 - n) * uSharp, 0.0);
+  // tilt-shift: the far and near edges of the view soften, like a photograph of a sand-table
+  float tb = smoothstep(0.3, 0.5, abs(vUv.y - 0.5)) * uTilt;
+  c = mix(c, texture2D(tBlur, vUv).rgb, tb);
+  c += texture2D(tBloom, vUv).rgb * uBloom;
   float l = dot(c, vec3(0.299, 0.587, 0.114));
   c = mix(vec3(l), c, uSat);
   c = (c - 0.5) * uContrast + 0.5;
@@ -3036,6 +3131,21 @@ void main() {
   vec2 q = vUv - 0.5; c *= 1.0 - dot(q, q) * uVig;
   c += uFlash * vec3(0.82, 0.88, 1.0) * (0.35 + 0.65 * l);
   gl_FragColor = vec4(clamp(c, 0.0, 1.0), 1.0);
+}`;
+// bloom: the bright parts (lanterns, flames, flashes, tracers) bleed light into the dark around them
+const BRIGHT_FS = `uniform sampler2D tDiffuse; uniform vec2 uSrc; uniform float uThr; varying vec2 vUv;
+void main() {
+  vec3 c = (texture2D(tDiffuse, vUv + uSrc * vec2(-1.0, -1.0)).rgb + texture2D(tDiffuse, vUv + uSrc * vec2(1.0, -1.0)).rgb
+          + texture2D(tDiffuse, vUv + uSrc * vec2(-1.0, 1.0)).rgb + texture2D(tDiffuse, vUv + uSrc * vec2(1.0, 1.0)).rgb) * 0.25;
+  float l = max(c.r, max(c.g, c.b));
+  gl_FragColor = vec4(c * smoothstep(uThr, uThr + 0.2, l), 1.0);
+}`;
+const BLUR_FS = `uniform sampler2D tDiffuse; uniform vec2 uDir; varying vec2 vUv;
+void main() {
+  vec3 s = texture2D(tDiffuse, vUv).rgb * 0.227027;
+  s += (texture2D(tDiffuse, vUv + uDir * 1.3846).rgb + texture2D(tDiffuse, vUv - uDir * 1.3846).rgb) * 0.3162162;
+  s += (texture2D(tDiffuse, vUv + uDir * 3.2308).rgb + texture2D(tDiffuse, vUv - uDir * 3.2308).rgb) * 0.0702703;
+  gl_FragColor = vec4(s, 1.0);
 }`;
 function r3PostInit() {
   const r = R3.renderer;
@@ -3046,11 +3156,17 @@ function r3PostInit() {
     const mat = new THREE.ShaderMaterial({
       vertexShader: POST_VS, fragmentShader: POST_FS, depthTest: false, depthWrite: false,
       uniforms: { tDiffuse: { value: rt.texture }, uRes: { value: new THREE.Vector2(4, 4) }, uSharp: { value: 0.2 }, uSat: { value: 1.06 }, uContrast: { value: 1.06 },
-        uVig: { value: 0.35 }, uFlash: { value: 0 }, uLift: { value: new THREE.Vector3(0, 0, 0) }, uGain: { value: new THREE.Vector3(1, 1, 1) } },
+        uVig: { value: 0.35 }, uFlash: { value: 0 }, uLift: { value: new THREE.Vector3(0, 0, 0) }, uGain: { value: new THREE.Vector3(1, 1, 1) },
+        tBloom: { value: null }, uBloom: { value: 0 }, tBlur: { value: null }, uTilt: { value: 0 } },
     });
     const sc = new THREE.Scene(), cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false; sc.add(quad);
-    R3.rt = rt; R3.post = { sc, cam, mat, U: mat.uniforms };
+    const opt = { format: THREE.RGBAFormat, depthBuffer: false, stencilBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
+    const bA = new THREE.WebGLRenderTarget(4, 4, opt), bB = new THREE.WebGLRenderTarget(4, 4, opt), bC = new THREE.WebGLRenderTarget(4, 4, opt);
+    const bright = new THREE.ShaderMaterial({ vertexShader: POST_VS, fragmentShader: BRIGHT_FS, depthTest: false, depthWrite: false, uniforms: { tDiffuse: { value: rt.texture }, uSrc: { value: new THREE.Vector2() }, uThr: { value: 0.8 } } });
+    const blur = new THREE.ShaderMaterial({ vertexShader: POST_VS, fragmentShader: BLUR_FS, depthTest: false, depthWrite: false, uniforms: { tDiffuse: { value: null }, uDir: { value: new THREE.Vector2() } } });
+    mat.uniforms.tBloom.value = bA.texture; mat.uniforms.tBlur.value = bC.texture;
+    R3.rt = rt; R3.post = { sc, cam, mat, quad, U: mat.uniforms, bA, bB, bC, bright, blur };
     r3PostSize();
     return true;
   } catch (e) { R3.post = null; R3.rt = null; return false; }
@@ -3059,6 +3175,28 @@ function r3PostSize() {
   if (!R3.rt) return;
   const v = new THREE.Vector2(); R3.renderer.getDrawingBufferSize(v);
   R3.rt.setSize(Math.max(4, v.x), Math.max(4, v.y)); R3.post.U.uRes.value.set(Math.max(4, v.x), Math.max(4, v.y));
+  const bw = Math.max(4, Math.round(v.x / 4)), bh = Math.max(4, Math.round(v.y / 4));
+  R3.post.bA.setSize(bw, bh); R3.post.bB.setSize(bw, bh); R3.post.bC.setSize(bw, bh); R3.post.bright.uniforms.uSrc.value.set(1.5 / v.x, 1.5 / v.y); R3.post.bw = bw; R3.post.bh = bh;
+}
+// the post chain: scene → bright pass → blur ×2 → sharpen, bloom, grade, vignette → screen
+function r3PostRender() {
+  const r = R3.renderer, P = R3.post, B = P.blur.uniforms, thr = P.bright.uniforms.uThr.value;
+  if (P.U.uTilt.value > 0) {
+    // a blurred copy of the whole picture for the tilt-shift
+    P.bright.uniforms.uThr.value = -1; P.quad.material = P.bright; r.setRenderTarget(P.bC); r.render(P.sc, P.cam); P.bright.uniforms.uThr.value = thr;
+    P.quad.material = P.blur;
+    B.tDiffuse.value = P.bC.texture; B.uDir.value.set(1.6 / P.bw, 0); r.setRenderTarget(P.bB); r.render(P.sc, P.cam);
+    B.tDiffuse.value = P.bB.texture; B.uDir.value.set(0, 1.6 / P.bh); r.setRenderTarget(P.bC); r.render(P.sc, P.cam);
+  }
+  if (P.U.uBloom.value > 0) {
+    P.quad.material = P.bright; r.setRenderTarget(P.bA); r.render(P.sc, P.cam);
+    P.quad.material = P.blur;
+    for (const sp of [1, 2.2]) {
+      B.tDiffuse.value = P.bA.texture; B.uDir.value.set(sp / P.bw, 0); r.setRenderTarget(P.bB); r.render(P.sc, P.cam);
+      B.tDiffuse.value = P.bB.texture; B.uDir.value.set(0, sp / P.bh); r.setRenderTarget(P.bA); r.render(P.sc, P.cam);
+    }
+  }
+  P.quad.material = P.mat; r.setRenderTarget(null); r.render(P.sc, P.cam);
 }
 // colour grading per light and weather: a little lift in the shadows, a tint in the highlights
 function r3Grade(G) {
@@ -3074,6 +3212,11 @@ function r3Grade(G) {
   if (kind === 'fog') { sat *= 0.72; con *= 0.9; lift = [0.05, 0.05, 0.05]; gain = [0.93, 0.94, 0.95]; vig = 0.3; }
   if (kind === 'ash') { sat *= 0.82; gain = [1.0, 0.97, 0.93]; }
   U.uSat.value = sat; U.uContrast.value = con; U.uVig.value = vig;
+  // how much glows: lanterns and fires at night; on the snow and in the fog only the very brightest
+  const dark = lt === 'night' || lt === 'dusk' || kind === 'storm';
+  R3.post.bright.uniforms.uThr.value = kind === 'snow' || kind === 'fog' ? 0.93 : dark ? 0.56 : 0.78;
+  U.uBloom.value = dark ? 0.9 : kind === 'snow' || kind === 'fog' ? 0.35 : 0.55;
+  U.uTilt.value = r3Quality() === QUALITY.ultra ? 0.7 : 0.5;
   U.uLift.value.set(...lift); U.uGain.value.set(...gain);
   U.uSharp.value = r3Quality() === QUALITY.ultra ? 0.24 : 0.16;
 }
@@ -3239,6 +3382,7 @@ function buildGround(G, root) {
   R3.gCanvas = cv; R3.gCtx = ctx; R3.gTex = tex;
   const mat = own(new THREE.MeshLambertMaterial({ map: tex }));
   if (Q.detail) groundDetail(mat, Wt, Ht);
+  enhanceMat(mat, 0, 'ground' + (Q.detail ? 'd' : ''));
   const mesh = new THREE.Mesh(g, mat); mesh.receiveShadow = true;
   root.add(mesh); R3.ground = mesh;
   // a dark skirt beyond the scenery (pale on the snow)
@@ -3304,6 +3448,27 @@ function waterTex(spark) {
   const t = own(new THREE.CanvasTexture(cv)); t.wrapS = t.wrapT = THREE.RepeatWrapping;
   return t;
 }
+// the river surface: long sheen bands that drift with the current, and rings where raindrops land
+function waterEnhance(m) {
+  enhanceMat(m, 0, 'water');
+  const prev = m.onBeforeCompile, U = { uRain: R3.rainK, uSheen: R3.sheenK };
+  m.onBeforeCompile = (sh, r) => {
+    prev(sh, r); Object.assign(sh.uniforms, U);
+    sh.fragmentShader = 'uniform float uRain, uSheen;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+  { vec2 wp = vWorldG.xz;
+    float sk = vn2(wp * vec2(0.09, 0.45) + vec2(uTimeE * 0.06, 0.0)) * 0.7 + vn2(wp * vec2(0.3, 1.1) - vec2(uTimeE * 0.11, 0.0)) * 0.3;
+    totalEmissiveRadiance += vec3(0.75, 0.82, 0.9) * smoothstep(0.55, 0.85, sk) * 0.07 * uSheen;
+    if (uRain > 0.0) {
+      for (int j = 0; j < 2; j++) {
+        vec2 q = wp * (2.4 + float(j) * 1.3) + float(j) * 17.0; vec2 cell = floor(q); vec2 f = fract(q) - 0.5;
+        float ph = h3(vec3(cell, 3.0 + float(j))); float tt = fract(uTimeE * (0.8 + ph * 0.5) + ph);
+        vec2 off = vec2(h3(vec3(cell, 5.0)), h3(vec3(cell, 7.0))) - 0.5; float d = length(f - off * 0.45);
+        totalEmissiveRadiance += vec3(0.8, 0.86, 0.9) * smoothstep(0.03, 0.0, abs(d - tt * 0.42)) * (1.0 - tt) * 0.28 * uRain;
+      }
+    } }`);
+  };
+  const k = m.customProgramCacheKey(); m.customProgramCacheKey = () => k + '-ripple';
+}
 function buildWater(G, root, L) {
   const isW = (c, r) => isWaterCh(vch(G, c, r));
   const shoreAt = (cx, cz) => !(isW(cx - 1, cz - 1) && isW(cx, cz - 1) && isW(cx - 1, cz) && isW(cx, cz));
@@ -3338,6 +3503,7 @@ function buildWater(G, root, L) {
   g.setIndex(idx); g.computeVertexNormals();
   const tex = waterTex(false), glint = waterTex(true);
   const m = own(new THREE.MeshLambertMaterial({ map: tex, vertexColors: true, emissive: L.wEm, transparent: true, opacity: 0.9, depthWrite: false }));
+  waterEnhance(m);
   const mesh = new THREE.Mesh(g, m); mesh.receiveShadow = true; mesh.renderOrder = 1; root.add(mesh);
   const m2 = own(new THREE.MeshBasicMaterial({ map: glint, transparent: true, opacity: L.spark, blending: THREE.AdditiveBlending, depthWrite: false }));
   const top = new THREE.Mesh(g, m2); top.position.y = 0.012; top.renderOrder = 2; root.add(top);
@@ -3349,7 +3515,7 @@ function buildWater(G, root, L) {
 const SWAY = new Set(['ico', 'ico1', 'cone', 'sph', 'tuft']);
 function swayMat() {
   if (R3.swayMat) return R3.swayMat;
-  const m = new THREE.MeshLambertMaterial({ color: 0xffffff });
+  const m = new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true });
   m.onBeforeCompile = sh => {
     sh.uniforms.uWind = R3.windU; sh.uniforms.uWindK = R3.windK;
     sh.vertexShader = 'uniform float uWind; uniform float uWindK;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
@@ -3361,6 +3527,7 @@ function swayMat() {
 #endif`);
   };
   m.customProgramCacheKey = () => 'arditi-sway';
+  enhanceMat(m, 0.16, 'sway');
   R3.swayMat = m; return m;
 }
 class Inst {
@@ -3379,8 +3546,8 @@ class Inst {
       let cx = 0, cy = 0, cz = 0; for (const it of list) { cx += it.x; cy += it.y; cz += it.z; }
       cx /= list.length; cy /= list.length; cz /= list.length;
       let rad = 0; for (const it of list) rad = Math.max(rad, Math.hypot(it.x - cx, it.y - cy, it.z - cz) + it.r * 1.8);
-      const g = own(GEOM[base].clone()); g.boundingSphere = new THREE.Sphere(new THREE.Vector3(cx, cy, cz), rad + 0.5);
-      out.push(addInst(root, g, SWAY.has(base) ? swayMat() : lmat(0xffffff), list, !noShadow));
+      const g = own(aoGeo(GEOM[base] === G0.ico1 ? 'ico1' : base, GEOM[base]).clone()); g.boundingSphere = new THREE.Sphere(new THREE.Vector3(cx, cy, cz), rad + 0.5);
+      out.push(addInst(root, g, SWAY.has(base) ? swayMat() : instMat(), list, !noShadow));
     }
     return out;
   }
@@ -3554,7 +3721,12 @@ function buildDecor(G, root) {
       // drifts and lumps in the snow
       if (hs(40) < 0.35) { const x = c + hs(42), z = r + hs(44); I.push('bag:ns', x, groundY(x, z) - 0.01, z, 0, hs(46) * 6, 0, 0.18 + hs(47) * 0.22, 0.035 + hs(48) * 0.03, 0.12 + hs(49) * 0.14, 0xf4f6f9); }
     } else if (near && (ch === '.' || ch === ',' || ch === ':' || ch === 'g')) {
-      const n = ch === '.' ? 2 : 1;
+      const n = ch === '.' ? (r3Quality().smooth ? 4 : 2) : 1;
+      // wild flowers in the meadows on a fine day
+      if (ch === '.' && !lime && (G.M.light === 'day' || G.M.light === 'dawn') && (!G.wx || G.wx.kind === 'clear') && hs(60) < 0.16) {
+        const fc = [0xf2efe6, 0xe8d04a, 0xc8504a, 0x9a7ad0][Math.floor(hs(61) * 4)];
+        for (let k = 0; k < 3; k++) { const x = c + hs(62 + k), z = r + hs(65 + k); I.push('stone:ns', x, groundY(x, z) + 0.06, z, 0, hs(68 + k) * 6, 0, 0.025, 0.02, 0.025, fc); }
+      }
       for (let k = 0; k < n; k++) {
         if (hs(40 + k) > (ch === '.' ? 0.7 : 0.4)) continue;
         const x = c + hs(42 + k), z = r + hs(44 + k), y = groundY(x, z);
@@ -3600,6 +3772,13 @@ function roofOn(K, cx, cz, len, span, alongX, y, rh, roofC, wallC, broken) {
     const off = s * (span / 4 + 0.03), yy = y + rh / 2 + 0.04;
     if (alongX) K.add(G0.box, roofC, cx, yy, cz + off, len + 0.32, 0.07, sl, s * slope, 0, 0);
     else K.add(G0.box, roofC, cx + off, yy, cz, sl, 0.07, len + 0.32, 0, 0, -s * slope);
+    // courses of curved tiles running down the slope, a shade darker in their shadow
+    const n = Math.max(3, Math.round(sl / 0.2)), dark = shadeHex(roofC, -0.16);
+    for (let i = 1; i < n; i++) {
+      const u = -sl / 2 + i * sl / n;
+      if (alongX) { const a = s * slope; K.add(G0.box, dark, cx, yy + u * -Math.sin(a) + 0.04 * Math.cos(a), cz + off + u * Math.cos(a) + 0.04 * Math.sin(a), len + 0.3, 0.025, 0.045, a, 0, 0); }
+      else { const b = -s * slope; K.add(G0.box, dark, cx + off + u * Math.cos(b) - 0.04 * Math.sin(b), yy + u * Math.sin(b) + 0.04 * Math.cos(b), cz, 0.045, 0.025, len + 0.3, 0, 0, b); }
+    }
   }
   K.add(G0.cyl8, shadeHex(roofC, -0.15), cx, y + rh + 0.05, cz, 0.06, len + 0.34, 0.06, alongX ? 0 : Math.PI / 2, 0, alongX ? Math.PI / 2 : 0);
 }
@@ -3981,6 +4160,7 @@ function buildHuman(sp) {
     kS.add(G0.box, dark, 0.11, 0.0, 0.05, 0.018, 0.11, 0.024, 0, 0, 0.25);
     kS.add(G0.box, pouch, -0.08, 0.04, 0.085, 0.07, 0.05, 0.03);
   }
+  if (sp.winter && !cai) for (const sx of [-1, 1]) kS.add(G0.sph6, 0xeef2f5, sx * 0.1 * bk, 0.318, -0.015, 0.036, 0.01, 0.04);
   if (sp.winter && !cai) { kS.add(G0.cyl, sp.kind === 'it' ? 0x4c4f3c : 0x4b5257, 0, 0.335, 0.004, 0.06, 0.05, 0.058); kS.add(G0.box, sp.kind === 'it' ? 0x4c4f3c : 0x4b5257, 0.03, 0.27, 0.1, 0.03, 0.09, 0.012, -0.15, 0, 0.1); }
   spine.add(kS.mesh());
   // neck and head
@@ -4049,6 +4229,8 @@ function buildHuman(sp) {
     hatK.add(G0.tiny, 0xd6aa4c, 0, 0.162, 0.078, 0.011, 0.014, 0.006);
   }
   if (sp.mud) kH.add(G0.box, 0x4a3b2c, 0.03, 0.075, 0.068, 0.03, 0.012, 0.01, 0, 0, 0.4);
+  // in the snow storm, snow settles on helmets and shoulders
+  if (sp.winter && (sp.hat === 'adrian' || sp.hat === 'stahl')) hatK.add(G0.hemi, 0xf0f3f6, 0, sp.hat === 'adrian' ? 0.168 : 0.172, 0, 0.066, 0.022, 0.074);
   head.add(kH.mesh()); if (!hatK.empty) head.add(hatK.mesh());
   // arms and hands
   for (let i = 0; i < 2; i++) {
@@ -4093,7 +4275,7 @@ function makeLantern() {
   K.add(G0.torus, 0x2a2622, 0, 0.13, 0, 0.03, 0.03, 0.03, Math.PI / 2, 0, 0);
   g.add(K.mesh(false));
   const glass = new THREE.Mesh(G0.box, new THREE.MeshBasicMaterial({ color: 0xffcf72 })); glass.scale.set(0.046, 0.075, 0.046); glass.position.y = 0.05; g.add(glass);
-  const glow = makeSprite(softDot(), 0.7, 0.7, true, true); glow.material.color.setHex(0xffb24a); glow.material.opacity = 0.75; glow.position.y = 0.05; g.add(glow);
+  const glow = makeSprite(softDot(), 1.15, 1.15, true, true); glow.material.color.setHex(0xffb24a); glow.material.opacity = 0.8; glow.position.y = 0.05; g.add(glow);
   return { g, glow };
 }
 function makeDummy() {
@@ -4123,20 +4305,27 @@ function actorModel(G, a, isUnit) {
   if (a.dummy) M = makeDummy();
   else {
     const sp = actorSpec(G, a, isUnit), B = buildHuman(sp);
-    M = { root: B.root, B, sp, W: mountWeapons(B, sp), P: poseIdle(), phase: HASH(sp.seed, 1, 1) * 6, yaw: 0, px: null, pz: null, strike: 0, fire: 0, throwT: 0, spd: 0, deadT: 0, fallBack: HASH(sp.seed, 2, 2) < 0.5 };
+    M = { root: B.root, B, sp, W: mountWeapons(B, sp), P: poseIdle(), deadT: a.alive ? 0 : 9, phase: HASH(sp.seed, 1, 1) * 6, yaw: 0, px: null, pz: null, strike: 0, fire: 0, throwT: 0, spd: 0, deadT: 0, fallBack: HASH(sp.seed, 2, 2) < 0.5 };
     if (a.type === 'mg') { M.mg = makeMGun(); M.mg.position.set(0, 0, 0.5); M.root.add(M.mg); M.kneel = true; }
   }
   // soldiers stay visible through trees and walls as a tinted silhouette (drawn in a second pass)
   M.layer = isUnit ? 1 : 2; M.root.traverse(o => { if (o.isMesh) { o.layers.enable(M.layer); if (o.material === vcMat()) o.material = isUnit ? R3.actorMatU : R3.actorMatE; } });
+  if (M.sp && !M.sp.lantern && !isUnit && (G.M.light === 'night' || G.M.light === 'dusk') && (a.type === 'sentry' || a.type === 'rifle') && HASH(M.sp.seed, 9, 9) < 0.4) {
+    // a cigarette glowing in the dark: careless, and easy to spot
+    const cig = makeSprite(softDot(), 0.14, 0.14, true, true); cig.material.color.setHex(0xff7a2a); cig.position.set(0.012, 0.045, 0.09); M.B.head.add(cig); M.cig = cig; M.cigT = HASH(M.sp.seed, 10, 9) * 5;
+  }
   if (M.sp && M.sp.lantern) {
     // a lantern in the free hand, and the pool of light it throws on the ground
     const L = makeLantern(); L.g.position.set(0, -0.24, 0.02); M.B.el[1].add(L.g); M.lantern = L;
-    const pool = new THREE.Mesh(geo().disc, new THREE.MeshBasicMaterial({ map: softDot(), color: 0xffa040, transparent: true, opacity: 0.32, blending: THREE.AdditiveBlending, depthWrite: false }));
-    pool.renderOrder = 2; pool.scale.set(1.9, 1, 1.9); R3.root.add(pool); M.pool = pool;
+    const pool = new THREE.Mesh(geo().disc, new THREE.MeshBasicMaterial({ map: softDot(), color: 0xffa040, transparent: true, opacity: 0.42, blending: THREE.AdditiveBlending, depthWrite: false }));
+    pool.renderOrder = 2; pool.scale.set(2.6, 1, 2.6); R3.root.add(pool); M.pool = pool;
   }
   M.tag = makeSprite(null, 0.62, 0.62); M.tag.visible = false; R3.root.add(M.tag);
   M.blood = new THREE.Mesh(geo().disc, own(new THREE.MeshBasicMaterial({ color: 0x4a120c, transparent: true, opacity: 0.6, depthWrite: false })));
   M.blood.visible = false; M.blood.renderOrder = 2; R3.root.add(M.blood);
+  // a soft contact shadow, so every man stands on the ground even under an overcast sky
+  if (!R3.blobMat) R3.blobMat = new THREE.MeshBasicMaterial({ map: softDot(), color: 0x000000, transparent: true, opacity: 0.42, depthWrite: false });
+  M.blob = new THREE.Mesh(geo().disc, R3.blobMat); M.blob.renderOrder = 2; R3.root.add(M.blob);
   R3.root.add(M.root);
   return M;
 }
@@ -4187,6 +4376,11 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
   const want = _yawOf(a.facing);
   M.yaw += angNorm(want - M.yaw) * Math.min(1, dt * 12);
   M.root.position.set(wx, y, wz); M.root.rotation.set(0, M.yaw, 0);
+  if (M.blob) {
+    const sw = t.water && isUnit, lying = !a.alive || (isUnit && a.crawl);
+    M.blob.visible = !sw && !(a.carriedBy); M.blob.position.set(wx, y + 0.025, wz); M.blob.rotation.y = M.yaw;
+    M.blob.scale.set(lying ? 0.42 : 0.36, 1, lying ? 0.75 : 0.36);
+  }
   if (M.dummy) {
     M.tag.visible = false; M.blood.visible = false;
     M.root.rotation.x = a.alive ? 0 : -1.45; return;
@@ -4197,8 +4391,17 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
   const walking = M.spd > 0.12, swim = t.water && isUnit, crawl = isUnit && a.crawl && !swim;
   const run = walking && (isUnit ? !crawl && !a.carrying && M.spd > 1.7 : M.spd > 2.2);
   let blend = 16, weapon = 'hand';
+  if (M.cig) {
+    const calm = a.alive && (a.state === 'idle' || a.state === 'returning'); M.cig.visible = calm;
+    if (calm) {
+      M.cigT -= dt; if (M.cigT <= 0) M.cigT = 4 + Math.random() * 4;
+      const drag = M.cigT > 3.2 ? 1 : 0.35; M.cig.material.opacity = drag * (0.8 + 0.2 * Math.sin(T * 9));
+      M.cig.scale.setScalar(0.1 + 0.08 * drag);
+      if (M.cigT < 3.2 && M.cigT + dt >= 3.2) { const hp = new THREE.Vector3(); M.B.head.getWorldPosition(hp); spawnParticle({ x: hp.x + Math.sin(M.yaw) * 0.1, y: hp.y + 0.05, z: hp.z + Math.cos(M.yaw) * 0.1, vx: 0.1, vy: 0.2, vz: 0, T: 2.4, s0: 0.06, s1: 0.4, col: 0xb8b6ae, a0: 0.35, add: false, tex: 'puff' }); }
+    }
+  }
   // the lantern's pool of light follows its bearer, and goes out when he falls
-  if (M.pool) { M.pool.visible = a.alive; M.lantern.glow.visible = a.alive; if (a.alive) { const lf = 0.92 + 0.08 * Math.sin(T * 13 + M.phase) * Math.sin(T * 7.3); M.pool.position.set(wx + Math.sin(M.yaw) * 0.25, y + 0.04, wz + Math.cos(M.yaw) * 0.25); M.pool.material.opacity = 0.32 * lf; M.lantern.glow.material.opacity = 0.75 * lf; } }
+  if (M.pool) { M.pool.visible = a.alive; M.lantern.glow.visible = a.alive; if (a.alive) { const lf = 0.92 + 0.08 * Math.sin(T * 13 + M.phase) * Math.sin(T * 7.3); M.pool.position.set(wx + Math.sin(M.yaw) * 0.25, y + 0.04, wz + Math.cos(M.yaw) * 0.25); M.pool.material.opacity = 0.42 * lf; M.lantern.glow.material.opacity = 0.8 * lf; } }
   // dead or carried
   if (!a.alive) {
     M.tag.visible = false;
@@ -4206,6 +4409,12 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     if (a.sunk) { M.root.visible = false; M.blood.visible = false; return; }
     M.root.visible = true;
     const back = M.fallBack;
+    M.deadT = (M.deadT || 0) + dt;
+    if (M.deadT < 0.3 && !a.carriedBy) {
+      Object.assign(P, { hy: 0.34, hx: back ? -0.25 : 0.3, sx: back ? -0.3 : 0.55, nx: back ? -0.4 : 0.5, rsx: -0.3, rsz: -0.4, rex: -0.6, lsx: 0.2, lsz: 0.5, lex: -0.5, rtx: -0.8, rkx: 1.6, ltx: -0.5, lkx: 1.2 });
+      if (M.mg) M.mg.visible = true;
+      finishPose(M, P, Math.min(1, dt * 16), 'none'); return;
+    }
     Object.assign(P, { hy: 0.1, hx: back ? -1.5 : 1.5, hpz: back ? -0.38 : 0.38, sx: 0, nx: back ? 0.2 : -0.35, ny: 0.5,
       rsx: back ? 0.4 : -0.5, rsz: -1.0, rex: -0.4, lsx: back ? -0.3 : 0.4, lsz: 0.8, lex: -0.9, rtz: -0.18, ltz: 0.22, rkx: 0.35, lkx: 0.05 });
     weapon = 'none';
@@ -4520,16 +4729,78 @@ function syncCone(G, e, Lc) {
 }
 
 /* ---------- particles ---------- */
+// textures for the particles: a soft dot, a billowing puff for smoke and fire, a four-pointed star for muzzle flashes
+function puffTex(seed) {
+  return cachedTex('puff' + seed, (g, w, h) => {
+    const im = g.createImageData(w, h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      const dx = (x + 0.5) / w - 0.5, dy = (y + 0.5) / h - 0.5, r = Math.hypot(dx, dy) * 2;
+      let n = 0, a = 1, f = 3;
+      for (let o = 0; o < 4; o++) { n += a * vnoise(x / w * f + seed * 7.3, y / h * f + seed * 3.1); a *= 0.5; f *= 2.1; }
+      const v = clamp((1 - r) * 1.6 + (n / 1.875 - 0.5) * 1.3 - 0.25, 0, 1);
+      const k = (y * w + x) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = 255; im.data[k + 3] = v * v * 255;
+    }
+    g.putImageData(im, 0, 0);
+  }, 64, 64);
+}
+function starTex() {
+  return cachedTex('star', (g, w, h) => {
+    const cx = w / 2, cy = h / 2, gr = g.createRadialGradient(cx, cy, 0, cx, cy, w / 2);
+    gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.25, 'rgba(255,240,200,.75)'); gr.addColorStop(1, 'rgba(255,200,120,0)');
+    g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, w / 2, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(255,250,230,.95)';
+    for (const a of [0, Math.PI / 2, Math.PI / 4 * 0.5]) { g.save(); g.translate(cx, cy); g.rotate(a); g.beginPath(); g.moveTo(-w / 2, 0); g.lineTo(0, -2.2); g.lineTo(w / 2, 0); g.lineTo(0, 2.2); g.closePath(); g.fill(); g.restore(); }
+  }, 64, 64);
+}
+const PTEX = { dot: () => softDot(), puff: () => puffTex(1), puff2: () => puffTex(2), star: () => starTex() };
 function spawnParticle(p) {
-  let s = R3.particles.find(q => !q.live && q.add === !!p.add);
+  const tk = p.tex || 'dot';
+  let s = R3.particles.find(q => !q.live && q.add === !!p.add && q.tk === tk);
   if (!s) {
-    if (R3.particles.length > 420) return;
-    const spr = makeSprite(softDot(), 1, 1, true, !!p.add); spr.renderOrder = p.add ? 8 : 7; R3.root.add(spr);
-    s = { spr, add: !!p.add }; R3.particles.push(s);
+    if (R3.particles.length > 520) return;
+    const spr = makeSprite(PTEX[tk](), 1, 1, true, !!p.add); spr.renderOrder = p.add ? 8 : 7; R3.root.add(spr);
+    s = { spr, add: !!p.add, tk }; R3.particles.push(s);
   }
-  Object.assign(s, p, { live: true, t: 0 });
-  s.spr.visible = true; s.spr.material.color.setHex(p.col); s.spr.material.opacity = p.a0;
+  Object.assign(s, { rot: 0, spin: 0, grav: false, drag: 0 }, p, { live: true, t: 0 });
+  s.spr.visible = true; s.spr.material.color.setHex(p.col); s.spr.material.opacity = p.a0; s.spr.material.rotation = s.rot || (tk !== 'dot' ? Math.random() * TAU : 0);
   s.spr.position.set(p.x, p.y, p.z); s.spr.scale.set(p.s0, p.s0, 1);
+}
+// chunks of earth and splinters thrown by a blast: real little blocks that tumble, land and lie a while
+function spawnDebris(x, y, z, n, col) {
+  R3.debris = R3.debris || [];
+  for (let i = 0; i < n; i++) {
+    let d = R3.debris.find(q => !q.live);
+    if (!d) { if (R3.debris.length > 70) return; const m = new THREE.Mesh(geo().dod, lmat(0x3a3128)); m.castShadow = true; R3.root.add(m); d = { m }; R3.debris.push(d); }
+    const a = Math.random() * TAU, sp = 1.2 + Math.random() * 2.6, sz = 0.04 + Math.random() * 0.07;
+    Object.assign(d, { live: true, t: 0, x, y: y + 0.2, z, vx: Math.cos(a) * sp, vy: 3 + Math.random() * 3.5, vz: Math.sin(a) * sp, rx: Math.random() * 9, rz: Math.random() * 9, ground: false });
+    d.m.material = lmat(i % 3 ? (col || 0x3a3128) : 0x5a4a38); d.m.scale.set(sz, sz * 0.8, sz); d.m.visible = true;
+  }
+}
+function stepDebris(dt) {
+  if (!R3.debris) return;
+  for (const d of R3.debris) {
+    if (!d.live) continue;
+    d.t += dt;
+    if (!d.ground) {
+      d.vy -= 9 * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.z += d.vz * dt;
+      const gy = R3.G ? surfY(R3.G, d.x, d.z) : 0;
+      if (d.y <= gy + 0.02) { d.y = gy + 0.02; d.ground = true; }
+      d.m.rotation.x += d.rx * dt; d.m.rotation.z += d.rz * dt;
+    }
+    d.m.position.set(d.x, d.y, d.z);
+    if (d.t > 6) { d.live = false; d.m.visible = false; }
+  }
+}
+// the blast front: a bright ring racing outward over the ground
+function spawnShock(x, y, z, r) {
+  R3.shocks = R3.shocks || [];
+  let w = R3.shocks.find(q => !q.live);
+  if (!w) { const m = new THREE.Mesh(geo().ring, new THREE.MeshBasicMaterial({ color: 0xffe0b0, transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false })); m.renderOrder = 6; R3.root.add(m); w = { m }; R3.shocks.push(w); }
+  Object.assign(w, { live: true, t: 0, r }); w.m.position.set(x, y + 0.06, z); w.m.visible = true;
+}
+function stepShocks(dt) {
+  if (!R3.shocks) return;
+  for (const w of R3.shocks) { if (!w.live) continue; w.t += dt; const k = w.t / 0.42; if (k >= 1) { w.live = false; w.m.visible = false; continue; } const s = w.r * (0.4 + 2.6 * Math.sqrt(k)); w.m.scale.set(s, 1, s); w.m.material.opacity = 0.75 * (1 - k); }
 }
 function stepParticles(dt) {
   for (const s of R3.particles) {
@@ -4538,10 +4809,13 @@ function stepParticles(dt) {
     if (k >= 1) { s.live = false; s.spr.visible = false; continue; }
     s.x += s.vx * dt; s.y += s.vy * dt; s.z += s.vz * dt;
     if (s.grav) s.vy -= 6 * dt;
+    if (s.drag) { const f = Math.max(0, 1 - s.drag * dt); s.vx *= f; s.vy *= f; s.vz *= f; }
+    if (s.spin) s.spr.material.rotation += s.spin * dt;
     s.spr.position.set(s.x, s.y, s.z);
     const sz = s.s0 + (s.s1 - s.s0) * k; s.spr.scale.set(sz, sz, 1);
     s.spr.material.opacity = s.a0 * (1 - k) * Math.min(1, s.t * 6);
   }
+  stepDebris(dt); stepShocks(dt);
 }
 
 /* ---------- overlays that follow the ground ---------- */
@@ -4690,21 +4964,28 @@ function syncFx(G, dt) {
       m.material.opacity = 1 - k; used.add(f);
     } else if (f.k === 'flash') {
       if (k < 1 && flashI < 1.6) { flashI = 1.6; fx = f.x / TILE; fz = f.y / TILE; fy = surfY(G, fx, fz); }
-      if (!f.seen) { f.seen = true; spawnParticle({ x: f.x / TILE, y: surfY(G, f.x / TILE, f.y / TILE) + 0.75, z: f.y / TILE, vx: 0, vy: 0, vz: 0, T: 0.09, s0: 0.5, s1: 0.2, col: 0xffd27a, a0: 1, add: true }); }
+      if (!f.seen) {
+        f.seen = true; const x = f.x / TILE, z = f.y / TILE, y = surfY(G, x, z) + 0.72;
+        spawnParticle({ x, y, z, vx: 0, vy: 0, vz: 0, T: 0.08, s0: 0.75, s1: 0.35, col: 0xffe2a0, a0: 1, add: true, tex: 'star' });
+        spawnParticle({ x, y, z, vx: 0.2, vy: 0.25, vz: 0, T: 1.0, s0: 0.15, s1: 0.55, col: 0xb8b2a6, a0: 0.4, add: false, tex: 'puff', spin: 0.6, drag: 1.5 });
+      }
     } else if (f.k === 'boom') {
       const x = f.x / TILE, z = f.y / TILE, y = surfY(G, x, z), r = f.r / TILE;
       if (!f.seen) {
         f.seen = true;
-        spawnParticle({ x, y: y + 0.4, z, vx: 0, vy: 0.6, vz: 0, T: 0.45, s0: r * 0.8, s1: r * 2.4, col: 0xffb050, a0: 1, add: true });
-        spawnParticle({ x, y: y + 0.3, z, vx: 0, vy: 0.2, vz: 0, T: 0.22, s0: r * 0.6, s1: r * 1.4, col: 0xfff4d0, a0: 1, add: true });
-        for (let i = 0; i < 12; i++) { const a = Math.random() * TAU, sp = 0.6 + Math.random() * 1.4; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 0.9 + Math.random() * 1.2, vz: Math.sin(a) * sp, T: 1.6 + Math.random(), s0: 0.5, s1: 1.8 + Math.random(), col: 0x48433d, a0: 0.75, add: false }); }
-        for (let i = 0; i < 10; i++) { const a = Math.random() * TAU, sp = 2 + Math.random() * 3; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 2.5 + Math.random() * 3, vz: Math.sin(a) * sp, T: 0.8, s0: 0.12, s1: 0.08, col: 0x2a2520, a0: 1, add: false, grav: true }); }
+        // the flash, the fireball rolling up, the black smoke, sparks, clods of earth, the blast ring
+        spawnParticle({ x, y: y + 0.3, z, vx: 0, vy: 0.2, vz: 0, T: 0.16, s0: r * 0.9, s1: r * 2.0, col: 0xfff4d8, a0: 1, add: true, tex: 'star' });
+        for (let i = 0; i < 5; i++) { const a = Math.random() * TAU, sp = 0.4 + Math.random() * 0.8; spawnParticle({ x: x + Math.cos(a) * 0.2, y: y + 0.3, z: z + Math.sin(a) * 0.2, vx: Math.cos(a) * sp, vy: 1.1 + Math.random() * 0.8, vz: Math.sin(a) * sp, T: 0.5 + Math.random() * 0.25, s0: r * 0.7, s1: r * 1.7, col: i % 2 ? 0xffa040 : 0xff7a2a, a0: 1, add: true, tex: 'puff', spin: (Math.random() - 0.5) * 3, drag: 2 }); }
+        for (let i = 0; i < 14; i++) { const a = Math.random() * TAU, sp = 0.6 + Math.random() * 1.4; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 0.9 + Math.random() * 1.3, vz: Math.sin(a) * sp, T: 2.2 + Math.random() * 1.2, s0: 0.6, s1: 2.2 + Math.random(), col: i % 3 ? 0x3e3a35 : 0x5a5550, a0: 0.7, add: false, tex: i % 2 ? 'puff' : 'puff2', spin: (Math.random() - 0.5) * 0.8, drag: 0.8 }); }
+        for (let i = 0; i < 18; i++) { const a = Math.random() * TAU, sp = 2.5 + Math.random() * 4; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 2 + Math.random() * 4, vz: Math.sin(a) * sp, T: 0.5 + Math.random() * 0.4, s0: 0.07, s1: 0.03, col: 0xffc878, a0: 1, add: true, grav: true }); }
+        spawnDebris(x, y, z, r / TILE > 1.5 ? 14 : 9, G.M.winter ? 0x6a665e : null);
+        spawnShock(x, y, z, r);
         if (isWaterCh(vch(G, Math.floor(x), Math.floor(z)))) for (let i = 0; i < 14; i++) { const a = Math.random() * TAU, sp = 0.5 + Math.random(); spawnParticle({ x, y: -0.1, z, vx: Math.cos(a) * sp, vy: 3 + Math.random() * 2.5, vz: Math.sin(a) * sp, T: 1.0, s0: 0.25, s1: 0.4, col: 0xdfeaec, a0: 0.9, add: false, grav: true }); }
         r3Scorch(f.x, f.y, f.r * 0.8); r3TexDirty(f.x - f.r, f.y - f.r, f.x + f.r, f.y + f.r);
         const dc = Math.hypot(x - R3.cam.tx, z - R3.cam.tz);
         R3.shake = Math.max(R3.shake, (f.r / TILE > 1.5 ? 0.42 : 0.3) * clamp(1.2 - dc / 14, 0.15, 1));
       }
-      if (k < 0.35) { flashI = Math.max(flashI, 6 * (1 - k / 0.35)); fx = x; fz = z; fy = y; }
+      if (k < 0.3) { flashI = Math.max(flashI, 3.4 * (1 - k / 0.3)); fx = x; fz = z; fy = y; }
     } else if (f.k === 'fire') {
       if (!f.seen) {
         f.seen = true;
@@ -4768,6 +5049,35 @@ function syncFx(G, dt) {
   for (const [t, s] of R3.textVis) if (!seenT.has(t)) { R3.root.remove(s); s.material.map.dispose(); s.material.dispose(); R3.textVis.delete(t); }
 }
 /* ---------- partial updates of the painted ground: only the changed patch goes to the GPU ---------- */
+/* ---------- star shells over the night field ---------- */
+function syncFlares(G, dt) {
+  if (!R3.flareL) return;
+  const seen = new Set(), lights = [...R3.flareL];
+  for (const f of G.flares) {
+    let v = R3.flareVis.get(f.id);
+    if (!v) {
+      const core = makeSprite(starTex(), 0.5, 0.5, true, true); core.material.color.setHex(0xf6ffe8); core.renderOrder = 9;
+      const glow = makeSprite(softDot(), 3, 3, true, true); glow.material.color.setHex(0xd8f0c0); glow.renderOrder = 9;
+      const pool = new THREE.Mesh(geo().disc, new THREE.MeshBasicMaterial({ map: softDot(), color: 0xc8e0b0, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false }));
+      pool.renderOrder = 2; R3.root.add(core, glow, pool);
+      v = { core, glow, pool, trail: 0 }; R3.flareVis.set(f.id, v);
+    }
+    seen.add(f.id);
+    const k = flareLight(f), u = Math.min(1, f.t / 0.9);
+    const x = (f.x0 + (f.x - f.x0) * u) / TILE, z = (f.y0 + (f.y - f.y0) * u) / TILE, gy = groundY(x, z);
+    const h = f.t < 0.9 ? 1 + 6.5 * Math.sin(u * Math.PI / 2) : 7.5 - 4.5 * (f.t - 0.9) / (f.T - 0.9);
+    const sway = Math.sin(f.t * 1.3 + f.id) * 0.25;
+    v.core.position.set(x + sway, gy + h, z); v.glow.position.copy(v.core.position);
+    const fl = 0.85 + 0.15 * Math.sin(f.t * 31) * Math.sin(f.t * 17);
+    v.core.material.opacity = f.t < 0.9 ? 0.8 : k * fl; v.glow.material.opacity = 0.3 * k * fl; v.glow.scale.setScalar(1.3 + 0.8 * k);
+    v.pool.position.set(x, gy + 0.05, z); const pr = f.r / TILE * (0.6 + 0.4 * k); v.pool.scale.set(pr, 1, pr); v.pool.material.opacity = 0.07 * k * fl;
+    v.trail -= dt;
+    if (v.trail <= 0 && k > 0.05) { v.trail = 0.12; spawnParticle({ x: x + sway, y: gy + h + 0.1, z, vx: 0.15, vy: 0.25, vz: 0, T: 2.2, s0: 0.15, s1: 0.7, col: 0x9a9a92, a0: 0.35, add: false, tex: 'puff' }); }
+    const L = lights.shift(); if (L) { L.position.set(x + sway, gy + h, z); L.intensity = 1.25 * k * fl; L.distance = f.r / TILE * 2.4; }
+  }
+  for (const L of lights) L.intensity = 0;
+  for (const [id, v] of R3.flareVis) if (!seen.has(id)) { R3.root.remove(v.core, v.glow, v.pool); v.core.material.dispose(); v.glow.material.dispose(); v.pool.material.dispose(); R3.flareVis.delete(id); }
+}
 function r3TexDirty(x0, y0, x1, y1) {
   const d = R3.dirtyRect;
   if (!d) R3.dirtyRect = { x0, y0, x1, y1, t: 0 };
@@ -4833,6 +5143,19 @@ function buildAmbient(G, root) {
     }
   }
   buildWeather(G, root);
+  // two lights for the star shells, always there so the shaders never need rebuilding
+  R3.flareL = null; R3.flareVis = new Map();
+  if (G.M.light === 'night' || G.M.light === 'dusk') { R3.flareL = [0, 1].map(() => { const L = new THREE.PointLight(0xeef6dc, 0, 14, 1.6); root.add(L); return L; }); }
+  // fireflies over the banks on a summer night
+  R3.flies = null;
+  if (G.M.light === 'night' && /giugno|luglio/i.test(G.M.date + G.M.context)) {
+    R3.flies = [];
+    for (let i = 0; i < 46; i++) {
+      const x = HASH(i, 1, 33) * G.W, z = HASH(i, 2, 33) * G.H; if (isWaterCh(vch(G, Math.floor(x), Math.floor(z)))) continue;
+      const sp = makeSprite(softDot(), 0.22, 0.22, true, true); sp.material.color.setHex(0xd8ff7a); sp.renderOrder = 9; root.add(sp);
+      R3.flies.push({ sp, x, z, ph: HASH(i, 3, 33) * 20, sp2: 0.3 + HASH(i, 4, 33) * 0.5 });
+    }
+  }
   R3.boomT = 3 + Math.random() * 4;
   // a few birds wheel over the field by day: crows over the San Gabriele
   R3.birds = [];
@@ -4854,7 +5177,7 @@ function stepAmbient(G, dt, T) {
     if (e.t <= 0) {
       e.t = e.every * (0.7 + Math.random() * 0.6);
       const wv = (R3.windK.value - 0.6) * 0.45;
-      spawnParticle({ x: e.x + (Math.random() - 0.5) * 0.15, y: e.y, z: e.z + (Math.random() - 0.5) * 0.15, vx: 0.18 + wv + Math.random() * 0.1, vy: (e.big ? 0.7 : 0.45) / (1 + wv * 0.5), vz: 0.05, T: e.big ? 5 : 3.2, s0: e.s0, s1: e.s1, col: e.col, a0: e.a0, add: false });
+      spawnParticle({ x: e.x + (Math.random() - 0.5) * 0.15, y: e.y, z: e.z + (Math.random() - 0.5) * 0.15, vx: 0.18 + wv + Math.random() * 0.1, vy: (e.big ? 0.7 : 0.45) / (1 + wv * 0.5), vz: 0.05, T: e.big ? 5 : 3.2, s0: e.s0, s1: e.s1, col: e.col, a0: e.a0 * 1.15, add: false, tex: Math.random() < 0.5 ? 'puff' : 'puff2', spin: (Math.random() - 0.5) * 0.5 });
     }
   }
   for (const m of R3.mist) {
@@ -4862,6 +5185,12 @@ function stepAmbient(G, dt, T) {
     m.s.position.x = m.x; m.s.position.y = m.river ? 0.15 : groundY(clamp(m.x, 0, G.W), m.z) + 0.7;
   }
   stepWeather(G, dt);
+  syncFlares(G, dt);
+  if (R3.flies) for (const f of R3.flies) {
+    const t = T * f.sp2 + f.ph, x = f.x + Math.sin(t * 0.7) * 0.8, z = f.z + Math.cos(t * 0.5) * 0.8;
+    f.sp.position.set(x, groundY(x, z) + 0.5 + Math.sin(t * 1.3) * 0.3, z);
+    f.sp.material.opacity = Math.max(0, Math.sin(t * 2.1) * Math.sin(t * 0.9 + 1)) * 0.95;
+  }
   if (R3.birds && R3.birds.length) {
     const F = R3.flock; F.a += dt * 0.06;
     const fx = G.W * 0.5 + Math.cos(F.a) * F.R, fz = G.H * 0.45 + Math.sin(F.a * 1.3) * F.R * 0.6;
@@ -5019,12 +5348,18 @@ function r3Build(G) {
   if (R3.root) { S.remove(R3.root); disposeOwn(); }
   R3.dirtyRect = null; R3.bridge = null;
   R3.models = new Map(); R3.cones = new Map(); R3.fxVis = new Map(); R3.projVis = new Map(); R3.chargeVis = new Map(); R3.textVis = new Map();
-  R3.particles = []; R3.wire = null; R3.water = null; R3.zone = null; R3.zoneKey = ''; R3.anim = []; R3.emitters = []; R3.mist = [];
+  R3.particles = []; R3.debris = []; R3.shocks = []; R3.wire = null; R3.water = null; R3.zone = null; R3.zoneKey = ''; R3.anim = []; R3.emitters = []; R3.mist = [];
   const root = new THREE.Group(); R3.root = root; S.add(root); R3.G = G;
   const L = wxLight(L3[G.M.light] || L3.day, G.wx ? G.wx.kind : 'clear', G.M.light);
   // in the dark, soldiers keep a faint light of their own so the player can always read them
   const darkK = (G.M.light === 'night' ? 1 : G.M.light === 'dusk' ? 0.8 : 0) + (G.wx && G.wx.kind === 'storm' ? 0.7 : G.wx && G.wx.kind === 'rain' ? 0.3 : 0);
-  if (!R3.actorMatU) { R3.actorMatU = new THREE.MeshLambertMaterial({ vertexColors: true }); R3.actorMatE = new THREE.MeshLambertMaterial({ vertexColors: true }); }
+  if (!R3.actorMatU) { R3.actorMatU = enhanceMat(new THREE.MeshLambertMaterial({ vertexColors: true }), 0.07, 'au'); R3.actorMatE = enhanceMat(new THREE.MeshLambertMaterial({ vertexColors: true }), 0.07, 'ae'); }
+  // cloud shadows drift over the field on clear days
+  const wk0 = G.wx ? G.wx.kind : 'clear';
+  R3.rainK.value = wk0 === 'storm' ? 1 : wk0 === 'rain' ? 0.75 : 0;
+  R3.wetK.value = wk0 === 'storm' || wk0 === 'rain' ? 1 : wk0 === 'fog' ? 0.4 : 0;
+  R3.sheenK.value = G.M.light === 'night' ? 0.35 : G.M.light === 'dusk' || wk0 === 'storm' ? 0.55 : 1;
+  R3.cloudK.value = wk0 === 'clear' ? (G.M.light === 'day' ? 0.24 : G.M.light === 'dawn' ? 0.16 : 0) : wk0 === 'ash' ? 0.14 : 0;
   R3.actorMatU.emissive.setRGB(0.13, 0.12, 0.1).multiplyScalar(clamp(darkK, 0, 1));
   R3.actorMatE.emissive.setRGB(0.09, 0.09, 0.1).multiplyScalar(clamp(darkK, 0, 1));
   R3.L = L; R3.snow = !!G.M.winter; R3.lanterns = [];
@@ -5174,7 +5509,7 @@ function r3Render(G, UI, T) {
     cam.layers.set(1); S.overrideMaterial = R3.silU; r.render(S, cam);
     S.overrideMaterial = null; S.background = bg; cam.layers.enableAll(); r.autoClear = true; r.shadowMap.autoUpdate = true;
   }
-  if (post) { r.setRenderTarget(null); R3.post.U.uFlash.value = R3.boltFx || 0; r.render(R3.post.sc, R3.post.cam); }
+  if (post) { R3.post.U.uFlash.value = R3.boltFx || 0; r3PostRender(); }
 }
 // lightning: the sky and the ground blaze white for an instant, in two or three flickers
 function r3Bolt(G, dt) {
@@ -5243,11 +5578,340 @@ function hitScreen(list, sx, sy, rPx, h) {
   for (const a of list) { const p = VIEW.project(a.x, a.y, h); const d = Math.hypot(p.x - sx, p.y - sy); if (d < bd) { bd = d; best = a; } }
   return best;
 }
+/* ================= MUSICA: una partitura originale, sintetizzata dal vivo con la Web Audio API =================
+   Strumenti: ottoni, tromba militare, archi, armonium, mandolino, celesta, contrabbasso, tamburo, grancassa, timpani, piatti.
+   Brani: il tema del titolo («Fiamme nere», marcia in re minore), il briefing, la musica di missione a strati
+   (calma, tensione, combattimento) che segue quello che succede sul campo, e le chiamate di vittoria e di sconfitta. */
+const MUS = { ready: false, bus: null, rev: null, revIn: null, player: null, want: null, intensity: 0, level: 0, holdT: 0, cueT: 0, timer: 0 };
+const NOTE_IDX = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
+// 'C#5', 'Bb4', 'r' (pausa) → numero MIDI
+function noteMidi(s) {
+  if (s === 'r') return null;
+  const m = /^([A-G])([#b]?)(-?\d)$/.exec(s); if (!m) return null;
+  return 12 * (+m[3] + 1) + NOTE_IDX[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+}
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+// 'A4:8 D5:4 r:4' → [[midi, sedicesimi], ...]
+function mel(str) { return str.trim().split(/\s+/).map(t => { const [n, d] = t.split(':'); return [noteMidi(n), +d]; }); }
+
+/* ---------- the room: a convolution reverb from a synthetic impulse, a gentle compressor ---------- */
+function musInit() {
+  if (MUS.ready || !AU.ctx) return MUS.ready;
+  try {
+    const c = AU.ctx;
+    MUS.bus = c.createGain(); MUS.bus.gain.value = 0;
+    const comp = c.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 18; comp.ratio.value = 3; comp.attack.value = 0.02; comp.release.value = 0.3;
+    MUS.bus.connect(comp); comp.connect(c.destination);
+    const len = Math.floor(c.sampleRate * 2.6), ir = c.createBuffer(2, len, c.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) { const k = i / len; d[i] = (Math.random() * 2 - 1) * Math.pow(1 - k, 3.2) * (i < 120 ? i / 120 : 1); } }
+    MUS.rev = c.createConvolver(); MUS.rev.buffer = ir;
+    MUS.revIn = c.createGain(); MUS.revIn.gain.value = 0.9;
+    const revOut = c.createGain(); revOut.gain.value = 0.55;
+    MUS.revIn.connect(MUS.rev); MUS.rev.connect(revOut); revOut.connect(MUS.bus);
+    MUS.ready = true;
+  } catch (e) { MUS.ready = false; }
+  return MUS.ready;
+}
+function musVolume() {
+  if (!MUS.ready) return;
+  const on = SAVE.sound && SAVE.music !== false, G = UI.G, paused = UI.screen === 'game' && G && G.paused && !UI.intro;
+  MUS.bus.gain.setTargetAtTime(on ? (paused ? 0.17 : UI.screen === 'game' ? 0.26 : 0.32) : 0, AU.ctx.currentTime, 0.35);
+}
+
+/* ---------- instruments: each plays one note into a destination (a layer), with a share sent to the room ---------- */
+function env(g, t, att, peak, dur, rel, sus = 0.8) {
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.linearRampToValueAtTime(peak, t + att);
+  g.gain.setTargetAtTime(peak * sus, t + att, Math.max(0.02, dur * 0.4));
+  g.gain.setTargetAtTime(0.0001, t + Math.max(att, dur), rel / 3);
+}
+function osc(type, f, t, end, detune = 0) { const o = AU.ctx.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); o.detune.value = detune; o.start(t); o.stop(end); return o; }
+function noiseSrc(t, end) { const s = AU.ctx.createBufferSource(); s.buffer = AU.noise; s.loop = true; s.start(t, Math.random()); s.stop(end); return s; }
+function vout(dest, send) { const g = AU.ctx.createGain(); g.connect(dest.dry); if (send > 0) { const s = AU.ctx.createGain(); s.gain.value = send; g.connect(s); s.connect(MUS.revIn); } return g; }
+const INST = {
+  // massed brass: detuned saws through a filter that opens with the attack, a late vibrato
+  brass(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 0.5, g = vout(d, 0.35), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.Q.value = 1.2; lp.frequency.setValueAtTime(300, t); lp.frequency.linearRampToValueAtTime(700 + 2600 * v, t + 0.07); lp.frequency.setTargetAtTime(500 + 1500 * v, t + 0.09, 0.25);
+    const vib = c.createOscillator(), vg = c.createGain(); vib.frequency.value = 5.4; vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(dur > 0.5 ? 7 : 0, t + Math.min(0.45, dur)); vib.connect(vg); vib.start(t); vib.stop(end);
+    for (const dt of [-7, 6]) { const o = osc('sawtooth', f, t, end, dt); vg.connect(o.detune); o.connect(lp); }
+    lp.connect(g); env(g, t, 0.05, 0.16 * v, dur, 0.22, 0.75);
+  },
+  // the bugle: brighter, a small scoop up into each note
+  bugle(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 0.4, g = vout(d, 0.45), bp = c.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = Math.min(3200, f * 2.2); bp.Q.value = 0.7;
+    const o = osc('sawtooth', f * 0.975, t, end); o.frequency.exponentialRampToValueAtTime(f, t + 0.045);
+    const o2 = osc('square', f * 0.975, t, end); o2.frequency.exponentialRampToValueAtTime(f, t + 0.045);
+    const g2 = c.createGain(); g2.gain.value = 0.35; o2.connect(g2); g2.connect(bp); o.connect(bp); bp.connect(g);
+    env(g, t, 0.025, 0.2 * v, dur, 0.18, 0.7);
+  },
+  // the string section: three detuned saws, a slow swell
+  strings(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 1.2, g = vout(d, 0.5), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 900 + 1200 * v + Math.min(1200, f * 0.8); lp.Q.value = 0.5;
+    for (const dt of [-11, 0, 9]) osc('sawtooth', f, t, end, dt).connect(lp);
+    const vib = c.createOscillator(), vg = c.createGain(); vib.frequency.value = 4.8; vg.gain.value = 5; vib.connect(vg); vib.start(t); vib.stop(end);
+    lp.connect(g); env(g, t, Math.min(0.5, 0.18 + dur * 0.15), 0.07 * v, dur, 0.9, 0.9);
+  },
+  // the low strings, bowed short: the ostinato of the tension layer
+  cello(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 0.4, g = vout(d, 0.3), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 700 + 900 * v; lp.Q.value = 0.8;
+    for (const dt of [-6, 5]) osc('sawtooth', f, t, end, dt).connect(lp);
+    lp.connect(g); env(g, t, 0.03, 0.13 * v, dur * 0.8, 0.12, 0.6);
+  },
+  // the harmonium of the field chapels: reedy pulses with a slight tremolo
+  harmonium(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 0.4, g = vout(d, 0.35), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 1500; lp.Q.value = 0.6;
+    osc('square', f, t, end, -4).connect(lp); osc('sawtooth', f, t, end, 5).connect(lp);
+    const tr = c.createOscillator(), tg = c.createGain(), amp = c.createGain(); tr.frequency.value = 6.2; tg.gain.value = 0.18; amp.gain.value = 1; tr.connect(tg); tg.connect(amp.gain); tr.start(t); tr.stop(end);
+    lp.connect(amp); amp.connect(g); env(g, t, 0.06, 0.06 * v, dur, 0.2, 0.85);
+  },
+  // the mandolin, played tremolo as in the Italian songs of the war
+  mandolin(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), g = vout(d, 0.4), lp = c.createBiquadFilter(), step = dur > 0.45 ? 1 / 11 : dur;
+    lp.type = 'lowpass'; lp.frequency.value = 3400; lp.connect(g); g.gain.value = 1;
+    for (let k = 0, tt = t; tt < t + dur - 0.01; k++, tt += step) {
+      const pg = c.createGain(), e = tt + 0.22;
+      for (const [ty, mul, dt] of [['triangle', 1, -3], ['sawtooth', 1, 4]]) osc(ty, f * mul, tt, e, dt).connect(pg);
+      const a = (k ? 0.045 : 0.07) * v * (0.85 + Math.random() * 0.3);
+      pg.gain.setValueAtTime(a, tt); pg.gain.exponentialRampToValueAtTime(0.0008, tt + 0.2); pg.connect(lp);
+    }
+  },
+  // a plucked harp or piano for the gentle moments
+  pluck(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + 2.4, g = vout(d, 0.45);
+    const a = osc('triangle', f, t, end), b = osc('sine', f * 2, t, end), gb = c.createGain(); gb.gain.value = 0.3; b.connect(gb); gb.connect(g); a.connect(g);
+    g.gain.setValueAtTime(0.12 * v, t); g.gain.exponentialRampToValueAtTime(0.0008, t + Math.min(2.2, 0.6 + dur * 1.5));
+  },
+  // a celesta in the snow
+  celesta(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + 2.2, g = vout(d, 0.6);
+    osc('sine', f, t, end).connect(g); const b = osc('sine', f * 4.01, t, end), gb = c.createGain(); gb.gain.setValueAtTime(0.25, t); gb.gain.exponentialRampToValueAtTime(0.001, t + 0.4); b.connect(gb); gb.connect(g);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.09 * v, t + 0.006); g.gain.exponentialRampToValueAtTime(0.0008, t + 1.8);
+  },
+  // the double bass, plucked
+  bass(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 0.6, g = vout(d, 0.15), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 420; osc('triangle', f, t, end).connect(lp); osc('sine', f, t, end).connect(lp); lp.connect(g);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.2 * v, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0008, t + Math.min(1.2, dur + 0.5));
+  },
+  // a low drone under the whole field
+  drone(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), end = t + dur + 1.6, g = vout(d, 0.4), lp = c.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 260; osc('sawtooth', f, t, end, -5).connect(lp); osc('sine', f, t, end, 4).connect(lp); osc('sine', f * 2, t, end).connect(lp); lp.connect(g);
+    env(g, t, Math.min(1.5, dur * 0.4), 0.08 * v, dur, 1.4, 1);
+  },
+  snare(t, m, dur, v, d) {
+    const c = AU.ctx, g = vout(d, 0.2), bp = c.createBiquadFilter(), end = t + 0.25;
+    bp.type = 'bandpass'; bp.frequency.value = 2200; bp.Q.value = 0.6; noiseSrc(t, end).connect(bp); bp.connect(g);
+    const o = osc('triangle', 190, t, t + 0.1), og = c.createGain(); og.gain.setValueAtTime(0.25 * v, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.06); o.connect(og); og.connect(g);
+    g.gain.setValueAtTime(0.16 * v, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.13 + 0.05 * v);
+  },
+  kick(t, m, dur, v, d) {
+    const g = vout(d, 0.1), o = osc('sine', 95, t, t + 0.5); o.frequency.exponentialRampToValueAtTime(42, t + 0.22); o.connect(g);
+    g.gain.setValueAtTime(0.42 * v, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.42);
+  },
+  timpani(t, m, dur, v, d) {
+    const c = AU.ctx, f = mtof(m), g = vout(d, 0.45), end = t + 1.8;
+    const o = osc('sine', f * 1.02, t, end); o.frequency.exponentialRampToValueAtTime(f, t + 0.08); o.connect(g);
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300; noiseSrc(t, t + 0.2).connect(lp); const ng = c.createGain(); ng.gain.setValueAtTime(0.5, t); ng.gain.exponentialRampToValueAtTime(0.001, t + 0.15); lp.connect(ng); ng.connect(g);
+    g.gain.setValueAtTime(0.36 * v, t); g.gain.exponentialRampToValueAtTime(0.0008, t + 1.5);
+  },
+  cymbal(t, m, dur, v, d) {
+    const c = AU.ctx, g = vout(d, 0.5), hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 5200;
+    noiseSrc(t, t + 2.2).connect(hp); hp.connect(g);
+    g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.09 * v, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0008, t + 2);
+  },
+};
+
+/* ---------- harmony helpers ---------- */
+const CH = { m: [0, 3, 7], M: [0, 4, 7], sus2: [0, 2, 7], sus4: [0, 5, 7], m7: [0, 3, 7, 10], '7': [0, 4, 7, 10] };
+function chordNotes(root, type, lo) { const n = CH[type].map(i => root + i); while (n[0] < lo) for (let i = 0; i < n.length; i++) n[i] += 12; while (n[0] >= lo + 12) for (let i = 0; i < n.length; i++) n[i] -= 12; return n; }
+const MINOR = [0, 2, 3, 5, 7, 8, 10], MAJOR = [0, 2, 4, 5, 7, 9, 11];
+
+/* ---------- a track: parts of timed events, in sixteenth-note steps, on named layers ---------- */
+class Track {
+  constructor(bpm, bars, layers) { this.bpm = bpm; this.bars = bars; this.steps = bars * 16; this.ev = []; this.layers = layers; }
+  add(layer, inst, step, midi, dur, vel = 0.8) { if (midi == null && inst !== 'snare' && inst !== 'kick' && inst !== 'cymbal') return; this.ev.push({ layer, inst, step, midi, dur, vel }); }
+  melody(layer, inst, bar, str, shift = 0, vel = 0.8) { let s = bar * 16; for (const [m, d] of mel(str)) { if (m != null) this.add(layer, inst, s, m + shift, d, vel); s += d; } return s; }
+  index() { this.at = Array.from({ length: this.steps }, () => []); for (const e of this.ev) this.at[e.step % this.steps].push(e); return this; }
+}
+// «Fiamme nere»: an original march in D minor, lament then rally
+const THEME_A = ['A4:8 D5:4 C5:2 Bb4:2', 'A4:8 F4:8', 'C5:6 Bb4:2 A4:4 G4:4', 'E4:12 G4:4', 'A4:8 D5:4 E5:4', 'F5:8 D5:4 Bb4:4', 'C#5:6 E5:2 D5:2 C#5:2 A4:4', 'D5:16'];
+const THEME_B = ['C5:4 F5:6 E5:2 D5:4', 'E5:8 C5:8', 'D5:6 C5:2 Bb4:4 D5:4', 'C5:8 A4:8', 'Bb4:6 A4:2 G4:4 Bb4:4', 'A4:8 F4:8', 'E4:4 A4:4 C#5:4 E5:4', 'D5:12 r:4'];
+const PROG_A = [[50, 'm'], [46, 'M'], [53, 'M'], [48, 'M'], [50, 'm'], [55, 'm'], [57, 'M'], [50, 'm']];
+const PROG_B = [[53, 'M'], [48, 'M'], [46, 'M'], [53, 'M'], [55, 'm'], [50, 'm'], [57, '7'], [50, 'm']];
+function marchBar(T, bar, root, type, opts) {
+  const s = bar * 16, ch = chordNotes(root, type, 55);
+  T.add('bass', 'bass', s, root - 12 - (root > 52 ? 12 : 0), 4, 0.9); T.add('bass', 'bass', s + 8, root - 5 - (root > 52 ? 12 : 0), 4, 0.75);
+  if (opts.harm) for (const st of [4, 12]) for (const n of ch) T.add('harm', 'harmonium', s + st, n, 3, 0.55);
+  if (opts.pad) for (const n of chordNotes(root, type, 50)) T.add('pad', 'strings', s, n, 16, 0.6);
+  if (opts.drums) {
+    for (const [st, v] of [[0, 1], [6, 0.5], [7, 0.6], [8, 0.85], [12, 0.6], [14, 0.5], [15, 0.6]]) T.add('drums', 'snare', s + st, null, 1, v);
+    if (opts.kick) { T.add('drums', 'kick', s, null, 1, 0.9); T.add('drums', 'kick', s + 8, null, 1, 0.7); }
+  }
+}
+function trackTitle() {
+  const T = new Track(80, 16, ['lead', 'harm', 'pad', 'bass', 'drums']);
+  PROG_A.forEach(([r, ty], i) => { marchBar(T, i, r, ty, { harm: true, pad: true, drums: i > 1, kick: false }); T.melody('lead', 'brass', i, THEME_A[i], 0, 0.75); });
+  PROG_B.forEach(([r, ty], i) => {
+    const b = 8 + i; marchBar(T, b, r, ty, { harm: true, pad: true, drums: true, kick: true });
+    T.melody('lead', 'bugle', b, THEME_B[i], 0, 0.8); T.melody('lead', 'brass', b, THEME_B[i], -12, 0.55);
+    if (i % 2 === 0) T.add('drums', 'timpani', b * 16, r - 12 - (r > 52 ? 12 : 0) + 12, 4, 0.8);
+  });
+  for (let k = 0; k < 4; k++) T.add('drums', 'snare', 7 * 16 + 12 + k, null, 1, 0.45 + k * 0.12);
+  for (let k = 0; k < 8; k++) T.add('drums', 'snare', 15 * 16 + 8 + k, null, 1, 0.4 + k * 0.08);
+  T.add('drums', 'cymbal', 8 * 16, null, 8, 0.9); T.add('drums', 'cymbal', 0, null, 8, 0.5);
+  return T.index();
+}
+// the briefing: the lament alone, on mandolin over the harmonium, slower
+function trackBrief() {
+  const T = new Track(68, 8, ['lead', 'harm', 'pad', 'bass']);
+  PROG_A.forEach(([r, ty], i) => {
+    const s = i * 16; T.add('bass', 'bass', s, r - 12 - (r > 52 ? 12 : 0), 8, 0.7);
+    for (const n of chordNotes(r, ty, 52)) T.add('harm', 'harmonium', s, n, 16, 0.5);
+    T.melody('lead', 'mandolin', i, THEME_A[i], 0, 0.75);
+  });
+  return T.index();
+}
+/* the mission music, in three layers over the same harmony: calm, tension, combat.
+   Each mission has its own key, pace and colour, after its light and its weather. */
+function missionMood(M) {
+  const wx = missionWx(M).kind, lt = M.light;
+  const keyOf = { sdricca: 55, fratta: 50, gabriele: 48, priula: 45, tremonti: 52, montello: 53, moschin: 50, caimani: 47, moriago: 45, berretta: 51 };
+  const mood = { root: keyOf[M.id] || 50, bpm: 80, prog: [[0, 'm'], [8, 'M'], [5, 'm'], [7, 'M']], scale: MINOR, calm: 'mandolin', pad: 'strings' };
+  if (M.id === 'sdricca') Object.assign(mood, { prog: [[0, 'M'], [5, 'M'], [7, 'M'], [0, 'M']], scale: MAJOR, bpm: 92, calm: 'pluck' });
+  if (lt === 'night' || lt === 'dusk') Object.assign(mood, { bpm: 66, prog: [[0, 'm'], [5, 'm'], [0, 'm'], [7, 'M']], calm: 'harmonium' });
+  if (wx === 'snow') Object.assign(mood, { bpm: 72, prog: [[0, 'm'], [3, 'M'], [10, 'M'], [5, 'm']], calm: 'celesta' });
+  if (wx === 'storm') Object.assign(mood, { bpm: 88, prog: [[0, 'm'], [1, 'M'], [0, 'm'], [10, 'M']], calm: 'harmonium' });
+  if (wx === 'fog') Object.assign(mood, { bpm: 62, prog: [[0, 'sus2'], [5, 'm'], [8, 'M'], [7, 'sus4']], calm: 'pluck' });
+  if (wx === 'ash') Object.assign(mood, { bpm: 76 });
+  return mood;
+}
+function trackGame(M) {
+  const md = missionMood(M), T = new Track(md.bpm, 8, ['pad', 'calm', 'tension', 'combat']), R = md.root;
+  const deg = (d, oct = 0) => R + md.scale[((d % 7) + 7) % 7] + 12 * (Math.floor(d / 7) + oct);
+  md.prog.forEach(([iv, ty], k) => {
+    const s = k * 32, root = R + iv, chord = chordNotes(root, ty, 55);
+    // pad: sustained strings and a drone, always there
+    for (const n of chord) T.add('pad', md.pad, s, n, 32, 0.55);
+    T.add('pad', 'drone', s, root - 24 + (root - 24 < 33 ? 12 : 0), 32, 0.7);
+    // tension: a bowed ostinato in eighths, a heartbeat on the timpani
+    for (let e = 0; e < 16; e++) T.add('tension', 'cello', s + e * 2, (e % 4 === 2 ? root + 7 : root) - 12 - (root > 52 ? 12 : 0), 2, e % 4 === 0 ? 0.9 : 0.6);
+    for (const st of [0, 16]) T.add('tension', 'timpani', s + st, root - 12, 4, 0.55);
+    T.add('tension', 'timpani', s + 6, root - 12, 2, 0.35); T.add('tension', 'timpani', s + 22, root - 12, 2, 0.35);
+    // combat: the march drums, brass stabs on the chord, a rising call
+    for (let b = 0; b < 2; b++) {
+      const bs = s + b * 16;
+      for (const [st, v] of [[0, 1], [4, 0.55], [6, 0.6], [7, 0.7], [8, 0.9], [10, 0.5], [12, 0.7], [14, 0.6], [15, 0.7]]) T.add('combat', 'snare', bs + st, null, 1, v);
+      T.add('combat', 'kick', bs, null, 1, 1); T.add('combat', 'kick', bs + 8, null, 1, 0.8);
+      for (const n of chord) { T.add('combat', 'brass', bs, n, 3, 0.75); T.add('combat', 'brass', bs + 6, n, 2, 0.6); }
+    }
+    T.add('combat', 'brass', s + 16, chord[0] + 12, 2, 0.8); T.add('combat', 'brass', s + 18, chord[1] + 12, 2, 0.8); T.add('combat', 'brass', s + 20, chord[2] + 12, 4, 0.85);
+    if (k === 0) T.add('combat', 'cymbal', s, null, 8, 0.7);
+  });
+  // calm: a short song phrase twice in the loop, in the instrument of the mission's mood
+  const phraseA = [[4, 6], [3, 2], [2, 4], [0, 4], [1, 6], [2, 2], [0, 8]], phraseB = [[2, 4], [4, 4], [5, 6], [4, 2], [3, 4], [1, 4], [0, 8]];
+  for (const [bar, ph] of [[1, phraseA], [5, phraseB]]) { let st = bar * 16; for (const [d, len] of ph) { T.add('calm', md.calm, st, deg(d, 1), len, 0.7); st += len; } }
+  return T.index();
+}
+// short calls: victory on the bugle, defeat on the strings
+function trackCue(kind, M) {
+  const R = M ? missionMood(M).root : 50;
+  if (kind === 'win') {
+    const T = new Track(96, 4, ['lead', 'pad', 'drums']), K = R - 50 > 4 ? R - 62 : R - 50;
+    T.melody('lead', 'bugle', 0, 'D5:2 D5:2 A4:2 D5:2 F#5:4 D5:4 F#5:2 F#5:2 D5:2 F#5:2 A5:8 r:4 A5:2 F#5:2 D5:4 A4:4 D5:12', K, 0.9);
+    for (const n of chordNotes(R + 12, 'M', 57)) { T.add('pad', 'brass', 32, n, 24, 0.8); T.add('pad', 'strings', 32, n, 28, 0.7); }
+    for (let k = 0; k < 12; k++) T.add('drums', 'timpani', 32 + k, R - 12, 1, 0.3 + k * 0.04);
+    T.add('drums', 'cymbal', 44, null, 8, 1); T.add('drums', 'timpani', 44, R - 12, 4, 1);
+    T.once = true; return T.index();
+  }
+  const T = new Track(60, 5, ['lead', 'pad', 'drums']), K = R - 50;
+  T.melody('lead', 'strings', 0, 'F5:8 E5:4 D5:4 C#5:8 A4:8 Bb4:6 A4:2 G4:4 E4:4 D4:16', K, 0.8);
+  for (const [b, r, ty] of [[0, 50, 'm'], [1, 45, 'M'], [2, 43, 'm'], [3, 50, 'm']]) for (const n of chordNotes(r + K, ty, 50)) T.add('pad', 'strings', b * 16, n, 16, 0.5);
+  for (const b of [0, 2, 3]) T.add('drums', 'timpani', b * 16, 38 + K, 4, 0.5);
+  T.once = true; return T.index();
+}
+
+/* ---------- the player: a look-ahead scheduler, layer gains for the crossfades ---------- */
+function musStart(T, key) {
+  if (!musInit()) return;
+  const c = AU.ctx, old = MUS.player;
+  if (old) { old.stop = true; for (const k in old.L) old.L[k].dry.gain.setTargetAtTime(0, c.currentTime, 0.6); setTimeout(() => { for (const k in old.L) try { old.L[k].dry.disconnect(); } catch (e) { } }, 4000); }
+  const L = {};
+  for (const name of T.layers) { const g = c.createGain(); g.gain.value = 0; g.connect(MUS.bus); L[name] = { dry: g }; }
+  const P = { T, key, L, step: 0, next: c.currentTime + 0.15, stop: false };
+  MUS.player = P;
+  for (const name of T.layers) P.L[name].dry.gain.setTargetAtTime(musLayerGain(P, name), c.currentTime + 0.1, 0.5);
+  musVolume();
+}
+function musLayerGain(P, name) {
+  if (P.key !== 'game') return 1;
+  const lv = MUS.level;
+  return name === 'pad' ? (lv >= 2 ? 0.7 : 1) : name === 'calm' ? (lv === 0 ? 1 : 0) : name === 'tension' ? (lv >= 1 ? 1 : 0) : name === 'combat' ? (lv >= 2 ? 1 : 0) : 1;
+}
+function musTick() {
+  const P = MUS.player; if (!P || P.stop || !AU.ctx) return;
+  const c = AU.ctx, T = P.T, spb = 60 / T.bpm / 4;
+  if (P.next < c.currentTime - 0.5) P.next = c.currentTime + 0.05; // the tab was asleep: pick up from now
+  while (P.next < c.currentTime + 0.2) {
+    if (T.once && P.step >= T.steps) { P.stop = true; if (P.after) setTimeout(() => musPlay(P.after), 900); return; }
+    for (const e of T.at[P.step % T.steps]) {
+      const lay = P.L[e.layer]; if (!lay) continue;
+      if (P.key === 'game' && musLayerGain(P, e.layer) === 0 && lay.dry.gain.value < 0.02) continue; // skip silent layers
+      try { INST[e.inst](P.next, e.midi, e.dur * spb, e.vel, lay); } catch (err) { }
+    }
+    P.step++; P.next += spb;
+  }
+}
+// which music for which screen
+function musPlay(key, M) {
+  MUS.want = key; MUS.wantM = M;
+  if (!AU.ctx || !SAVE.sound || SAVE.music === false) { MUS.pending = { key, M }; if (MUS.player) { MUS.player.stop = true; } return; }
+  if (!musInit()) return;
+  const cur = MUS.player;
+  if (cur && !cur.stop && cur.key === key && (key !== 'game' || cur.M === M)) { musVolume(); return; }
+  const T = key === 'title' ? trackTitle() : key === 'brief' ? trackBrief() : key === 'game' ? trackGame(M) : trackCue(key, M);
+  musStart(T, key); MUS.player.M = M;
+  if (key === 'win' || key === 'lose') MUS.player.after = 'brief';
+  MUS.level = 0; MUS.holdT = 0;
+}
+// the battle decides the layers: calm while unseen, tension when they search, combat when they shoot
+function musUpdate(dt) {
+  musTick();
+  const vk = UI.screen + (UI.G && UI.G.paused && !UI.intro ? 'p' : '');
+  if (vk !== MUS.vk) { MUS.vk = vk; musVolume(); }
+  if (!MUS.player || MUS.player.key !== 'game' || !UI.G) return;
+  const G = UI.G;
+  let want = 0;
+  for (const e of G.enemies) { if (!e.alive) continue; if (e.state === 'combat') { want = 2; break; } if (e.state === 'alert' || e.state === 'suspicious' || e.meter > 0.5) want = 1; }
+  if (G.over) want = MUS.level;
+  if (want >= MUS.level) { if (want > MUS.level) { MUS.level = want; musRelayer(); } MUS.holdT = want === 2 ? 9 : 5; }
+  else { MUS.holdT -= dt; if (MUS.holdT <= 0) { MUS.level = Math.max(want, MUS.level - 1); MUS.holdT = 5; musRelayer(); } }
+}
+function musRelayer() {
+  const P = MUS.player; if (!P || !AU.ctx) return;
+  for (const name in P.L) P.L[name].dry.gain.setTargetAtTime(musLayerGain(P, name), AU.ctx.currentTime, MUS.level === 2 ? 0.25 : 1.2);
+}
+// start, resume or silence the music after the audio settings change
+function musSync() {
+  if (!AU.ctx) return;
+  if (SAVE.sound && SAVE.music !== false) {
+    if (!MUS.player || MUS.player.stop) { MUS.player = null; musPlay(MUS.want || 'title', MUS.wantM); } else musVolume();
+  } else { if (MUS.player) MUS.player.stop = true; musVolume(); }
+}
+function musToggle() { SAVE.music = SAVE.music === false; persist(); auInit(); syncMusicButtons(); sfx('click'); musSync(); }
+function syncMusicButtons() {
+  for (const id of ['#bMusicTitle', '#bMusicPause']) { const b = $(id); if (!b) continue; b.querySelector('span').textContent = SAVE.music === false ? 'Musica no' : 'Musica sì'; b.classList.toggle('off', SAVE.music === false); }
+}
 /* ================= UI, INPUT, AUDIO ================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SAVE_KEY = 'arditi-save-v1';
-const SAVE = { done: {}, diff: 'ardito', sound: true, gfx: null };
+const SAVE = { done: {}, medal: {}, diff: 'ardito', sound: true, music: true, gfx: null };
 try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s && typeof s === 'object') Object.assign(SAVE, s); } catch (e) { }
 if (!DIFF[SAVE.diff]) SAVE.diff = 'ardito';
 // graphics: Ultra on a computer with a big screen, Alta on phones and tablets (the player can change it)
@@ -5280,18 +5944,35 @@ function auInit() {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     AU.noise = b;
   } catch (e) { AU.ctx = null; }
+  if (AU.ctx) setTimeout(musSync, 0);
 }
-function nz(t, dur, type, freq, q, gain) {
+// the field's acoustics: a short outdoor reverb and, in the mountains, a slapback echo off the rock
+function auFx() {
+  if (AU.verbIn || !AU.ctx) return;
+  const c = AU.ctx, len = Math.floor(c.sampleRate * 1.5), ir = c.createBuffer(2, len, c.sampleRate);
+  for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4); }
+  const cv = c.createConvolver(); cv.buffer = ir; const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2400;
+  AU.verbIn = c.createGain(); AU.verbIn.gain.value = 0.5; AU.verbIn.connect(cv); cv.connect(lp); lp.connect(AU.master);
+  AU.echo = c.createDelay(1.2); AU.echo.delayTime.value = 0.42; const fb = c.createGain(); fb.gain.value = 0.28; const elp = c.createBiquadFilter(); elp.type = 'lowpass'; elp.frequency.value = 1200;
+  AU.echoIn = c.createGain(); AU.echoIn.gain.value = 0;
+  AU.echoIn.connect(AU.echo); AU.echo.connect(elp); elp.connect(fb); fb.connect(AU.echo); elp.connect(AU.master);
+}
+function sendFx(g, verb, echo) {
+  if (!AU.verbIn) return;
+  if (verb) { const s = AU.ctx.createGain(); s.gain.value = verb; g.connect(s); s.connect(AU.verbIn); }
+  if (echo) { const s = AU.ctx.createGain(); s.gain.value = echo; g.connect(s); s.connect(AU.echoIn); }
+}
+function nz(t, dur, type, freq, q, gain, verb = 0, echo = 0) {
   const c = AU.ctx, s = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
   s.buffer = AU.noise; f.type = type; f.frequency.value = freq; f.Q.value = q;
   g.gain.setValueAtTime(Math.max(0.0002, gain), t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  s.connect(f); f.connect(g); g.connect(AU.master); s.start(t, Math.random() * 0.4); s.stop(t + dur + 0.05);
+  s.connect(f); f.connect(g); g.connect(AU.master); sendFx(g, verb, echo); s.start(t, Math.random() * 0.4); s.stop(t + dur + 0.05);
 }
-function tone(t, freq, dur, type, gain, f2) {
+function tone(t, freq, dur, type, gain, f2, verb = 0) {
   const c = AU.ctx, o = c.createOscillator(), g = c.createGain();
   o.type = type; o.frequency.setValueAtTime(freq, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
   g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, gain), t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  o.connect(g); g.connect(AU.master); o.start(t); o.stop(t + dur + 0.05);
+  o.connect(g); g.connect(AU.master); sendFx(g, verb, 0); o.start(t); o.stop(t + dur + 0.05);
 }
 function sfx(kind, x, y) {
   if (!SAVE.sound || !AU.ctx) return;
@@ -5301,12 +5982,15 @@ function sfx(kind, x, y) {
     const cc = VIEW.camCenter(), cx = cc.x, cy = cc.y;
     v = clamp(1.15 - Math.hypot(x - cx, y - cy) / 900, 0.18, 1);
   }
+  auFx();
+  // distant sounds lose their crack: the high end is muffled with distance, and the room carries more of them
+  const far = 1 - v, ec = AU.echoIn ? AU.echoIn.gain.value : 0;
   try {
     switch (kind) {
-      case 'shot': nz(t, 0.16, 'bandpass', 1400, 0.8, 0.9 * v); tone(t, 150, 0.12, 'sine', 0.45 * v, 50); break;
-      case 'mg': nz(t, 0.08, 'bandpass', 1750, 0.9, 0.55 * v); break;
-      case 'burst': for (let i = 0; i < 6; i++) nz(t + i * 0.055, 0.07, 'bandpass', 1900, 0.9, 0.55 * v); break;
-      case 'boom': nz(t, 1.1, 'lowpass', 520, 0.7, 1.4 * v); tone(t, 85, 0.6, 'sine', 0.9 * v, 28); break;
+      case 'shot': nz(t, 0.05, 'highpass', 3000, 0.7, 0.55 * v * v, 0.15); nz(t, 0.18, 'bandpass', 1300 - far * 500, 0.8, 0.85 * v, 0.6, 0.5); tone(t, 150, 0.14, 'sine', 0.5 * v, 45, 0.3); break;
+      case 'mg': nz(t, 0.035, 'highpass', 2800, 0.7, 0.35 * v * v); nz(t, 0.09, 'bandpass', 1650 - far * 500, 0.9, 0.55 * v, 0.45, 0.3); tone(t, 120, 0.07, 'sine', 0.25 * v, 60); break;
+      case 'burst': for (let i = 0; i < 6; i++) { nz(t + i * 0.055, 0.03, 'highpass', 3200, 0.7, 0.3 * v * v); nz(t + i * 0.055, 0.075, 'bandpass', 1900 - far * 600, 0.9, 0.55 * v, 0.4, 0.25); } break;
+      case 'boom': nz(t, 0.08, 'highpass', 1800, 0.6, 0.8 * v * v, 0.3); nz(t, 1.3, 'lowpass', 520 - far * 260, 0.7, 1.4 * v, 0.8, 0.6); tone(t, 85, 0.7, 'sine', 1.0 * v, 26, 0.4); nz(t + 0.25, 1.6, 'lowpass', 180, 0.5, 0.5 * v, 0.6); nz(t + 0.3, 0.9, 'bandpass', 900, 1.2, 0.12 * v); break;
       case 'knife': nz(t, 0.1, 'highpass', 3600, 0.7, 0.35 * v); break;
       case 'whistle': {
         const c = AU.ctx, o = c.createOscillator(), g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
@@ -5322,6 +6006,7 @@ function sfx(kind, x, y) {
       case 'click': tone(t, 880, 0.04, 'sine', 0.06); break;
       case 'splash': nz(t, 0.45, 'lowpass', 900, 0.7, 0.5 * v); break;
       case 'fall': tone(t, 220, 0.35, 'sine', 0.12 * v, 110); break;
+      case 'flare': nz(t, 0.12, 'lowpass', 400, 0.7, 0.5 * v, 0.3, 0.3); { const c = AU.ctx, o = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); o.buffer = AU.noise; f.type = 'bandpass'; f.Q.value = 3; f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(3800, t + 0.9); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.18 * v, t + 0.1); g.gain.exponentialRampToValueAtTime(0.0001, t + 1.0); o.connect(f); f.connect(g); g.connect(AU.master); o.start(t); o.stop(t + 1.05); nz(t + 0.95, 0.2, 'bandpass', 1500, 1, 0.25 * v, 0.6, 0.4); } break;
       case 'thunder': {
         // the crack, then the long roll, a moment after the flash
         const d = 0.35 + Math.random() * 1.2;
@@ -5349,6 +6034,8 @@ function ambStart(M) {
     AMB.M = M; AMB.t = 0; AMB.nextBird = 1.5; AMB.nextBoom = 2.5; AMB.nextCricket = 0.5;
     AMB.out = AU.ctx.createGain(); AMB.out.gain.value = 0; AMB.out.connect(AU.master);
     const wx = UI.G.wx || { kind: 'clear', wind: 0.3 }; AMB.wx = wx;
+    auFx(); const mountain = M.fill === ':' || ['moschin', 'tremonti', 'berretta', 'gabriele', 'fratta'].includes(M.id);
+    AU.echoIn.gain.value = mountain ? (wx.kind === 'fog' || wx.kind === 'snow' ? 0.25 : 0.45) : 0.12;
     AMB.wind = loopNoise('lowpass', M.id === 'moschin' || wx.kind === 'snow' ? 520 : 360, 0.6, 0.04);
     AMB.howl = wx.kind === 'snow' || wx.kind === 'storm' ? loopNoise('bandpass', 700, 6, 0) : null;
     AMB.water = /~/.test(UI.G.map.map(r => r.join('')).join('')) ? loopNoise('bandpass', 1050, 0.35, 0) : null;
@@ -5410,7 +6097,7 @@ function syncSoundButtons() {
     b.querySelector('span').textContent = SAVE.sound ? 'Audio sì' : 'Audio no';
   }
 }
-function toggleSound() { SAVE.sound = !SAVE.sound; persist(); auInit(); syncSoundButtons(); sfx('click'); }
+function toggleSound() { SAVE.sound = !SAVE.sound; persist(); auInit(); syncSoundButtons(); sfx('click'); musSync(); }
 function syncGfxButtons() {
   for (const id of ['#bGfxTitle', '#bGfxPause']) { const b = $(id); if (!b) continue; b.hidden = VIEW.mode !== '3d'; b.querySelector('span').textContent = 'Grafica: ' + QUALITY[SAVE.gfx].label; }
 }
@@ -5446,6 +6133,8 @@ function show(name) {
   for (const k in SCREENS) $(SCREENS[k]).hidden = k !== name;
   $('#hud').hidden = name !== 'game';
   $('#pause').hidden = true;
+  if (name === 'title' || name === 'missions' || name === 'archive') musPlay('title');
+  else if (name === 'brief') musPlay('brief');
   if (name !== 'game') {
     $('#help').hidden = true;
     const el = $(SCREENS[name]); if (el) el.scrollTop = 0;
@@ -5485,7 +6174,7 @@ function showMissions() {
     return `<li><button class="mcard" data-i="${i}">
       <span class="mnum">${i === 0 ? 'A' : esc(M.num)}</span>
       <span class="mtext"><span class="mname">${esc(M.name)}</span><span class="mmeta">${esc(M.date)} · ${esc(M.place)}</span><span class="mmeta">${esc(M.context)}${missionWx(M).kind !== 'clear' ? ' · ' + esc(WEATHER[missionWx(M).kind].label) : ''}</span></span>
-      ${d != null ? `<span class="stamp">Compiuta<br>${esc(DIFF[DIFF_ORDER[d]].label)}</span>` : ''}
+      ${d != null ? `<span class="mright">${SAVE.medal[M.id] != null ? medalSvg(SAVE.medal[M.id], 26) : ''}<span class="stamp">Compiuta<br>${esc(DIFF[DIFF_ORDER[d]].label)}</span></span>` : ''}
     </button></li>`;
   }).join('');
   show('missions');
@@ -5566,6 +6255,7 @@ function startMission(mi, restart) {
   } else VIEW.centerOn(UI.G, cx, cy - 40, true);
   sfx('click');
   ambStart(UI.G.M);
+  musPlay('game', UI.G.M);
   if (VIEW.mode === '3d' && !restart) startIntro();
 }
 /* the camera opens on the objective and travels back to the squad, under the mission title */
@@ -5613,7 +6303,7 @@ function onGameEvent(k, d) {
   else if (k === 'collapse') { if (VIEW.mode === '3d') r3Collapse(UI.G, d.c, d.rows); const o = UI.G.objects.find(b => b.type === 'mine'); sfx('collapse', o ? o.x : null, o ? o.y : null); }
   else if (k === 'objective') { toast('Obiettivo raggiunto: ' + d.text, 'good'); sfx('obj'); UI.sig = ''; }
   else if (k === 'end') {
-    sfx(d.result === 'win' ? 'win' : 'lose');
+    if (SAVE.music === false) sfx(d.result === 'win' ? 'win' : 'lose'); else musPlay(d.result === 'win' ? 'win' : 'lose', UI.G.M);
     if (d.result === 'win') {
       const M = UI.G.M, idx = DIFF_ORDER.indexOf(UI.G.diffKey);
       if (SAVE.done[M.id] == null || SAVE.done[M.id] < idx) { SAVE.done[M.id] = idx; persist(); }
@@ -5622,14 +6312,44 @@ function onGameEvent(k, d) {
   }
 }
 const fmtTime = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+/* ---------------- medals: gold for a clean action, silver for a hard-won one, bronze for any victory ---------------- */
+const MEDALS = [
+  { key: 'bronzo', label: 'Medaglia di bronzo', col: '#b0763c', hi: '#e2a96a' },
+  { key: 'argento', label: 'Medaglia d’argento', col: '#a9adb2', hi: '#eef1f4' },
+  { key: 'oro', label: 'Medaglia d’oro', col: '#c9a03c', hi: '#f6dc8a' },
+];
+function medalFor(G) {
+  if (G.result !== 'win') return -1;
+  const s = G.stats, d = DIFF_ORDER.indexOf(G.diffKey);
+  if (s.losses === 0 && s.alarms <= (d === 0 ? 2 : 1)) return 2;
+  if (s.losses <= 1 && s.alarms <= 5) return 1;
+  return 0;
+}
+function medalSvg(i, size = 64) {
+  const m = MEDALS[i];
+  return `<svg class="medal" width="${size}" height="${size * 1.45}" viewBox="0 0 64 93" aria-hidden="true">
+    <path d="M14 0h36v34l-18 10-18-10Z" fill="#2f6fb6"/><path d="M22 0h4v40l-4-2ZM38 0h4v38l-4 2Z" fill="#8cb9e8" opacity=".55"/>
+    <circle cx="32" cy="62" r="25" fill="${m.col}" stroke="#3a2c14" stroke-width="2"/><circle cx="32" cy="62" r="19" fill="none" stroke="${m.hi}" stroke-width="2" opacity=".8"/>
+    <path d="M32 47l4.4 9.2 10 1.2-7.4 6.8 2 9.8-9-5-9 5 2-9.8-7.4-6.8 10-1.2Z" fill="${m.hi}" opacity=".9"/>
+    <path d="M20 50a17 17 0 0 1 12-6" stroke="#fff" stroke-width="2.4" fill="none" opacity=".35" stroke-linecap="round"/></svg>`;
+}
+function medalWhy(G, i) {
+  const s = G.stats;
+  if (i === 2) return 'Nessun ardito perduto e il nemico quasi mai in allarme: un’azione da manuale.';
+  const lim = DIFF_ORDER.indexOf(G.diffKey) === 0 ? 2 : 1, many = s.alarms > lim;
+  if (i === 1) return `Per l’oro: ${s.losses ? 'nessun ardito perduto' : ''}${s.losses && many ? ' e ' : ''}${many ? `al massimo ${lim === 1 ? 'un allarme' : 'due allarmi'}` : ''}.`;
+  return 'Per l’argento: al massimo un ardito perduto e non più di cinque allarmi.';
+}
 function showDebrief() {
   const G = UI.G, M = G.M, win = G.result === 'win', next = UI.mi + 1 < MISSIONS.length ? UI.mi + 1 : null;
   UI.debriefShown = true;
-  const lost = G.stats.losses;
+  const lost = G.stats.losses, md = medalFor(G);
+  if (md >= 0 && (SAVE.medal[M.id] == null || SAVE.medal[M.id] < md)) { SAVE.medal[M.id] = md; persist(); }
   $('#debriefSheet').innerHTML = `
     <div class="lh"><span>Rapporto · ${esc(M.unit)}</span><span>${esc(M.date)}</span></div>
     <div class="big-stamp ${win ? 'ok' : 'ko'}">${win ? 'Missione compiuta' : 'Missione fallita'}</div>
     <h2>${esc(M.name)}</h2>
+    ${md >= 0 ? `<div class="medalrow">${medalSvg(md)}<div><b>${esc(MEDALS[md].label)}</b><span>${esc(medalWhy(G, md))}</span></div></div>` : ''}
     ${win ? '' : `<p class="reason">${esc(G.reason)}</p>`}
     <dl class="stats">
       <div><dt>Tempo</dt><dd>${fmtTime(G.time)}</dd></div>
@@ -6146,6 +6866,7 @@ let lastTs = 0;
 function loop(ts) {
   const T = ts / 1000; let dt = lastTs ? Math.min(0.05, T - lastTs) : 0; lastTs = T; UI.T = T;
   try {
+    musUpdate(dt);
     if (UI.screen === 'game' && UI.G) {
       if (UI.intro) stepIntro(dt);
       step(UI.G, dt);
@@ -6168,6 +6889,7 @@ function wire() {
   $('#mlist').onclick = e => { const b = e.target.closest('.mcard'); if (b) { auInit(); sfx('click'); showBrief(+b.dataset.i); } };
   $('#bSoundTitle').onclick = toggleSound; $('#bSoundPause').onclick = toggleSound;
   $('#bGfxTitle').onclick = cycleGfx; $('#bGfxPause').onclick = cycleGfx;
+  $('#bMusicTitle').onclick = musToggle; $('#bMusicPause').onclick = musToggle;
   $('#bHelpTitle').onclick = () => { $('#help').hidden = false; $('#bHelpClose').focus(); };
   $('#bHelpPause').onclick = () => { $('#help').hidden = false; $('#bHelpClose').focus(); };
   $('#bHelpClose').onclick = () => { $('#help').hidden = true; };
@@ -6184,7 +6906,7 @@ function wire() {
   $('#objPanel').onclick = () => { $('#objPanel').hidden = true; $('#bObj').setAttribute('aria-expanded', 'false'); };
   $('#bHintClose').onclick = () => { const c = UI.currentObjective(UI.G); UI.hintClosedFor = c ? c.id : null; refreshHud(true); };
   $('#bModeCancel').onclick = () => { UI.mode = 'move'; refreshHud(true); };
-  syncSoundButtons(); syncGfxButtons();
+  syncSoundButtons(); syncGfxButtons(); syncMusicButtons();
   addEventListener('resize', () => { VIEW.resize(); if (UI.screen === 'game') measureInsets(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden && UI.screen === 'game' && UI.G && !UI.G.paused && !UI.G.over) togglePause(); });
 }
