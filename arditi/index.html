@@ -309,6 +309,38 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .frontlist .fl b { color: var(--oro); margin-right: 6px; }
 .frontlist .fl span { display: block; color: var(--ink-dim); font-size: 12px; }
 .frontmap .fsea { font-family: var(--f-type); font-size: 8px; fill: #6f8ea8; font-style: italic; letter-spacing: .12em; }
+
+/* ---------- minimap ---------- */
+.minimap { position: absolute; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(var(--hudb, 140px) + 8px); padding: 4px; border-radius: 4px;
+  background: rgba(14,16,11,.88); border: 1px solid rgba(233,224,200,.32); box-shadow: 0 8px 24px rgba(0,0,0,.45); pointer-events: auto; line-height: 0; }
+.minimap canvas { display: block; border-radius: 2px; cursor: crosshair; touch-action: none; image-rendering: auto; }
+.minimap::after { content: 'N'; position: absolute; top: 6px; left: 8px; font: 700 10px/1 var(--f-ui); letter-spacing: .08em; color: rgba(246,239,220,.8); text-shadow: 0 1px 2px #000; pointer-events: none; }
+#bMap[aria-pressed="true"] { border-color: var(--oro); color: var(--oro); }
+@media (min-width: 900px) and (min-height: 560px) {
+  .minimap { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 92px); bottom: calc(env(safe-area-inset-bottom, 0px) + 16px); }
+}
+/* on phones the map button takes the centre button's place: a double tap on a portrait still centres on that man */
+@media (max-width: 480px) { #bCenter { display: none; } }
+
+/* ---------- the guard you are looking at ---------- */
+.inspect { position: absolute; left: 0; top: 0; padding: 5px 10px 6px; border-radius: 3px; background: rgba(14,16,11,.9); border: 1px solid rgba(233,224,200,.3); border-left: 3px solid #c8402f;
+  pointer-events: none; white-space: nowrap; display: flex; flex-direction: column; line-height: 1.15; box-shadow: 0 6px 16px rgba(0,0,0,.4); will-change: transform; }
+.inspect b { font-family: var(--f-ui); font-weight: 700; font-size: 14px; letter-spacing: .04em; }
+.inspect span { font-family: var(--f-type); font-size: 12px; color: var(--ink-dim); }
+.inspect i { font-style: normal; color: #9ccf7e; } .inspect i.sus { color: #e8c43a; } .inspect i.hot { color: #ff6a4a; }
+
+/* ---------- speech bubbles ---------- */
+#bubbles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.bubble { position: absolute; left: 0; top: 0; max-width: 220px; padding: 5px 10px 6px; border-radius: 10px; background: rgba(240,233,214,.96); color: #1f2016;
+  box-shadow: 0 5px 14px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; text-align: center; line-height: 1.15; will-change: transform, opacity; }
+.bubble::after { content: ''; position: absolute; left: 50%; bottom: -7px; margin-left: -7px; border: 7px solid transparent; border-bottom: 0; border-top-color: rgba(240,233,214,.96); }
+.bubble b { font-family: var(--f-ui); font-weight: 700; font-size: 15px; letter-spacing: .02em; white-space: nowrap; }
+.bubble span { font-family: var(--f-type); font-size: 11.5px; color: #5c5848; font-style: italic; white-space: nowrap; }
+.bubble.spot, .bubble.body { background: rgba(250,236,226,.97); } .bubble.spot b, .bubble.body b { color: #9c2a1c; font-size: 16px; }
+.bubble.spot::after, .bubble.body::after { border-top-color: rgba(250,236,226,.97); }
+.bubble.alert b { color: #8a4a12; }
+.bubble.trainer b { color: #2c4a1c; }
+@media (max-width: 480px) { .bubble b { font-size: 13.5px; } .bubble span { font-size: 10.5px; } }
 </style>
 </head>
 <body>
@@ -340,6 +372,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <symbol id="i-load" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 3.8v4.6h4.6"/><path d="M12 8v4.4l3 1.8"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5.5l11-2.5v12.5"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="17.5" cy="15.5" r="2.6" fill="currentColor"/><path d="M9 9l11-2.5"/></symbol>
     <symbol id="i-gfx" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16.5V20"/><path d="M8.5 12.5l2.5-3 2 2 2.5-3.5" stroke-width="1.6"/></symbol>
+    <symbol id="i-map" viewBox="0 0 24 24"><path d="M3.5 6.5 9 4l6 2.5 5.5-2.5v13.5L15 20l-6-2.5-5.5 2.5Z"/><path d="M9 4v13.5M15 6.5V20"/></symbol>
     <symbol id="i-center" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></symbol>
     <symbol id="i-emblem" viewBox="0 0 64 64"><path d="M32 3c3.4 7.6 11.6 10.4 11.6 19.6 0 4.3-2.1 7.4-5.2 9.4 1-4.2 0-7.2-2.1-9.5 0 5.2-3 7.6-4.3 9.7-1.2-2.1-4.3-4.5-4.3-9.7-2.1 2.3-3.1 5.3-2.1 9.5-3.1-2-5.2-5.1-5.2-9.4C20.4 13.4 28.6 10.6 32 3Z" fill="currentColor" stroke="none"/><rect x="26" y="29.5" width="12" height="4.5" rx="1" fill="currentColor" stroke="none"/><circle cx="32" cy="47" r="14.5" fill="currentColor" stroke="none"/><path d="M19 47h26" stroke="#131610" stroke-width="2"/></symbol>
   </defs>
@@ -355,6 +388,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <div class="hud-title"><span id="hMission"></span><span id="hClock">00:00</span></div>
     <button class="hb" id="bRotate" aria-label="Ruota la visuale"><svg class="ic"><use href="#i-rotate"/></svg></button>
     <button class="hb" id="bCenter" aria-label="Centra sull’ardito selezionato"><svg class="ic"><use href="#i-center"/></svg></button>
+    <button class="hb" id="bMap" aria-label="Minimappa (M)" aria-pressed="false"><svg class="ic"><use href="#i-map"/></svg></button>
     <button class="hb wide" id="bObj" aria-expanded="false" aria-controls="objPanel" aria-label="Obiettivi"><svg class="ic"><use href="#i-flag"/></svg><span id="hObjCount">0/0</span></button>
   </div>
   <div class="hint" id="hint" hidden><p id="hintText"></p><button class="x" id="bHintClose" aria-label="Nascondi il suggerimento"><svg class="ic"><use href="#i-close"/></svg></button></div>
@@ -365,6 +399,9 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <div class="squad" id="squad"></div>
     <div class="abil" id="abil"></div>
   </div>
+  <div id="bubbles" aria-live="off"></div>
+  <div class="inspect" id="inspect" hidden></div>
+  <div class="minimap" id="minimap" hidden><canvas id="mmCv" aria-label="Minimappa: tocca per spostare la visuale"></canvas></div>
   <div id="alarmEdge"></div>
 </div>
 
@@ -444,12 +481,14 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
       <div><dt>Cosa vede il nemico</dt><dd>
         <div class="legend-cones"><span><i style="background:rgba(236,214,140,.6)"></i>Tranquillo</span><span><i style="background:rgba(236,160,64,.7)"></i>Sospettoso</span><span><i style="background:rgba(226,96,52,.75)"></i>In allerta</span><span><i style="background:rgba(210,48,36,.8)"></i>Fa fuoco</span></div>
         Ogni cono è ciò che quel nemico vede. Un anello si riempie intorno a lui mentre ti nota: quando si chiude, dà l’allarme. Strisciando ti vede solo a metà distanza. Dentro un cespuglio sei invisibile, a meno che non ti stia accanto. Trincee, crateri e acqua ti rendono ancora più difficile da scorgere.</dd></div>
+      <div><dt>Minimappa</dt><dd>In basso a destra vedi tutto il campo: la squadra in oro, le sentinelle in rosso col loro sguardo, l’obiettivo che lampeggia e il riquadro di ciò che stai guardando. Tocca o trascina sulla minimappa per spostare la visuale. Si apre e si chiude col pulsante della mappa in alto o con il tasto M.</dd></div>
+      <div><dt>Studiare le sentinelle</dt><dd>Passa il mouse su un nemico, o tienici sopra il dito per un attimo, per vedere chi è, com’è il suo umore e il giro che fa: i puntini rossi scorrono nel verso della ronda. Per le sentinelle ferme vedi fin dove girano lo sguardo. Tenere premuto non dà ordini, quindi nessuno parte all’attacco per sbaglio.</dd></div>
       <div><dt>Rumore</dt><dd>Spari ed esplosioni richiamano ogni nemico a portata d’orecchio. Un sasso lanciato attira le sentinelle vicine a controllare, e può aprirti la strada.</dd></div>
       <div><dt>Meteo</dt><dd>Pioggia, temporale e vento coprono il rumore degli spari; nebbia, buio e neve accorciano la vista delle sentinelle, e nella neve si cammina più piano. Nei temporali un lampo illumina per un istante tutto il campo: quando lampeggia, stai giù. Le condizioni di ogni missione sono nel briefing.</dd></div>
       <div><dt>Medaglie</dt><dd>Vinci senza perdere arditi e quasi senza allarmi per la medaglia d’oro; con al massimo un caduto e cinque allarmi per quella d’argento. Ogni vittoria vale almeno il bronzo. La medaglia migliore resta segnata accanto alla missione.</dd></div>
       <div><dt>Corpi</dt><dd>Una guardia che trova un corpo dà l’allarme. Porta i corpi tra i cespugli o lasciali nel fiume.</dd></div>
       <div><dt>Pausa e salvataggi</dt><dd>Puoi mettere in pausa quando vuoi: gli ordini dati in pausa vengono eseguiti alla ripresa. Dal menu di pausa salvi il punto in cui sei e, se qualcosa va storto, riprendi da lì. Come in Commandos, salva spesso.</dd></div>
-      <div><dt>Tastiera</dt><dd>1–6 seleziona · A tutti · C striscia · K pugnale · F fuoco · G petardo · X pinze · E carica · S sasso · B prendi o posa · Frecce sposta la visuale · Q/R ruota · Spazio pausa · F5 salva · F9 riprendi · Esc annulla</dd></div>
+      <div><dt>Tastiera</dt><dd>1–6 seleziona · A tutti · C striscia · K pugnale · F fuoco · G petardo · X pinze · E carica · S sasso · B prendi o posa · Frecce sposta la visuale · Q/R ruota · Spazio pausa · M minimappa · F5 salva · F9 riprendi · Esc annulla</dd></div>
     </dl>
     <button class="btn primary" id="bHelpClose">Ho capito</button>
   </div>
@@ -1405,6 +1444,7 @@ function tileCost(G, c, r) {
 }
 function setTile(G, c, r, ch) {
   G.map[r][c] = ch;
+  G.mapRev = (G.mapRev || 0) + 1;
   G.dirtyTiles.push([c, r]);
 }
 function los(G, x0, y0, x1, y1) {
@@ -1573,7 +1613,7 @@ function makeEnemy(G, d) {
     path: [], state: 'idle', meter: 0, alive: true, target: null, lastKnown: null, lostT: 0,
     point: null, alertT: 0, susT: 0, lookT: 0, lookBase: f, fireCd: 0, wary: false, repathT: 0,
     discovered: false, hidden: false, carriedBy: null, dummy: !!T.dummy, static: !!T.static, trainer: !!T.trainer,
-    bark: null, barkT: 0, deadT: 0, spawned: !!d.spawned,
+    bark: null, barkT: 0, say: null, sayT: 0, deadT: 0, spawned: !!d.spawned,
   };
   // after dark some sentries walk with a lantern: they see farther, and they can be seen from afar
   const dark = G.M.light === 'night' || G.M.light === 'dusk';
@@ -1592,6 +1632,31 @@ function msg(G, text, kind = 'info', key = null, every = 0) {
   G.onEvent('msg', { text, kind });
 }
 function bark(e, t) { e.bark = t; e.barkT = 1.6; }
+/* what the guards say, in the German of the k.u.k. army, with the Italian under it; the instructor at the Sdricca shouts in Italian */
+const VOICE = {
+  sus: [['Was war das?', 'Cos’era?'], ['Wer da?', 'Chi va là?'], ['Hast du das gehört?', 'Hai sentito?'], ['Da drüben… ?', 'Laggiù… ?'], ['Hm? Was ist los?', 'Mh? Che succede?'], ['Ist da wer?', 'C’è qualcuno?']],
+  alert: [['Achtung! Da ist jemand!', 'Attenzione! C’è qualcuno!'], ['Schnell, dorthin!', 'Presto, di là!'], ['Gewehr bereit!', 'Fucile pronto!'], ['Ausschwärmen!', 'Sparpagliatevi!']],
+  spot: [['Alarm! Die Italiener!', 'Allarme! Gli italiani!'], ['Halt! Stehenbleiben!', 'Alt! Fermo!'], ['Feuer! Feuer!', 'Fuoco! Fuoco!'], ['Die Italiener kommen!', 'Arrivano gli italiani!'], ['Da! Schießt!', 'Là! Sparate!']],
+  body: [['Sanitäter! Hier liegt einer!', 'Barelliere! Qui c’è un uomo a terra!'], ['Kamerad! Mein Gott…', 'Camerata! Mio Dio…'], ['Ein Toter! Alarm!', 'Un morto! Allarme!']],
+  calm: [['Nichts. Nur der Wind.', 'Niente. Solo il vento.'], ['Wohl eine Ratte.', 'Sarà un topo.'], ['Zurück auf Posten.', 'Torno al mio posto.'], ['Ich seh’ schon Gespenster…', 'Comincio a vedere fantasmi…'], ['Verdammter Nebel…', 'Maledetta nebbia…']],
+  trainer: [['Ti ho visto! Torna alla linea!', ''], ['Basso, ho detto! Da capo!', ''], ['Così ti ammazzano! Indietro!', '']],
+};
+const VOICE_RANK = { calm: 1, sus: 1, alert: 2, spot: 3, body: 3, trainer: 3 };
+function say(G, e, kind) {
+  if (G.attract || e.dummy || !e.alive) return;
+  const L = VOICE[kind]; if (!L) return;
+  const rank = VOICE_RANK[kind];
+  if (e.sayT > 0.5 && e.say && VOICE_RANK[e.say.kind] > rank) return;
+  if (e.sayT > 0 && e.say && e.say.kind === kind) return;
+  G.sayAt = G.sayAt || {};
+  if (rank < 3 && G.time - (G.sayAt[kind] || -9) < 1.1) return; // one voice at a time for the small talk
+  G.sayAt[kind] = G.time;
+  let pool = L;
+  if (kind === 'calm') pool = L.filter(l => !/Nebel/.test(l[0]) || (G.wx && G.wx.kind === 'fog') || G.M.light === 'fog');
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  e.say = { de: pick[0], it: pick[1], kind }; e.sayT = rank >= 3 ? 2.8 : 2.3;
+  sound(G, rank >= 2 ? 'shout' : 'voice', e.x, e.y);
+}
 function floatText(G, x, y, txt, color) { G.texts.push({ x, y, txt, color, t: 0, T: 1.1 }); }
 function sound(G, kind, x, y) { if (!G.attract) G.onEvent('sfx', { kind, x, y }); }
 
@@ -1879,6 +1944,7 @@ function setSuspicious(G, e, pt) {
   e.path = e.static ? [] : (findPath(G, e.x, e.y, pt.x, pt.y, null) || []);
   if (e.static) e.wantFace = e.lookBase;
   bark(e, '?');
+  say(G, e, 'sus');
 }
 function toAlert(G, e, pt) {
   e.state = 'alert'; e.point = { x: pt.x, y: pt.y }; e.alertT = e.spawned ? 30 : 14; e.lookT = 0; e.wary = true;
@@ -1886,8 +1952,10 @@ function toAlert(G, e, pt) {
   e.path = e.static ? [] : (findPath(G, e.x, e.y, pt.x, pt.y, null) || []);
   if (e.static) e.wantFace = e.lookBase;
   if (e.barkT <= 0 || e.bark !== '!') bark(e, '!?');
+  say(G, e, 'alert');
 }
 function returnHome(G, e) {
+  if (e.state === 'suspicious' || e.state === 'alert') say(G, e, 'calm');
   e.meter = Math.min(e.meter, 0.25);
   if (e.static) { e.state = 'idle'; e.wantFace = e.homeFacing; return; }
   e.state = 'returning';
@@ -1991,7 +2059,7 @@ function checkBodies(G, e) {
     if (tileAt(G, b.x, b.y).hide) continue;
     if (!los(G, e.x, e.y, b.x, b.y)) continue;
     b.discovered = true;
-    toAlert(G, e, { x: b.x, y: b.y }); bark(e, '!');
+    toAlert(G, e, { x: b.x, y: b.y }); bark(e, '!'); say(G, e, 'body');
     raiseAlarm(G, e, { x: b.x, y: b.y }, 7, 'È stato trovato un corpo! Il nemico perlustra la zona.');
     return;
   }
@@ -2000,13 +2068,13 @@ function spot(G, e, u) {
   if (e.trainer) { trainerCatch(G, e, u); return; }
   e.state = 'combat'; e.target = u; e.meter = 1; e.lostT = 0; e.lastKnown = { x: u.x, y: u.y }; e.path = [];
   e.fireCd = Math.max(e.fireCd, 0.75 / G.diff.fireRate);
-  bark(e, '!');
+  bark(e, '!'); say(G, e, 'spot');
   raiseAlarm(G, e, { x: u.x, y: u.y }, e.T.whistle || 8, `Allarme! ${u.short} è stato avvistato.`);
 }
 function trainerCatch(G, e, u) {
   const cp = G.M.checkpoint || [tc(u.x), tc(u.y)];
   u.x = ctr(cp[0]); u.y = ctr(cp[1]); u.path = []; u.order = null; u.busy = 0;
-  e.meter = 0; e.state = 'idle'; bark(e, '!');
+  e.meter = 0; e.state = 'idle'; bark(e, '!'); say(G, e, 'trainer');
   sound(G, 'whistle', e.x, e.y);
   msg(G, `Fischio! L’istruttore ha visto ${u.short}. Torna alla linea: striscia e usa i cespugli.`, 'bad');
 }
@@ -2030,6 +2098,7 @@ function updateEnemy(G, e, dt) {
   if (!e.alive || e.dummy) return;
   e.fireCd = Math.max(0, e.fireCd - dt);
   e.barkT = Math.max(0, e.barkT - dt);
+  if (e.sayT > 0) e.sayT = Math.max(0, e.sayT - dt);
   perceive(G, e, dt);
   if (!e.alive) return;
   let speed = e.T.speed;
@@ -2958,12 +3027,112 @@ function aoGeo(base, g) {
   let a = AO_GEO.get(base + g.uuid); if (a) return a;
   a = g.clone(); a.computeBoundingBox();
   const P = a.attributes.position, bb = a.boundingBox, h = Math.max(1e-4, bb.max.y - bb.min.y), col = new Float32Array(P.count * 3);
-  const lo = { ico: 0.5, ico1: 0.5, sph: 0.5, cone: 0.55, dod: 0.62, tuft: 0.45, bag: 0.62, box: 0.78, cyl: 0.72, cyl8: 0.75, stone: 0.7, torus: 1 }[base] || 0.8;
-  for (let i = 0; i < P.count; i++) { const k = (P.getY(i) - bb.min.y) / h, v = lo + (1 - lo) * smooth(k, 0, 0.85); col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = v; }
+  const lo = { crown: 0.62, ico: 0.5, ico1: 0.5, sph: 0.5, cone: 0.55, dod: 0.62, tuft: 0.45, bag: 0.62, box: 0.78, cyl: 0.72, cyl8: 0.75, stone: 0.7, torus: 1 }[base.startsWith('crown') ? 'crown' : base.startsWith('rock') ? 'stone' : base] || 0.8;
+  const tint = g.userData && g.userData.tint;
+  for (let i = 0; i < P.count; i++) { const k = (P.getY(i) - bb.min.y) / h; let v = lo + (1 - lo) * smooth(k, 0, 0.85); if (tint) v *= tint[i]; col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = v; }
   a.setAttribute('color', new THREE.BufferAttribute(col, 3));
   AO_GEO.set(base + g.uuid, a); return a;
 }
 const GEO = {};
+/* ---------- tree crowns: clusters of lumpy leaf masses merged into one shape, darker inside and underneath ----------
+   fine crowns (many smooth lobes) grow on the playable map; the woods beyond the edge use a lighter cut of the same shapes */
+function crownGeo(seed, kind, fine) {
+  const rnd = (() => { let s = seed * 9301 + 49297; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; })();
+  const lobes = [];
+  if (kind === 'poplar') {
+    // a Lombardy poplar: a tall column of small lobes, narrowing to the tip
+    const n = fine ? 5 : 3;
+    for (let i = 0; i < n; i++) { const t = i / (n - 1); lobes.push([(rnd() - 0.5) * 0.12, -0.8 + t * 1.7, (rnd() - 0.5) * 0.12, 0.42 * (1 - t * 0.5) + rnd() * 0.06]); }
+  } else if (kind === 'weep') {
+    // a willow: a broad, low dome whose skirt hangs down towards the water
+    lobes.push([0, 0.12, 0, 0.62]);
+    const n = fine ? 5 : 2;
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + rnd() * 0.5; lobes.push([Math.cos(a) * 0.48, -0.05 + rnd() * 0.1, Math.sin(a) * 0.48, 0.42 + rnd() * 0.08]); }
+  } else {
+    // a broadleaf: a heavy middle, lobes round it and a lighter top
+    lobes.push([0, 0, 0, 0.6]);
+    const n = fine ? 4 : 1;
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2 + rnd() * 0.9; lobes.push([Math.cos(a) * (0.42 + rnd() * 0.12), (rnd() - 0.4) * 0.3, Math.sin(a) * (0.42 + rnd() * 0.12), 0.38 + rnd() * 0.12]); }
+    lobes.push([(rnd() - 0.5) * 0.2, 0.42 + rnd() * 0.08, (rnd() - 0.5) * 0.2, 0.4 + rnd() * 0.06]);
+  }
+  // one smooth, indexed ball to dent: corners welded so the lobes shade round
+  const src = fine ? new THREE.IcosahedronGeometry(1, 1) : new THREE.SphereGeometry(1, 6, 4), IP = src.attributes.position, weld = new Map(), uniq = [], bi = [];
+  const srcIdx = src.index ? src.index.array : null, cnt = srcIdx ? srcIdx.length : IP.count;
+  for (let t = 0; t < cnt; t++) {
+    const i = srcIdx ? srcIdx[t] : t;
+    const key = `${IP.getX(i).toFixed(3)},${IP.getY(i).toFixed(3)},${IP.getZ(i).toFixed(3)}`;
+    let j = weld.get(key); if (j == null) { j = uniq.length / 3; weld.set(key, j); uniq.push(IP.getX(i), IP.getY(i), IP.getZ(i)); }
+    bi.push(j);
+  }
+  src.dispose();
+  const pos = [], idx = [], tint = [];
+  for (const [lx, ly, lz, lr] of lobes) {
+    const o = pos.length / 3, ph = rnd() * 10;
+    for (let i = 0; i < uniq.length; i += 3) {
+      const vx = uniq[i], vy = uniq[i + 1], vz = uniq[i + 2];
+      // a lumpy surface: two octaves of smooth noise push the leaves in and out
+      const n1 = vnoise(vx * 2.1 + ph, vz * 2.1 + vy * 1.7) - 0.5, n2 = vnoise(vx * 4.3 - ph, vy * 4.3 + vz * 3.1) - 0.5;
+      const r = lr * (1 + n1 * 0.34 + n2 * 0.16);
+      const x = lx + vx * r; let y = ly + vy * r; const z = lz + vz * r;
+      if (kind === 'weep') { if (vy < 0.1) y -= (0.1 - vy) * lr * 0.9 * (0.7 + n1); }
+      else if (kind !== 'poplar' && y < -0.32) y = -0.32 + (y + 0.32) * 0.35; // the underside flattens where the light cannot reach
+      pos.push(x, y, z);
+      // darker towards the core of the crown and underneath, a little noise from leaf to leaf
+      const out = Math.min(1, Math.hypot(x, z, y * 0.6) / 0.95);
+      tint.push(clamp(0.72 + 0.32 * out + n2 * 0.28 + (vy > 0 ? 0.06 : -0.04), 0.55, 1.15));
+    }
+    for (let t = 0; t < bi.length; t++) idx.push(o + bi[t]);
+  }
+  // fitted to the unit ball on every axis, so a crown takes the place of the old round shapes at the same scale
+  let mnx = 1e9, mxx = -1e9, mny = 1e9, mxy = -1e9, mnz = 1e9, mxz = -1e9;
+  for (let i = 0; i < pos.length; i += 3) { mnx = Math.min(mnx, pos[i]); mxx = Math.max(mxx, pos[i]); mny = Math.min(mny, pos[i + 1]); mxy = Math.max(mxy, pos[i + 1]); mnz = Math.min(mnz, pos[i + 2]); mxz = Math.max(mxz, pos[i + 2]); }
+  const cx = (mnx + mxx) / 2, cy = (mny + mxy) / 2, cz = (mnz + mxz) / 2, ax = 2 / (mxx - mnx), ay = 2 / (mxy - mny), az = 2 / (mxz - mnz);
+  for (let i = 0; i < pos.length; i += 3) { pos[i] = (pos[i] - cx) * ax; pos[i + 1] = (pos[i + 1] - cy) * ay; pos[i + 2] = (pos[i + 2] - cz) * az; }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  g.userData.tint = new Float32Array(tint);
+  return g;
+}
+/* ---------- rocks: a ball broken into weathered faces, with bands of strata and dark cracks between them ---------- */
+function rockGeo(seed, fine) {
+  const g = new THREE.IcosahedronGeometry(1, fine ? 1 : 0), P = g.attributes.position, ph = seed * 1.37;
+  const key = (x, y, z) => vnoise(x * 1.7 + ph, z * 1.7 + y * 1.3) - 0.5;
+  for (let i = 0; i < P.count; i++) {
+    const x = P.getX(i), y = P.getY(i), z = P.getZ(i);
+    const n1 = key(x, y, z), n2 = vnoise(x * 3.9 - ph, y * 3.9 + z * 2.7) - 0.5;
+    let r = 1 + n1 * 0.55 + n2 * 0.18;
+    // a flatter top, as limestone breaks along its beds
+    let yy = y * r; if (yy > 0.35) yy = 0.35 + (yy - 0.35) * 0.45;
+    P.setXYZ(i, x * r, yy, z * r);
+  }
+  g.computeVertexNormals();
+  // per face: the tops catch the light, the undersides and the cracks go dark, and the strata band across
+  const tint = new Float32Array(P.count);
+  for (let f = 0; f < P.count; f += 3) {
+    const cy = (P.getY(f) + P.getY(f + 1) + P.getY(f + 2)) / 3, ny = (g.attributes.normal.getY(f) + g.attributes.normal.getY(f + 1) + g.attributes.normal.getY(f + 2)) / 3;
+    const n = vnoise(P.getX(f) * 5 + ph, P.getZ(f) * 5 + cy * 3) - 0.5;
+    const t = clamp(0.84 + ny * 0.16 + n * 0.26 + Math.sin(cy * 11 + ph) * 0.05, 0.55, 1.15);
+    tint[f] = tint[f + 1] = tint[f + 2] = t;
+  }
+  g.userData.tint = tint;
+  return g;
+}
+function rocks(fine) {
+  if (!GEO.rocks) GEO.rocks = { F: [0, 1, 2, 3].map(i => rockGeo(5 + i * 7, true)), C: [0, 1, 2, 3].map(i => rockGeo(5 + i * 7, false)) };
+  const out = {};
+  for (let i = 0; i < 4; i++) out['rock' + i] = fine ? GEO.rocks.F[i] : GEO.rocks.C[i];
+  return out;
+}
+// the six crown shapes in both cuts: crown0–3 broadleaf, crownP poplar, crownW willow; 'C' in front of the number for the light cut
+function crowns(fine) {
+  if (!GEO.crowns) {
+    const mk = f => ({ 0: crownGeo(11, 'broad', f), 1: crownGeo(23, 'broad', f), 2: crownGeo(37, 'broad', f), 3: crownGeo(53, 'broad', f), P: crownGeo(71, 'poplar', f), W: crownGeo(89, 'weep', f) });
+    GEO.crowns = { F: mk(true), C: mk(false) };
+  }
+  const out = {};
+  for (const k of ['0', '1', '2', '3', 'P', 'W']) { out['crown' + k] = fine ? GEO.crowns.F[k] : GEO.crowns.C[k]; out['crownC' + k] = GEO.crowns.C[k]; }
+  return out;
+}
 function prismGeo() {
   // unit gable prism: x ∈ [-.5,.5], base z ∈ [-.5,.5] at y = 0, ridge at y = 1, z = 0
   const A = [-0.5, 0, -0.5], B = [-0.5, 0, 0.5], C = [-0.5, 1, 0], D = [0.5, 0, -0.5], E = [0.5, 0, 0.5], F = [0.5, 1, 0];
@@ -2981,6 +3150,7 @@ function geo() {
   GEO.cyl = new THREE.CylinderGeometry(1, 1, 1, 10);
   GEO.cyl6 = new THREE.CylinderGeometry(1, 1, 1, 6);
   GEO.cyl8 = new THREE.CylinderGeometry(1, 1, 1, 8);
+  GEO.twig = new THREE.CylinderGeometry(0.7, 1, 1, 4, 1, true); // a branch: four sides, open ends, hidden in the crown
   GEO.cone = new THREE.ConeGeometry(1, 1, 8);
   GEO.cone7 = new THREE.ConeGeometry(1, 1, 7);
   GEO.pyr = new THREE.ConeGeometry(1, 1, 4);
@@ -3530,7 +3700,7 @@ function buildWater(G, root, L) {
 
 /* ---------- vegetation, rocks, walls, trenches: instanced ---------- */
 // leaves and grass move in the wind: a small vertex offset, stronger towards the top of each shape
-const SWAY = new Set(['ico', 'ico1', 'cone', 'sph', 'tuft']);
+const SWAY = new Set(['ico', 'ico1', 'cone', 'sph', 'tuft', 'crown0', 'crown1', 'crown2', 'crown3', 'crownP', 'crownW', 'crownC0', 'crownC1', 'crownC2', 'crownC3', 'crownCP', 'crownCW']);
 function swayMat() {
   if (R3.swayMat) return R3.swayMat;
   const m = new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true });
@@ -3558,7 +3728,7 @@ class Inst {
   flush(root) {
     const G0 = geo(), out = [];
     const sm = r3Quality().smooth;
-    const GEOM = { box: G0.box, ico: sm ? G0.ico1 : G0.ico, ico1: G0.ico1, dod: G0.dod, cyl: sm ? G0.cyl : G0.cyl6, cyl8: G0.cyl8, cone: sm ? G0.cone : G0.cone7, sph: sm ? G0.sph : G0.sph6, tuft: G0.tuft, stone: G0.oct, bag: G0.bag, torus: G0.torus };
+    const GEOM = { box: G0.box, ico: sm ? G0.ico1 : G0.ico, ico1: G0.ico1, dod: G0.dod, cyl: sm ? G0.cyl : G0.cyl6, cyl8: G0.cyl8, cone: sm ? G0.cone : G0.cone7, sph: sm ? G0.sph : G0.sph6, tuft: G0.tuft, stone: G0.oct, bag: G0.bag, torus: G0.torus, twig: G0.twig, ...crowns(!!sm), ...rocks(!!sm) };
     for (const k in this.L) {
       const key = k.split('|')[0], base = key.split(':')[0], noShadow = key.endsWith(':ns'), list = this.L[k];
       let cx = 0, cy = 0, cz = 0; for (const it of list) { cx += it.x; cy += it.y; cz += it.z; }
@@ -3585,6 +3755,7 @@ function snowy(hex, k) { if (!R3.snow) return hex; const a = new THREE.Color(hex
 const AUTUMN = [0xb88a2c, 0xa4562a, 0x8c7a2c, 0xc29a3a, 0x7a6a2e];
 function leaf(hex, c, r, k) { if (!R3.autumn) return hex; const h = HASH(c, r, 70 + k); return h < 0.22 ? hex : shadeHex(AUTUMN[Math.floor(HASH(c, r, 80) * AUTUMN.length)], (h - 0.5) * 0.25); }
 function plantTree(I, G, kind, cx, cz, gy, c, r, big) {
+  const CR = big ? 'crownC' : 'crown';
   const hs = k => HASH(c, r, k), sc = (0.85 + hs(3) * 0.4) * (big ? 1.15 : 1), ox = (hs(1) - 0.5) * 0.3, oz = (hs(2) - 0.5) * 0.3;
   const x = cx + ox, z = cz + oz;
   if (kind === 'conifer') {
@@ -3610,32 +3781,35 @@ function plantTree(I, G, kind, cx, cz, gy, c, r, big) {
     const lean = (hs(8) - 0.5) * 0.4;
     I.push('cyl', x, gy + 0.4 * sc, z, lean * 0.5, 0, lean, 0.1, 0.8 * sc, 0.1, 0x55483a);
     const g = leaf(shadeHex(0x7d8e62, (hs(7) - 0.5) * 0.25), c, r, 1);
-    I.push('sph', x + lean * 0.3, gy + 1.15 * sc, z, 0, hs(5) * 6, 0, 0.75 * sc, 0.55 * sc, 0.75 * sc, g);
-    I.push('sph', x + lean * 0.3 + 0.2, gy + 0.95 * sc, z - 0.15, 0, 0, 0, 0.55 * sc, 0.45 * sc, 0.55 * sc, shadeHex(g, -0.08));
+    for (let b = 0; b < 2; b++) { const a = hs(50 + b) * TAU; if (!big) I.push('twig', x + lean * 0.2 + Math.cos(a) * 0.14, gy + 0.95 * sc, z + Math.sin(a) * 0.14, Math.sin(a) * 0.8, 0, -Math.cos(a) * 0.8, 0.04, 0.45 * sc, 0.04, 0x55483a); }
+    I.push(CR + 'W', x + lean * 0.3, gy + 1.12 * sc, z, 0, hs(5) * 6, 0, 0.85 * sc, 0.62 * sc, 0.85 * sc, g);
   } else if (kind === 'poplar') {
     I.push('cyl', x, gy + 0.5 * sc, z, 0, 0, 0, 0.07, 1.0 * sc, 0.07, 0x5f5444);
-    I.push('sph', x, gy + 1.9 * sc, z, 0, 0, 0, 0.38 * sc, 1.35 * sc, 0.38 * sc, leaf(shadeHex(0x50703a, (hs(7) - 0.5) * 0.25), c, r, 2));
+    I.push(CR + 'P', x, gy + 1.9 * sc, z, 0, hs(5) * 6, 0, 0.4 * sc, 1.38 * sc, 0.4 * sc, leaf(shadeHex(0x50703a, (hs(7) - 0.5) * 0.25), c, r, 2));
   } else if (kind === 'mulberry') {
     I.push('cyl', x, gy + 0.38 * sc, z, 0, 0, 0, 0.12, 0.76 * sc, 0.12, 0x4e3f2e);
     I.push('sph', x, gy + 0.78 * sc, z, 0, 0, 0, 0.17, 0.12, 0.17, 0x4e3f2e);
-    I.push('ico', x, gy + 1.15 * sc, z, hs(4), hs(5) * 6, hs(6), 0.68 * sc, 0.52 * sc, 0.68 * sc, leaf(shadeHex(0x4c6a2e, (hs(7) - 0.5) * 0.3), c, r, 3));
+    for (let b = 0; b < 3; b++) { const a = b / 3 * TAU + hs(52); if (!big) I.push('twig', x + Math.cos(a) * 0.12, gy + 0.92 * sc, z + Math.sin(a) * 0.12, Math.sin(a) * 0.9, 0, -Math.cos(a) * 0.9, 0.035, 0.32 * sc, 0.035, 0x4e3f2e); }
+    I.push(CR + Math.floor(hs(53) * 4), x, gy + 1.18 * sc, z, 0, hs(5) * 6, 0, 0.72 * sc, 0.46 * sc, 0.72 * sc, leaf(shadeHex(0x4c6a2e, (hs(7) - 0.5) * 0.3), c, r, 3));
   } else {
     const v = hs(30);
     if (v < 0.22 && !R3.snow) {
       // a birch: pale bark, a light and airy crown
       I.push('cyl', x, gy + 0.7 * sc, z, (hs(31) - 0.5) * 0.12, 0, (hs(32) - 0.5) * 0.12, 0.055, 1.4 * sc, 0.055, 0xd8d4c8);
       for (let k = 0; k < 3; k++) I.push('box', x + (hs(33 + k) - 0.5) * 0.05, gy + (0.3 + k * 0.35) * sc, z, 0, hs(36 + k) * 6, 0, 0.06, 0.03, 0.06, 0x2a2622);
-      I.push('ico', x, gy + 1.6 * sc, z, hs(4), hs(5) * 6, hs(6), 0.5 * sc, 0.7 * sc, 0.5 * sc, leaf(shadeHex(0x6a8a3a, (hs(7) - 0.5) * 0.3), c, r, 4));
-      I.push('ico', x + 0.15, gy + 1.25 * sc, z - 0.1, hs(8), hs(9) * 6, 0, 0.36 * sc, 0.4 * sc, 0.36 * sc, leaf(shadeHex(0x5e7e34, (hs(10) - 0.5) * 0.3), c, r, 5));
+      I.push(CR + '1', x, gy + 1.62 * sc, z, 0, hs(5) * 6, 0, 0.5 * sc, 0.72 * sc, 0.5 * sc, leaf(shadeHex(0x6a8a3a, (hs(7) - 0.5) * 0.3), c, r, 4));
+      I.push(CR + '3', x + 0.15, gy + 1.25 * sc, z - 0.1, 0, hs(9) * 6, 0, 0.36 * sc, 0.38 * sc, 0.36 * sc, leaf(shadeHex(0x5e7e34, (hs(10) - 0.5) * 0.3), c, r, 5));
     } else if (v > 0.8) {
-      // a broad old oak with three heavy lobes
-      I.push('cyl', x, gy + 0.6 * sc, z, 0, 0, 0, 0.13, 1.2 * sc, 0.13, 0x433426);
-      for (let k = 0; k < 3; k++) { const a = k / 3 * TAU + hs(40 + k); I.push('ico', x + Math.cos(a) * 0.32 * sc, gy + (1.45 + hs(43 + k) * 0.25) * sc, z + Math.sin(a) * 0.32 * sc, hs(4 + k), hs(5 + k) * 6, 0, 0.62 * sc, 0.52 * sc, 0.62 * sc, leaf(shadeHex(0x34502a, (hs(46 + k) - 0.5) * 0.35), c, r, 6)); }
-      I.push('ico', x, gy + 1.95 * sc, z, hs(12), hs(13) * 6, 0, 0.5 * sc, 0.42 * sc, 0.5 * sc, leaf(shadeHex(0x456432, (hs(14) - 0.5) * 0.3), c, r, 7));
+      // a broad old oak: a thick bole, heavy limbs and a wide, lumpy crown
+      I.push('cyl', x, gy + 0.6 * sc, z, 0, 0, 0, 0.14, 1.2 * sc, 0.14, 0x433426);
+      for (let b = 0; b < 3; b++) { const a = b / 3 * TAU + hs(40); if (!big) I.push('twig', x + Math.cos(a) * 0.22 * sc, gy + 1.22 * sc, z + Math.sin(a) * 0.22 * sc, Math.sin(a) * 0.75, 0, -Math.cos(a) * 0.75, 0.06, 0.62 * sc, 0.06, 0x433426); }
+      I.push(CR + '0', x, gy + 1.68 * sc, z, 0, hs(5) * 6, 0, 1.02 * sc, 0.74 * sc, 1.02 * sc, leaf(shadeHex(0x3f5a2c, (hs(6) - 0.5) * 0.3), c, r, 6));
+      I.push(CR + (1 + Math.floor(hs(41) * 3)), x + (hs(8) - 0.5) * 0.3, gy + 2.1 * sc, z + (hs(9) - 0.5) * 0.3, 0, hs(13) * 6, 0, 0.58 * sc, 0.42 * sc, 0.58 * sc, leaf(shadeHex(0x456432, (hs(14) - 0.5) * 0.3), c, r, 7));
     } else {
       I.push('cyl', x, gy + 0.55 * sc, z, 0, 0, 0, 0.09, 1.1 * sc, 0.09, 0x4a3828);
-      I.push('ico', x, gy + 1.45 * sc, z, hs(4), hs(5) * 6, hs(6), 0.72 * sc, 0.62 * sc, 0.72 * sc, leaf(shadeHex(0x3a5229, (hs(7) - 0.5) * 0.35), c, r, 8));
-      I.push('ico', x + (hs(8) - 0.5) * 0.4, gy + 1.8 * sc, z + (hs(9) - 0.5) * 0.4, hs(10), hs(11) * 6, 0, 0.48 * sc, 0.42 * sc, 0.48 * sc, leaf(shadeHex(0x4a6534, (hs(12) - 0.5) * 0.3), c, r, 9));
+      for (let b = 0; b < 2; b++) { const a = hs(54 + b) * TAU; if (!big) I.push('twig', x + Math.cos(a) * 0.14 * sc, gy + 1.08 * sc, z + Math.sin(a) * 0.14 * sc, Math.sin(a) * 0.7, 0, -Math.cos(a) * 0.7, 0.04, 0.45 * sc, 0.04, 0x4a3828); }
+      I.push(CR + Math.floor(hs(56) * 4), x, gy + 1.5 * sc, z, 0, hs(5) * 6, 0, 0.8 * sc, 0.66 * sc, 0.8 * sc, leaf(shadeHex(0x3a5229, (hs(7) - 0.5) * 0.35), c, r, 8));
+      if (hs(57) < 0.5) I.push(CR + Math.floor(hs(58) * 4), x + (hs(8) - 0.5) * 0.4, gy + 1.9 * sc, z + (hs(9) - 0.5) * 0.4, 0, hs(11) * 6, 0, 0.44 * sc, 0.36 * sc, 0.44 * sc, leaf(shadeHex(0x4a6534, (hs(12) - 0.5) * 0.3), c, r, 9));
     }
   }
 }
@@ -3659,16 +3833,17 @@ function buildDecor(G, root) {
       for (let k = 0; k < 2; k++) {
         const s = 0.55 + hs(k) * 0.35, hy = (edge ? 0.9 : 0.6) + hs(k + 3) * (edge ? 1.0 : 0.9);
         const base = lime ? 0x948f80 : 0x6d695f, tone = shadeHex(base, (hs(k + 7) - 0.5) * 0.35);
-        I.push('dod', cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.3, cz + (hs(k + 13) - 0.5) * 0.5, hs(k + 1) * 3, hs(k + 2) * 6, hs(k + 4) * 3, s, hy * 0.62, s, tone);
+        I.push('rock' + Math.floor(hs(k + 17) * 4), cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.3, cz + (hs(k + 13) - 0.5) * 0.5, (hs(k + 1) - 0.5) * 0.5, hs(k + 2) * 6, (hs(k + 4) - 0.5) * 0.5, s, hy * 0.62, s, tone);
         if (R3.snow) I.push('bag', cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.62, cz + (hs(k + 13) - 0.5) * 0.5, 0, hs(k + 2) * 6, 0, s * 0.8, hy * 0.16, s * 0.8, SNOWC);
       }
     } else if (ch === 'T') {
       plantTree(I, G, treeKind(G, c, r), cx, cz, gy, c, r, !inside);
     } else if (ch === 'b') {
       const dead = st.tree === 'dead';
-      for (let k = 0; k < 3; k++) {
-        const s = 0.28 + hs(k) * 0.16;
-        I.push('ico', cx + (hs(k + 4) - 0.5) * 0.5, gy + s * 0.6, cz + (hs(k + 8) - 0.5) * 0.5, hs(k + 1) * 3, hs(k + 2) * 6, 0, s * 1.15, s * 0.95, s * 1.15, snowy(shadeHex(dead ? 0x6b6a4a : st.tree === 'conifer' ? 0x34482c : R3.autumn && hs(k + 20) < 0.6 ? 0x7a6430 : 0x48612f, (hs(k + 12) - 0.5) * 0.35), 0.55));
+      // a bush: two or three leafy masses, the same shapes as the tree crowns at a smaller size
+      for (let k = 0, n = 2 + (hs(29) < 0.5 ? 1 : 0); k < n; k++) {
+        const s = 0.3 + hs(k) * 0.16;
+        I.push('crownC' + Math.floor(hs(k + 30) * 4), cx + (hs(k + 4) - 0.5) * 0.5, gy + s * 0.62, cz + (hs(k + 8) - 0.5) * 0.5, 0, hs(k + 2) * 6, 0, s * 1.2, s * 0.9, s * 1.2, snowy(shadeHex(dead ? 0x6b6a4a : st.tree === 'conifer' ? 0x34482c : R3.autumn && hs(k + 20) < 0.6 ? 0x7a6430 : 0x48612f, (hs(k + 12) - 0.5) * 0.35), 0.55));
       }
     } else if (ch === 'd') {
       for (let k = 0; k < 2; k++) {
@@ -4901,6 +5076,9 @@ function buildDyn() {
   const dg = own(new THREE.CircleGeometry(0.055, 8).rotateX(-Math.PI / 2));
   D.dots = new THREE.InstancedMesh(dg, new THREE.MeshBasicMaterial({ color: 0xd6aa4c, transparent: true, opacity: 0.9, depthWrite: false }), 400);
   D.dots.count = 0; D.dots.renderOrder = 4; D.dots.frustumCulled = false; R3.root.add(D.dots);
+  const rg = own(new THREE.CircleGeometry(0.065, 8).rotateX(-Math.PI / 2));
+  D.rdots = new THREE.InstancedMesh(rg, new THREE.MeshBasicMaterial({ color: 0xe86a4c, transparent: true, opacity: 0.9, depthWrite: false }), 700);
+  D.rdots.count = 0; D.rdots.renderOrder = 4; D.rdots.frustumCulled = false; R3.root.add(D.rdots);
   R3.dyn = D;
 }
 function poolGet(arr, make) { let m = arr.find(x => !x.userData.used); if (!m) { m = make(); arr.push(m); } m.userData.used = true; m.visible = true; return m; }
@@ -4934,6 +5112,32 @@ function syncDyn(G, UI, T) {
   }
   D.dots.count = n; D.dots.instanceMatrix.needsUpdate = true;
   poolEnd(D.selRings); poolEnd(D.xMarks);
+  // the guard under the cursor or the finger: his round as dots drifting the way he walks, or the sweep he keeps
+  let rn = 0;
+  const ie = UI && typeof INSPECT !== 'undefined' ? INSPECT.e : null;
+  if (ie && ie.alive) {
+    const put = (x, z, s) => { if (rn >= 700) return; mt.makeScale(s, 1, s); mt.setPosition(x, surfY(G, x, z) + 0.07, z); D.rdots.setMatrixAt(rn++, mt); };
+    const route = patrolRoute(G, ie);
+    if (route) {
+      const step = 0.42, off = (T * 0.9) % step;
+      let carry = off;
+      for (let i = 1; i < route.length; i++) {
+        const ax = route[i - 1].x / TILE, az = route[i - 1].y / TILE, bx = route[i].x / TILE, bz = route[i].y / TILE, L = Math.hypot(bx - ax, bz - az);
+        let d = carry;
+        for (; d < L; d += step) put(ax + (bx - ax) * d / L, az + (bz - az) * d / L, 1);
+        carry = d - L;
+      }
+      for (const w of ie.patrol) put(w.x / TILE, w.y / TILE, 2.1);
+    } else if (ie.scan && ie.scan.length > 1) {
+      const ex = ie.x / TILE, ez = ie.y / TILE, R = effRange(G, ie) / TILE;
+      for (const a of ie.scan) for (let d = 0.6; d < R; d += 0.45) put(ex + Math.cos(a) * d, ez + Math.sin(a) * d, 0.8);
+      let lo = Math.min(...ie.scan), hi = Math.max(...ie.scan);
+      if (hi - lo > Math.PI) { const t = lo; lo = hi; hi = t + TAU; }
+      for (let a = lo; a <= hi; a += 0.09) put(ex + Math.cos(a) * R * 0.62, ez + Math.sin(a) * R * 0.62, 0.8);
+    }
+    D.rdots.material.color.setHex(ie.state === 'combat' || ie.state === 'alert' ? 0xff5a3a : ie.state === 'suspicious' ? 0xe8c43a : 0xe86a4c);
+  }
+  D.rdots.count = rn; D.rdots.instanceMatrix.needsUpdate = true;
   // ability range, draped over the ground
   if (UI && UI.mode !== 'move' && sel.length === 1 && ABIL[UI.mode] && ABIL[UI.mode].range) {
     const u = sel[0], R = ABIL[UI.mode].range;
@@ -5995,11 +6199,164 @@ function musToggle() { SAVE.music = SAVE.music === false; persist(); auInit(); s
 function syncMusicButtons() {
   for (const id of ['#bMusicTitle', '#bMusicPause']) { const b = $(id); if (!b) continue; b.querySelector('span').textContent = SAVE.music === false ? 'Musica no' : 'Musica sì'; b.classList.toggle('off', SAVE.music === false); }
 }
+/* ================= MINIMAPPA TATTICA: il campo dall'alto, la squadra, le sentinelle, l'obiettivo e l'inquadratura ================= */
+const MM = { on: null, el: null, cv: null, g: null, terr: null, sig: '', sigT: 0, s: 4, dpr: 1, W: 0, H: 0, G: null, drag: false, fps: 0 };
+
+// the map's own colours: the ground keeps its palette, the rest gets a flat, readable tint
+const MM_COL = {
+  '|': '#8a6a44', '_': '#5f8088', '=': '#3a3124', 'o': '#4a3d2c', 'b': '#3c5628', 'x': '#6f6049', 'S': '#a6966c',
+  '#': '#6c6960', 'T': '#2d4720', 'W': '#3e382f', '~': '#35657a', 'v': '#56703a', 'd': '#5a4630', 'c': '#7b6848',
+};
+const MM_SNOW = { 'b': '#8fa3a8', 'T': '#4f6b5c', '#': '#9aa0a6', 'S': '#bdb7a8', 'v': '#a7b2a9', 'd': '#7b6a58', '=': '#8b8a86', 'o': '#9c9a95' };
+function mmTileCol(G, ch) {
+  if (GPAL[ch]) return GPAL[ch][0];
+  if (G.M.winter && MM_SNOW[ch]) return MM_SNOW[ch];
+  return MM_COL[ch] || GPAL['.'][0];
+}
+function mmLayout() {
+  const desk = matchMedia('(min-width: 900px) and (min-height: 560px)').matches;
+  const G = MM.G, maxW = desk ? 232 : 150, maxH = desk ? 168 : 112;
+  MM.s = Math.max(1.5, Math.min(maxW / G.W, maxH / G.H));
+  MM.dpr = Math.min(2, devicePixelRatio || 1);
+  const w = Math.round(G.W * MM.s), h = Math.round(G.H * MM.s);
+  MM.cv.style.width = w + 'px'; MM.cv.style.height = h + 'px';
+  MM.cv.width = Math.round(w * MM.dpr); MM.cv.height = Math.round(h * MM.dpr);
+  MM.terr = null; MM.sig = '';
+}
+// the terrain, painted once and again only when the map itself changes (a cut wire, a fallen bridge)
+function mmTerrain(G) {
+  const s = MM.s * MM.dpr, c = document.createElement('canvas');
+  c.width = MM.cv.width; c.height = MM.cv.height;
+  const g = c.getContext('2d');
+  for (let r = 0; r < G.H; r++) for (let q = 0; q < G.W; q++) {
+    const ch = G.map[r][q];
+    g.fillStyle = mmTileCol(G, ch);
+    g.fillRect(Math.floor(q * s), Math.floor(r * s), Math.ceil(s) + 1, Math.ceil(s) + 1);
+    if (ch === 'x') { g.fillStyle = 'rgba(20,16,10,.55)'; g.fillRect(q * s + s * 0.2, r * s + s * 0.4, s * 0.6, s * 0.2); }
+  }
+  // a soft relief: darker under walls, rocks and woods, so shapes read at a glance
+  g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgba(30,26,18,.18)';
+  for (let r = 0; r < G.H; r++) for (let q = 0; q < G.W; q++) { const t = TILES[G.map[r][q]]; if (t && !t.sight) g.fillRect(q * s + s * 0.35, r * s + s * 0.35, s, s); }
+  g.globalCompositeOperation = 'source-over';
+  return c;
+}
+function mmSync() {
+  if (!MM.el) return;
+  const G = UI.G, inGame = UI.screen === 'game' && G && !G.over && !UI.intro;
+  MM.el.hidden = !(inGame && MM.on);
+  $('#bMap').setAttribute('aria-pressed', String(!!MM.on));
+}
+function mmToggle(force) {
+  MM.on = force != null ? force : !MM.on;
+  SAVE.minimap = MM.on; persist();
+  if (MM.on && UI.G) { MM.G = null; }
+  mmSync(); sfx('click');
+}
+function mmInit() {
+  MM.el = $('#minimap'); MM.cv = $('#mmCv'); MM.g = MM.cv.getContext('2d');
+  if (MM.on == null) MM.on = SAVE.minimap != null ? SAVE.minimap : matchMedia('(min-width: 900px) and (min-height: 560px)').matches;
+  const toWorld = e => {
+    const b = MM.cv.getBoundingClientRect();
+    return { x: clamp((e.clientX - b.left) / MM.s, 0, MM.G.W) * TILE, y: clamp((e.clientY - b.top) / MM.s, 0, MM.G.H) * TILE };
+  };
+  MM.cv.addEventListener('pointerdown', e => {
+    if (!MM.G || !UI.G) return;
+    e.preventDefault(); e.stopPropagation(); MM.drag = true;
+    try { MM.cv.setPointerCapture(e.pointerId); } catch (_) { }
+    const w = toWorld(e); VIEW.centerOn(UI.G, w.x, w.y, false);
+  });
+  MM.cv.addEventListener('pointermove', e => { if (!MM.drag || !UI.G) return; const w = toWorld(e); VIEW.centerOn(UI.G, w.x, w.y, true); });
+  const up = () => { MM.drag = false; };
+  MM.cv.addEventListener('pointerup', up); MM.cv.addEventListener('pointercancel', up);
+  MM.cv.addEventListener('contextmenu', e => e.preventDefault());
+  addEventListener('resize', () => { if (MM.G) mmLayout(); });
+}
+function mmTick(dt) {
+  const G = UI.G;
+  mmSync();
+  if (MM.el.hidden) return;
+  if (MM.G !== G) { MM.G = G; mmLayout(); }
+  MM.fps -= dt; if (MM.fps > 0) return; MM.fps = 1 / 20;
+  MM.sigT -= dt;
+  if (!MM.terr || MM.sigT <= 0) {
+    MM.sigT = 0.5;
+    const sig = G.map.map(r => r.join('')).join('');
+    if (sig !== MM.sig || !MM.terr) { MM.sig = sig; MM.terr = mmTerrain(G); }
+  }
+  const g = MM.g, s = MM.s * MM.dpr, T = UI.T, P = v => v / TILE * s, lw = MM.dpr;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(MM.terr, 0, 0);
+  const night = G.M.light === 'night' || G.M.light === 'dusk';
+  if (night) { g.fillStyle = 'rgba(8,12,30,.28)'; g.fillRect(0, 0, MM.cv.width, MM.cv.height); }
+
+  // the current objective: a pulsing gold frame, or rings round its targets
+  const cur = UI.currentObjective(G), pulse = 0.55 + 0.45 * Math.sin(T * 4);
+  if (cur) {
+    g.strokeStyle = `rgba(232,196,96,${0.55 + 0.45 * pulse})`; g.lineWidth = 1.6 * lw; g.setLineDash([3 * lw, 2 * lw]);
+    if (cur.type === 'reach') { const [zc, zr, zw, zh] = cur.zone; g.strokeRect(zc * s + lw, zr * s + lw, zw * s - 2 * lw, zh * s - 2 * lw); }
+    g.setLineDash([]);
+    const ring = (x, y) => { g.beginPath(); g.arc(P(x), P(y), (2.2 + pulse * 1.4) * lw * Math.max(1, MM.s / 4), 0, TAU); g.stroke(); };
+    if (cur.type === 'kill') for (const id of cur.targets) { const e = G.enemies.find(x => x.id === id); if (e && e.alive) ring(e.x, e.y); }
+    if (cur.type === 'destroy') for (const id of cur.targets) { const b = G.objects.find(x => x.id === id); if (b && !b.destroyed) ring(b.x, b.y); }
+    if (cur.type === 'collect') { const b = G.objects.find(x => x.id === cur.target); if (b && !b.collected) ring(b.x, b.y); }
+  }
+
+  // bodies the guards could still stumble on
+  g.fillStyle = 'rgba(30,24,18,.75)';
+  for (const e of G.enemies) if (!e.alive && !e.dummy && !e.carriedBy && !e.sunk) { g.fillRect(P(e.x) - 1.2 * lw, P(e.y) - 1.2 * lw, 2.4 * lw, 2.4 * lw); }
+
+  // the guards: a faint wedge of what they watch, a dot, and the colour of their mood
+  const dotR = Math.max(1.6, MM.s * 0.42) * lw;
+  for (const e of G.enemies) {
+    if (!e.alive || e.dummy) continue;
+    const hot = e.state === 'alert' || e.state === 'combat', sus = e.state === 'suspicious';
+    const x = P(e.x), y = P(e.y);
+    const R = P(effRange(G, e)), fov = effFov(e);
+    g.fillStyle = hot ? 'rgba(232,80,50,.22)' : sus ? 'rgba(232,196,58,.2)' : 'rgba(120,210,110,.13)';
+    g.beginPath(); g.moveTo(x, y); g.arc(x, y, R, e.facing - fov / 2, e.facing + fov / 2); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(10,10,8,.85)'; g.beginPath(); g.arc(x, y, dotR + lw, 0, TAU); g.fill();
+    g.fillStyle = hot ? (Math.sin(T * 12) > 0 ? '#ff5a3a' : '#c8402f') : sus ? '#e8c43a' : e.trainer ? '#9fb4c8' : '#c8402f';
+    g.beginPath(); g.arc(x, y, dotR, 0, TAU); g.fill();
+  }
+
+  // the guard you are looking at: his round
+  const ie = INSPECT.e;
+  if (ie && ie.alive) {
+    const route = patrolRoute(G, ie);
+    if (route) {
+      g.strokeStyle = 'rgba(255,120,90,.95)'; g.lineWidth = 1.3 * lw; g.setLineDash([2 * lw, 2 * lw]); g.lineDashOffset = -T * 8 * lw;
+      g.beginPath(); route.forEach((p, i) => { if (i) g.lineTo(P(p.x), P(p.y)); else g.moveTo(P(p.x), P(p.y)); }); g.stroke(); g.setLineDash([]);
+    }
+    g.strokeStyle = '#f6efdc'; g.lineWidth = 1.2 * lw; g.beginPath(); g.arc(P(ie.x), P(ie.y), dotR + 2.6 * lw, 0, TAU); g.stroke();
+  }
+
+  // the squad: gold, the selected men ringed in white
+  for (const u of G.units) {
+    if (!u.alive) continue;
+    const x = P(u.x), y = P(u.y), sel = UI.sel.includes(u);
+    g.fillStyle = 'rgba(10,10,8,.9)'; g.beginPath(); g.arc(x, y, dotR + 1.2 * lw, 0, TAU); g.fill();
+    g.fillStyle = u.crawl ? '#b8913c' : '#e6bd5c'; g.beginPath(); g.arc(x, y, dotR + 0.3 * lw, 0, TAU); g.fill();
+    if (sel) { g.strokeStyle = '#f6efdc'; g.lineWidth = 1.2 * lw; g.beginPath(); g.arc(x, y, dotR + 2.6 * lw, 0, TAU); g.stroke(); }
+  }
+
+  // what the camera sees: the four screen corners laid on the ground
+  try {
+    const top = Math.max(0, V.insetTop || 0), bot = V.h - Math.max(0, V.insetBottom || 0);
+    const pts = [[0, top], [V.w, top], [V.w, bot], [0, bot]].map(([sx, sy]) => VIEW.pick(sx, sy));
+    if (pts.every(p => p && isFinite(p.x) && isFinite(p.y))) {
+      g.strokeStyle = 'rgba(246,239,220,.85)'; g.lineWidth = 1.1 * lw;
+      g.beginPath(); pts.forEach((p, i) => { const fx = P(p.x), fy = P(p.y); if (i) g.lineTo(fx, fy); else g.moveTo(fx, fy); }); g.closePath(); g.stroke();
+    }
+  } catch (e) { }
+
+  // a thin red pulse at the edge while the alarm sounds
+  if (G.alarmFlash > 0) { g.strokeStyle = `rgba(220,60,40,${0.5 + 0.4 * Math.sin(T * 10)})`; g.lineWidth = 3 * lw; g.strokeRect(1.5 * lw, 1.5 * lw, MM.cv.width - 3 * lw, MM.cv.height - 3 * lw); }
+}
 /* ================= UI, INPUT, AUDIO ================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SAVE_KEY = 'arditi-save-v1';
-const SAVE = { done: {}, medal: {}, diff: 'ardito', sound: true, music: true, gfx: null };
+const SAVE = { done: {}, medal: {}, diff: 'ardito', sound: true, music: true, gfx: null, minimap: null };
 try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s && typeof s === 'object') Object.assign(SAVE, s); } catch (e) { }
 if (!DIFF[SAVE.diff]) SAVE.diff = 'ardito';
 // graphics: Ultra on a computer with a big screen, Alta on phones and tablets (the player can change it)
@@ -6085,6 +6442,27 @@ function sfx(kind, x, y) {
         o.frequency.value = 2500; l.frequency.value = 26; lg.gain.value = 150; l.connect(lg); lg.connect(o.frequency);
         g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16 * v, t + 0.03); g.gain.setValueAtTime(0.16 * v, t + 0.45); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
         o.connect(g); g.connect(AU.master); o.start(t); l.start(t); o.stop(t + 0.75); l.stop(t + 0.75);
+        break;
+      }
+      case 'voice': case 'shout': {
+        // not words: the shape of a voice at a distance, a few syllables through a throat and a closed mouth
+        const c = AU.ctx, loud = kind === 'shout', n = 3 + Math.floor(Math.random() * 3);
+        const o = c.createOscillator(), f1 = c.createBiquadFilter(), f2 = c.createBiquadFilter(), lp = c.createBiquadFilter(), g = c.createGain(), m = c.createGain();
+        o.type = 'sawtooth'; f1.type = f2.type = 'bandpass'; f1.Q.value = 5; f2.Q.value = 7; lp.type = 'lowpass'; lp.frequency.value = loud ? 2400 - far * 900 : 1500 - far * 600;
+        o.connect(f1); o.connect(f2); f1.connect(m); f2.connect(m); m.connect(lp); lp.connect(g); g.connect(AU.master); sendFx(g, loud ? 0.5 : 0.3, loud ? 0.3 : 0.1);
+        const base = (loud ? 165 : 112) + Math.random() * 30, vowels = [[700, 1200], [400, 2000], [550, 900], [300, 800], [600, 1700]];
+        let tt = t; g.gain.setValueAtTime(0.0001, t);
+        const peak = (loud ? 0.14 : 0.07) * v;
+        for (let i = 0; i < n; i++) {
+          const d = (loud ? 0.13 : 0.11) + Math.random() * 0.07, [a, b] = vowels[Math.floor(Math.random() * vowels.length)];
+          const end = i === n - 1, f0 = base * (loud ? (1.15 - i * 0.04) : end ? 1.18 : 1 - i * 0.02);
+          o.frequency.setTargetAtTime(f0, tt, 0.02);
+          f1.frequency.setTargetAtTime(a, tt, 0.015); f2.frequency.setTargetAtTime(b, tt, 0.015);
+          g.gain.setTargetAtTime(peak, tt, 0.018); g.gain.setTargetAtTime(peak * 0.15, tt + d * 0.7, 0.025);
+          tt += d + (Math.random() < 0.3 ? 0.06 : 0.015);
+        }
+        g.gain.setTargetAtTime(0.0001, tt, 0.04);
+        o.start(t); o.stop(tt + 0.3);
         break;
       }
       case 'stone': tone(t, 900, 0.05, 'triangle', 0.14 * v); tone(t + 0.09, 680, 0.05, 'triangle', 0.1 * v); break;
@@ -6708,6 +7086,73 @@ function drawFace(g, u, W, H) {
 }
 
 /* ---------------- map taps ---------------- */
+/* ---------------- looking at a guard: hover with the mouse or hold a finger on him ---------------- */
+const INSPECT = { e: null, t: 0, mouse: null, routes: new WeakMap() };
+// the round he walks, waypoint to waypoint and back to the first, the way he really walks it
+function patrolRoute(G, e) {
+  if (!e.patrol || e.patrol.length < 2) return null;
+  const key = G.wireCut + '|' + (G.mapRev || 0);
+  const c = INSPECT.routes.get(e);
+  if (c && c.key === key) return c.pts;
+  const pts = [e.patrol[0]];
+  for (let i = 0; i < e.patrol.length; i++) {
+    const a = e.patrol[i], b = e.patrol[(i + 1) % e.patrol.length];
+    const seg = findPath(G, a.x, a.y, b.x, b.y, e) || [b];
+    pts.push(...seg);
+  }
+  INSPECT.routes.set(e, { key, pts });
+  return pts;
+}
+function inspectLabel(e) {
+  const kind = e.T.static ? (e.type === 'mg' ? 'arma fissa' : 'fermo') : e.patrol ? 'di ronda' : e.scan ? 'scruta la zona' : 'di guardia';
+  const mood = e.state === 'combat' || e.state === 'alert' ? 'in allarme' : e.state === 'suspicious' ? 'sospettoso' : e.state === 'returning' ? 'torna al suo posto' : 'tranquillo';
+  return { name: e.T.label, kind, mood, hot: e.state === 'combat' || e.state === 'alert', sus: e.state === 'suspicious' || e.state === 'returning' };
+}
+function inspectTick(dt) {
+  const G = UI.G, el = $('#inspect');
+  if (!G || G.over || UI.intro) { INSPECT.e = null; el.hidden = true; return; }
+  const live = G.enemies.filter(e => e.alive && !e.dummy);
+  if (INSPECT.mouse && !PTR.size && UI.mode === 'move') {
+    const h = hitScreen(live, INSPECT.mouse.x, INSPECT.mouse.y, 30, 0.6);
+    if (h) { INSPECT.e = h; INSPECT.t = 0.25; }
+  }
+  INSPECT.t -= dt;
+  if (INSPECT.t <= 0 || (INSPECT.e && !INSPECT.e.alive)) INSPECT.e = null;
+  const e = INSPECT.e;
+  if (!e) { el.hidden = true; return; }
+  const L = inspectLabel(e), talking = e.sayT > 0, p = VIEW.project(e.x, e.y, talking ? -0.2 : 2.3);
+  const sig = L.name + L.kind + L.mood;
+  if (el.dataset.sig !== sig) {
+    el.dataset.sig = sig;
+    el.innerHTML = `<b>${esc(L.name)}</b><span>${esc(L.kind)} · <i class="${L.hot ? 'hot' : L.sus ? 'sus' : ''}">${esc(L.mood)}</i></span>`;
+  }
+  el.hidden = false;
+  el.style.transform = `translate(${Math.round(p.x)}px, ${Math.round(p.y)}px) translate(-50%, ${talking ? '14px' : '-100%'})`;
+}
+/* ---------------- what the guards say: a bubble over the head, German above and Italian below ---------------- */
+const BUB = new Map();
+function bubbleTick() {
+  const G = UI.G, box = $('#bubbles');
+  const want = new Set();
+  if (G && !UI.intro) for (const e of G.enemies) {
+    if (!e.alive || !(e.sayT > 0) || !e.say) continue;
+    const p = VIEW.project(e.x, e.y, 2.4);
+    if (p.x < -80 || p.y < -40 || p.x > V.w + 80 || p.y > V.h + 40) continue;
+    want.add(e);
+    let el = BUB.get(e);
+    if (!el) { el = document.createElement('div'); el.className = 'bubble'; box.append(el); BUB.set(e, el); }
+    const key = e.say.de + e.say.kind;
+    if (el.dataset.k !== key) {
+      el.dataset.k = key;
+      el.className = 'bubble ' + e.say.kind;
+      el.innerHTML = `<b lang="${e.say.it ? 'de' : 'it'}">${esc(e.say.de)}</b>${e.say.it ? `<span>${esc(e.say.it)}</span>` : ''}`;
+    }
+    const a = Math.min(1, e.sayT / 0.35);
+    el.style.opacity = String(a);
+    el.style.transform = `translate(${Math.round(p.x)}px, ${Math.round(p.y)}px) translate(-50%, -100%)`;
+  }
+  for (const [e, el] of BUB) if (!want.has(e)) { el.remove(); BUB.delete(e); }
+}
 function hitRadius() { return 26; }
 function nearest(list, w, r) {
   let best = null, bd = r;
@@ -6779,7 +7224,21 @@ function setupInput() {
     if (UI.screen !== 'game') return;
     try { cv.setPointerCapture(e.pointerId); } catch (_) { }
     PTR.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, rot: e.button === 2 });
-    if (PTR.size === 1) { gest.drag = false; gest.pinch = false; }
+    if (PTR.size === 1) {
+      gest.drag = false; gest.pinch = false; gest.long = false;
+      clearTimeout(gest.lpT);
+      if (e.pointerType !== 'mouse' && UI.G && !UI.G.over) {
+        const sx = e.clientX, sy = e.clientY;
+        // hold a finger on a guard to see his round: it does not count as a tap, so nobody gets knifed by mistake
+        gest.lpT = setTimeout(() => {
+          if (gest.drag || gest.pinch || PTR.size !== 1 || !UI.G) return;
+          const h = hitScreen(UI.G.enemies.filter(x => x.alive && !x.dummy), sx, sy, 36, 0.6);
+          if (!h) return;
+          gest.long = true; INSPECT.e = h; INSPECT.t = 3.5; sfx('click');
+          try { navigator.vibrate && navigator.vibrate(12); } catch (_) { }
+        }, 430);
+      }
+    } else clearTimeout(gest.lpT);
     if (PTR.size === 2) {
       const [a, b] = [...PTR.values()];
       gest.pinch = true; gest.dist0 = Math.hypot(a.x - b.x, a.y - b.y); gest.s0 = VIEW.size();
@@ -6805,10 +7264,13 @@ function setupInput() {
   const end = e => {
     const p = PTR.get(e.pointerId); if (!p) return;
     PTR.delete(e.pointerId);
-    if (e.type === 'pointerup' && !gest.drag && !gest.pinch && PTR.size === 0 && UI.screen === 'game') mapTap(e.clientX, e.clientY);
-    if (PTR.size === 0) { gest.drag = false; gest.pinch = false; }
+    clearTimeout(gest.lpT);
+    if (e.type === 'pointerup' && !gest.drag && !gest.pinch && !gest.long && PTR.size === 0 && UI.screen === 'game') mapTap(e.clientX, e.clientY);
+    if (PTR.size === 0) { gest.drag = false; gest.pinch = false; gest.long = false; }
   };
   cv.addEventListener('pointerup', end);
+  cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') INSPECT.mouse = { x: e.clientX, y: e.clientY }; });
+  cv.addEventListener('pointerleave', () => { INSPECT.mouse = null; });
   cv.addEventListener('pointercancel', end);
   cv.addEventListener('wheel', e => { if (UI.screen !== 'game') return; e.preventDefault(); VIEW.zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.0015)); }, { passive: false });
   cv.addEventListener('contextmenu', e => { e.preventDefault(); if (UI.mode !== 'move') { UI.mode = 'move'; refreshHud(true); } });
@@ -6835,6 +7297,7 @@ function onKey(e) {
   if (k === 'escape') { if (UI.mode !== 'move') { UI.mode = 'move'; refreshHud(true); } else togglePause(); return; }
   if (/^[1-6]$/.test(k)) { const u = G.units[+k - 1]; if (u) portraitTap(u); return; }
   if (k === 'a') { selectAll(); return; }
+  if (k === 'm') { mmToggle(); return; }
   if (k === 'arrowleft') { VIEW.pan(80, 0); e.preventDefault(); return; }
   if (k === 'arrowright') { VIEW.pan(-80, 0); e.preventDefault(); return; }
   if (k === 'arrowup') { VIEW.pan(0, 80); e.preventDefault(); return; }
@@ -7032,8 +7495,12 @@ function loop(ts) {
       ambTick(dt); perfWatch(dt); footsteps(dt);
       VIEW.render(UI.G, UI, T);
       hudTick(dt);
+      mmTick(dt);
+      inspectTick(dt);
+      bubbleTick();
       if (UI.G.over && UI.G.overT <= 0 && !UI.debriefShown) showDebrief();
     } else if (UI.bg) {
+      if (MM.el && !MM.el.hidden) MM.el.hidden = true;
       step(UI.bg, dt); VIEW.attract(UI.bg, T); VIEW.render(UI.bg, null, T);
     }
   } catch (e) { console.error(e); }
@@ -7061,6 +7528,7 @@ function wire() {
   $('#bQuit').onclick = () => { UI.G = null; showMissions(); };
   $('#bCenter').onclick = () => { const u = UI.sel[0]; if (u) VIEW.centerOn(UI.G, u.x, u.y); };
   $('#bRotate').onclick = () => { VIEW.rotate(1); sfx('click'); };
+  $('#bMap').onclick = () => { auInit(); mmToggle(); };
   $('#bObj').onclick = () => { const p = $('#objPanel'); p.hidden = !p.hidden; $('#bObj').setAttribute('aria-expanded', String(!p.hidden)); };
   $('#objPanel').onclick = () => { $('#objPanel').hidden = true; $('#bObj').setAttribute('aria-expanded', 'false'); };
   $('#bHintClose').onclick = () => { const c = UI.currentObjective(UI.G); UI.hintClosedFor = c ? c.id : null; refreshHud(true); };
@@ -7081,7 +7549,7 @@ function boot(data) {
   makeGrain();
   initView();
   if (VIEW.mode !== '3d') $('#bRotate').hidden = true;
-  setupInput(); wire();
+  setupInput(); wire(); mmInit();
   data = data || {};
   if (data.diff && DIFF[data.diff]) { SAVE.diff = data.diff; diffControl($('#diffTitle'), $('#diffTitleDesc')); }
   const mi = Number.isInteger(data.mi) && MISSIONS[data.mi] ? data.mi : 0;
