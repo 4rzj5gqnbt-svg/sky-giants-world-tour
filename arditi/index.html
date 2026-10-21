@@ -4450,6 +4450,11 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     if (a.sunk) { M.root.visible = false; M.blood.visible = false; return; }
     M.root.visible = true;
     const back = M.fallBack;
+    if (!M.deadT && !a.sunk) {
+      const hy = y + 0.75;
+      for (let i = 0; i < 6; i++) { const an = Math.random() * TAU, sp = 0.4 + Math.random() * 0.8; spawnParticle({ x: wx, y: hy, z: wz, vx: Math.cos(an) * sp, vy: 0.6 + Math.random() * 0.6, vz: Math.sin(an) * sp, T: 0.45, s0: 0.07, s1: 0.04, col: 0x5a1610, a0: 0.9, add: false, grav: true }); }
+      if (t.water) for (let i = 0; i < 8; i++) { const an = Math.random() * TAU, sp = 0.5 + Math.random(); spawnParticle({ x: wx, y: -0.1, z: wz, vx: Math.cos(an) * sp, vy: 1.8 + Math.random() * 1.5, vz: Math.sin(an) * sp, T: 0.8, s0: 0.15, s1: 0.25, col: 0xdfeaec, a0: 0.8, add: false, grav: true }); }
+    }
     M.deadT = (M.deadT || 0) + dt;
     if (M.deadT < 0.3 && !a.carriedBy) {
       Object.assign(P, { hy: 0.34, hx: back ? -0.25 : 0.3, sx: back ? -0.3 : 0.55, nx: back ? -0.4 : 0.5, rsx: -0.3, rsz: -0.4, rex: -0.6, lsx: 0.2, lsz: 0.5, lex: -0.5, rtx: -0.8, rkx: 1.6, ltx: -0.5, lkx: 1.2 });
@@ -4481,6 +4486,12 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
   const ph = M.phase, s = Math.sin(ph);
   if (swim) {
     M.root.position.y = -0.14;
+    // the wake of a swimmer: rings and a little white water behind the shoulders
+    M.wakeT = (M.wakeT || 0) - dt;
+    if (M.wakeT <= 0) {
+      M.wakeT = walking ? 0.18 : 0.9;
+      spawnParticle({ x: wx - Math.sin(M.yaw) * 0.25 + (Math.random() - 0.5) * 0.1, y: -0.1, z: wz - Math.cos(M.yaw) * 0.25, vx: 0, vy: 0.02, vz: 0, T: walking ? 1.1 : 1.6, s0: 0.12, s1: walking ? 0.55 : 0.4, col: 0xdfe8ea, a0: walking ? 0.4 : 0.25, add: false });
+    }
     Object.assign(P, { hy: -0.06, hx: 1.42, hpz: -0.12, sx: 0, nx: -0.85, rsx: -1.6 - 1.5 * s, rsz: -0.2, rex: -0.35, lsx: -1.6 + 1.5 * s, lsz: 0.2, lex: -0.35,
       rtx: 0.25 * Math.sin(ph * 2), ltx: -0.25 * Math.sin(ph * 2), rkx: 0.25, lkx: 0.25, rax: 0.9, lax: 0.9 });
     weapon = 'none';
