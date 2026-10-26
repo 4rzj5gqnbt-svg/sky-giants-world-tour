@@ -12,9 +12,19 @@
 <meta property="og:url" content="https://arditi.vercel.app/"><meta property="og:image" content="https://arditi.vercel.app/og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://arditi.vercel.app/og.jpg">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Barlow+Condensed:wght@500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Arditi">
+<link rel="preload" href="fonts/bodoni-moda-latin-opsz-italic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-display: swap; font-weight: 400 900; src: url(fonts/bodoni-moda-latin-opsz-normal.woff2) format('woff2-variations'), url(fonts/bodoni-moda-latin-opsz-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: italic; font-display: swap; font-weight: 400 900; src: url(fonts/bodoni-moda-latin-opsz-italic.woff2) format('woff2-variations'), url(fonts/bodoni-moda-latin-opsz-italic.woff2) format('woff2'); }
+@font-face { font-family: 'Barlow Condensed'; font-style: normal; font-display: swap; font-weight: 500; src: url(fonts/barlow-condensed-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Barlow Condensed'; font-style: normal; font-display: swap; font-weight: 600; src: url(fonts/barlow-condensed-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Barlow Condensed'; font-style: normal; font-display: swap; font-weight: 700; src: url(fonts/barlow-condensed-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Courier Prime'; font-style: normal; font-display: swap; font-weight: 400; src: url(fonts/courier-prime-latin-400-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Courier Prime'; font-style: italic; font-display: swap; font-weight: 400; src: url(fonts/courier-prime-latin-400-italic.woff2) format('woff2'); }
+@font-face { font-family: 'Courier Prime'; font-style: normal; font-display: swap; font-weight: 700; src: url(fonts/courier-prime-latin-700-normal.woff2) format('woff2'); }
 /* Layout: a full-bleed tactical map with HUD bands top and bottom; briefings are typed paper orders laid over the field */
 :root {
   --ground: #131610; --panel: #1e2319; --panel-2: #283022; --line: #3e4734;
@@ -161,6 +171,14 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .hint p { margin: 0; font-family: var(--f-type); font-size: 13.5px; line-height: 1.45; }
 .hint b { display: block; font-family: var(--f-ui); font-size: 14px; letter-spacing: .1em; text-transform: uppercase; color: #8c3a2c; margin-bottom: 2px; }
 .hint .x { position: absolute; top: 2px; right: 2px; width: 40px; height: 40px; border: 0; background: none; color: var(--paper-ink); cursor: pointer; display: grid; place-items: center; }
+.hint { cursor: pointer; }
+.hint .htx { display: block; }
+/* folded: only the objective, on one line, with a mark that there is more to read */
+.hint.min { padding-top: 6px; padding-bottom: 6px; background: rgba(235,225,200,.88); }
+.hint.min .htx { display: none; }
+.hint.min b { margin: 0; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hint.min b::before { content: '▸ '; }
+.hint.min .x { top: -2px; width: 36px; height: 36px; }
 .objpanel { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 64px); right: max(16px, env(safe-area-inset-right, 0px)); width: min(340px, calc(100% - 32px)); z-index: 2;
   background: rgba(30,35,25,.97); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px; pointer-events: auto; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
 .objpanel h3 { margin: 0 0 8px; font-family: var(--f-ui); font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-dim); }
@@ -248,6 +266,31 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
   .objpanel { right: calc(max(16px, env(safe-area-inset-right, 0px)) + 94px); }
 }
 @media (hover: none) { .pt .k { display: none; } }
+/* a phone on its side: the squad down the left edge, the orders down the right, the battlefield in between */
+@media (max-height: 520px) and (orientation: landscape) {
+  .hud-top { padding-top: calc(env(safe-area-inset-top, 0px) + 6px); padding-bottom: 8px; gap: 8px; }
+  .hb { width: 40px; height: 40px; }
+  .hb.wide { font-size: 16px; padding: 0 12px; }
+  #hMission { font-size: 17px; }
+  .hud-bottom { background: none; padding-top: 0; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+    padding-left: calc(max(10px, env(safe-area-inset-left, 0px)) + 74px); padding-right: calc(max(10px, env(safe-area-inset-right, 0px)) + 132px); }
+  #squad { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 56px); left: max(10px, env(safe-area-inset-left, 0px)); flex-direction: column; width: auto; max-width: none; gap: 4px; }
+  #squad .pt { flex: none; width: 64px; max-width: none; height: clamp(36px, calc((100vh - 74px) / 7 - 4px), 56px); }
+  #squad .pt .nm { font-size: 11.5px; padding-top: 6px; }
+  #squad .pt .face { object-position: center 42%; }
+  #squad .pt.all { height: 32px; }
+  #squad .pt.all .ic { display: none; }
+  #abil { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 56px); right: max(10px, env(safe-area-inset-right, 0px)); width: auto; max-width: none;
+    display: grid; grid-template-columns: repeat(2, 60px); grid-auto-rows: clamp(42px, calc((100vh - 76px) / 4 - 5px), 54px); gap: 5px; }
+  #abil .ab { max-width: none; height: auto; }
+  #abil .ab span { font-size: 11.5px; }
+  .hint { top: calc(env(safe-area-inset-top, 0px) + 54px); left: calc(max(10px, env(safe-area-inset-left, 0px)) + 76px); right: calc(max(10px, env(safe-area-inset-right, 0px)) + 136px); max-width: none; padding: 7px 40px 7px 10px; }
+  .hint p { font-size: 12.5px; line-height: 1.38; }
+  .hint b { font-size: 12.5px; }
+  .objpanel { top: calc(env(safe-area-inset-top, 0px) + 54px); right: calc(max(10px, env(safe-area-inset-right, 0px)) + 136px); max-height: calc(100vh - 70px); overflow-y: auto; }
+  .toast { font-size: 14px; padding: 5px 10px; }
+  #toasts { padding-left: 90px; padding-right: 150px; }
+}
 @media (max-width: 380px) { .ab span { font-size: 11px; } .pt .nm { font-size: 12px; } .btn { font-size: 18px; padding: 10px 18px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 
@@ -341,6 +384,74 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .bubble.alert b { color: #8a4a12; }
 .bubble.trainer b { color: #2c4a1c; }
 @media (max-width: 480px) { .bubble b { font-size: 13.5px; } .bubble span { font-size: 10.5px; } }
+
+/* ---------- guard dogs in the briefing ---------- */
+.dogbox { border-left-color: #b8762c; }
+
+/* ---------- veterans ---------- */
+.vst { display: inline-block; margin-left: 8px; font-family: var(--f-ui); font-weight: 700; font-size: 13px; letter-spacing: .06em; color: #9a6b12; white-space: nowrap; }
+.vst.dim { color: var(--ink-dim); font-weight: 600; }
+.squad-list .vsk { margin-top: 4px; font-size: 13px; color: #5b4a1c; }
+.squad-list .vsk b { font-family: var(--f-ui); font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+.pt .vs { position: absolute; top: 2px; left: 17px; z-index: 1; font-size: 10px; line-height: 1; letter-spacing: -1px; color: var(--oro); text-shadow: 0 1px 2px #000; }
+@media (hover: none) { .pt .vs { left: 4px; } }
+.vetlist, .roster ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.vetlist li, .roster ul > li { display: grid; grid-template-columns: 52px 1fr; gap: 12px; align-items: start; }
+.vface { width: 52px; height: 61px; object-fit: cover; object-position: center 30%; border-radius: 3px; border: 1.5px solid var(--paper-ink); background: #11140d; }
+.vbody { min-width: 0; }
+.vhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 0; }
+.vhead > b { font-family: var(--f-ui); font-weight: 700; font-size: 18px; letter-spacing: .02em; }
+.vhead .role { font-family: var(--f-ui); font-weight: 600; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin-left: 8px; color: var(--ink-dim); }
+.vadd { margin-left: auto; padding-left: 10px; font-family: var(--f-type); font-size: 13px; color: var(--paper-dim); }
+.vadd.pos { color: #2f6b2c; font-weight: 700; }
+.xpbar { height: 7px; margin: 5px 0 3px; background: rgba(0,0,0,.14); border-radius: 4px; overflow: hidden; }
+.xpbar i { display: block; height: 100%; background: linear-gradient(90deg, #a77b22, #e0b85a); border-radius: 4px; }
+.vbody small { font-family: var(--f-type); font-size: 12.5px; color: var(--paper-dim); }
+.promo { margin: 6px 0 0; padding: 6px 10px; background: rgba(214,170,76,.22); border-left: 3px solid #b8861f; font-size: 14px; line-height: 1.45; }
+.roster { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--line); }
+.roster h3 { margin: 0 0 4px; font-family: var(--f-display); font-style: italic; font-weight: 800; font-size: 26px; }
+.roster .rnote { margin: 0 0 14px; font-family: var(--f-type); font-size: 13.5px; line-height: 1.5; color: var(--ink-dim); }
+.roster ul > li { padding: 12px; background: rgba(30,35,25,.92); border: 1px solid var(--line); border-radius: 4px; }
+.roster .vface { border-color: rgba(233,224,200,.3); }
+.roster .vst { color: var(--oro); }
+.roster .vbody small { color: var(--ink-dim); }
+.roster .xpbar { background: rgba(255,255,255,.1); }
+.sklist { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 3px; font-family: var(--f-type); font-size: 13px; line-height: 1.4; color: var(--ink-dim); }
+.sklist li { padding-left: 16px; position: relative; opacity: .62; }
+.sklist li::before { content: '○'; position: absolute; left: 0; top: 0; }
+.sklist li.on { opacity: 1; color: var(--ink); }
+.sklist li.on::before { content: '★'; color: var(--oro); }
+.sklist b { font-family: var(--f-ui); font-size: 14px; font-weight: 700; letter-spacing: .02em; }
+
+/* ---------- the map film before each action: an old staff map that closes in on the place ---------- */
+#mapfilm { position: fixed; inset: 0; z-index: 31; overflow: hidden; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 45%, #f0e6cc 0%, #e4d5b2 58%, #c7b085 100%); color: #2a2117; transition: opacity .2s; }
+#mapfilm::after { content: ''; position: absolute; inset: -50%; pointer-events: none; background-image: var(--grain); opacity: .16; mix-blend-mode: multiply; animation: grain 0.9s steps(6) infinite; }
+#mapfilm::before { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1; box-shadow: inset 0 0 120px 30px rgba(70,48,20,.45); }
+#mapfilm.out { animation: introOut .5s ease both; }
+#mfSvg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.mf-lab text { font-family: 'Courier Prime', 'Courier New', monospace; fill: #3e3220; }
+.mf-lab .mf-hill { font-family: 'Bodoni Moda', Georgia, serif; font-style: italic; fill: #6b5434; text-anchor: middle; }
+.mf-lab .mf-river { font-family: 'Bodoni Moda', Georgia, serif; font-style: italic; fill: #345a72; }
+.mf-lab .mf-sea { font-family: 'Bodoni Moda', Georgia, serif; font-style: italic; letter-spacing: .3em; fill: #4d6a74; text-anchor: middle; }
+.mf-town circle { fill: #2a2117; }
+.mf-mark { font-family: 'Bodoni Moda', Georgia, serif; font-style: italic; font-weight: 700; fill: #7d1d14; paint-order: stroke; stroke: #f0e6cc; stroke-width: 4px; stroke-linejoin: round; }
+.mf-cap { position: absolute; z-index: 2; top: calc(env(safe-area-inset-top, 0px) + 22px); left: max(22px, env(safe-area-inset-left, 0px)); right: max(22px, env(safe-area-inset-right, 0px)); pointer-events: none; }
+.mf-cap > div { opacity: 0; transform: translateY(8px); transition: opacity .7s ease, transform .7s ease; }
+.mf-cap > div.on { opacity: 1; transform: none; }
+.mf-date { font-family: 'Courier Prime', monospace; font-weight: 700; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: #7d1d14; }
+.mf-name { margin: 2px 0 4px; font-family: 'Bodoni Moda', Georgia, serif; font-style: italic; font-weight: 800; font-size: clamp(34px, 7vw, 66px); line-height: 1.02; color: #241c12; }
+.mf-ctx { font-family: 'Courier Prime', monospace; font-size: 14px; line-height: 1.45; color: #4a3b25; max-width: 560px; }
+.mf-sub { position: absolute; z-index: 2; left: max(16px, env(safe-area-inset-left, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(env(safe-area-inset-bottom, 0px) + 46px); margin: 0 auto; max-width: 720px; min-height: 1.45em;
+  padding: 10px 16px; font-family: 'Courier Prime', monospace; font-size: 16.5px; line-height: 1.45; color: #f4ecd8; background: rgba(32,24,14,.82); border-radius: 3px; pointer-events: none; }
+.mf-sub:empty { visibility: hidden; }
+.mf-skip { position: absolute; z-index: 2; left: 0; right: 0; bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); text-align: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: #5a4a30; opacity: .85; pointer-events: none; }
+@media (max-height: 520px) and (orientation: landscape) { .mf-name { font-size: 34px; } .mf-sub { font-size: 14.5px; bottom: calc(env(safe-area-inset-bottom, 0px) + 36px); padding: 7px 12px; } .mf-cap { top: 12px; } }
+
+/* ---------- offline: install / download ---------- */
+.offrow { margin-top: 2px; }
+.offrow a.linkbtn { text-decoration: none; }
+.offnote { margin: 4px 0 0; font-family: var(--f-type); font-size: 12.5px; color: var(--verde); text-align: center; }
 </style>
 </head>
 <body>
@@ -371,6 +482,8 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4.5h11l3 3v12H5Z"/><path d="M8 4.5v5h7v-5M8 19.5v-6h8v6"/></symbol>
     <symbol id="i-load" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4 3.8v4.6h4.6"/><path d="M12 8v4.4l3 1.8"/></symbol>
     <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5.5l11-2.5v12.5"/><circle cx="6.5" cy="18" r="2.6" fill="currentColor"/><circle cx="17.5" cy="15.5" r="2.6" fill="currentColor"/><path d="M9 9l11-2.5"/></symbol>
+    <symbol id="i-voice" viewBox="0 0 24 24"><path d="M4 5.5h16v10H11l-4.5 3.5v-3.5H4Z"/><path d="M8 9.5h8M8 12.5h5"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3.5v11M7.5 10 12 14.5 16.5 10"/><path d="M4.5 16.5v3h15v-3"/></symbol>
     <symbol id="i-gfx" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16.5V20"/><path d="M8.5 12.5l2.5-3 2 2 2.5-3.5" stroke-width="1.6"/></symbol>
     <symbol id="i-map" viewBox="0 0 24 24"><path d="M3.5 6.5 9 4l6 2.5 5.5-2.5v13.5L15 20l-6-2.5-5.5 2.5Z"/><path d="M9 4v13.5M15 6.5V20"/></symbol>
     <symbol id="i-center" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4"/></symbol>
@@ -424,8 +537,14 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
       <button class="linkbtn" id="bHelpTitle">Come si gioca</button>
       <button class="linkbtn" id="bSoundTitle"><svg class="ic"><use href="#i-sound"/></svg><span>Audio sì</span></button>
       <button class="linkbtn" id="bMusicTitle"><svg class="ic"><use href="#i-music"/></svg><span>Musica sì</span></button>
+      <button class="linkbtn" id="bVoiceTitle" hidden><svg class="ic"><use href="#i-voice"/></svg><span>Voci sì</span></button>
       <button class="linkbtn" id="bGfxTitle"><svg class="ic"><use href="#i-gfx"/></svg><span>Grafica</span></button>
     </div>
+    <div class="actions offrow" id="offRow" hidden>
+      <button class="linkbtn" id="bInstall" hidden><svg class="ic"><use href="#i-download"/></svg><span>Installa il gioco</span></button>
+      <a class="linkbtn" id="bDownload" href="arditi-offline.html" download="Arditi.html"><svg class="ic"><use href="#i-download"/></svg><span>Scarica il file del gioco</span></a>
+    </div>
+    <p class="offnote" id="offNote" hidden></p>
     <p class="fine">I membri della squadra sono inventati. Reparti, comandanti, luoghi, date, uniformi e armi sono storici.</p>
   </div>
 </section>
@@ -437,6 +556,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
       <div><h2>Campagna</h2><p>Dieci azioni, nell’ordine in cui furono combattute. Puoi giocarle in qualsiasi ordine.</p></div>
     </div>
     <ul class="mlist" id="mlist"></ul>
+    <div id="roster"></div>
   </div>
 </section>
 
@@ -466,6 +586,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <button class="btn" id="bHelpPause">Come si gioca</button>
     <button class="btn" id="bSoundPause"><svg class="ic"><use href="#i-sound"/></svg><span>Audio sì</span></button>
     <button class="btn" id="bMusicPause"><svg class="ic"><use href="#i-music"/></svg><span>Musica sì</span></button>
+    <button class="btn" id="bVoicePause" hidden><svg class="ic"><use href="#i-voice"/></svg><span>Voci sì</span></button>
     <button class="btn" id="bGfxPause"><svg class="ic"><use href="#i-gfx"/></svg><span>Grafica</span></button>
     <button class="btn" id="bQuit">Torna alla campagna</button>
   </div>
@@ -486,6 +607,8 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
       <div><dt>Rumore</dt><dd>Spari ed esplosioni richiamano ogni nemico a portata d’orecchio. Un sasso lanciato attira le sentinelle vicine a controllare, e può aprirti la strada.</dd></div>
       <div><dt>Meteo</dt><dd>Pioggia, temporale e vento coprono il rumore degli spari; nebbia, buio e neve accorciano la vista delle sentinelle, e nella neve si cammina più piano. Nei temporali un lampo illumina per un istante tutto il campo: quando lampeggia, stai giù. Le condizioni di ogni missione sono nel briefing.</dd></div>
       <div><dt>Medaglie</dt><dd>Vinci senza perdere arditi e quasi senza allarmi per la medaglia d’oro; con al massimo un caduto e cinque allarmi per quella d’argento. Ogni vittoria vale almeno il bronzo. La medaglia migliore resta segnata accanto alla missione.</dd></div>
+      <div><dt>Cani da guardia</dt><dd>Un cane vede poco ma fiuta tutto nel cerchio tratteggiato intorno a lui, anche chi striscia o si nasconde nei cespugli. Giragli al largo, attiralo via con un sasso o prendilo di corsa col pugnale prima che abbai. Se uccidi il suo conduttore, dopo un istante abbaia e chiama le sentinelle. Pioggia e neve smorzano il fiuto; l’acqua cancella l’odore.</dd></div>
+      <div><dt>Veterani</dt><dd>Ogni missione dà esperienza a chi vi partecipa: di più se torna vivo, per ogni nemico fermato, per la medaglia e ai livelli più difficili. Conta il risultato migliore di ogni missione. Con l’esperienza un ardito diventa Provato, Veterano e Leggenda, e a ogni grado sblocca un’abilità. Trovi la squadra in fondo alla pagina della Campagna.</dd></div>
       <div><dt>Corpi</dt><dd>Una guardia che trova un corpo dà l’allarme. Porta i corpi tra i cespugli o lasciali nel fiume.</dd></div>
       <div><dt>Pausa e salvataggi</dt><dd>Puoi mettere in pausa quando vuoi: gli ordini dati in pausa vengono eseguiti alla ripresa. Dal menu di pausa salvi il punto in cui sei e, se qualcosa va storto, riprendi da lì. Come in Commandos, salva spesso.</dd></div>
       <div><dt>Tastiera</dt><dd>1–6 seleziona · A tutti · C striscia · K pugnale · F fuoco · G petardo · X pinze · E carica · S sasso · B prendi o posa · Frecce sposta la visuale · Q/R ruota · Spazio pausa · M minimappa · F5 salva · F9 riprendi · Esc annulla</dd></div>
@@ -493,6 +616,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
     <button class="btn primary" id="bHelpClose">Ho capito</button>
   </div>
 </div>
+<script>window.ARDITI_WEB = 1;</script>
 <script src="three.min.js"></script>
 <script>
 'use strict';
@@ -583,6 +707,25 @@ const ROLES = {
                   abilities: ['crawl', 'knife', 'grenade', 'charge', 'stone', 'carry'], ammo: { grenade: 0, charge: 0 } },
 };
 
+/* Veterani: ogni ardito accumula esperienza di missione in missione e sblocca piccole abilità.
+   L'esperienza di una missione conta una volta sola (la migliore ottenuta), così rigiocare serve solo a fare meglio. */
+const VET_LEVELS = [
+  { xp: 0, title: 'Nuovo' }, { xp: 100, title: 'Provato' }, { xp: 300, title: 'Veterano' }, { xp: 650, title: 'Leggenda' },
+];
+const VET_SKILLS = {
+  pugnale:      [{ key: 'felpato', name: 'Passo felpato', desc: 'striscia più svelto' }, { key: 'tiratore', name: 'Tiratore scelto', desc: 'moschetto più preciso e una casella più lontano' }],
+  petardiere:   [{ key: 'braccio', name: 'Braccio lungo', desc: 'lancia i petardi una casella e mezza più in là' }, { key: 'petardo', name: 'Tasche piene', desc: 'un petardo in più' }],
+  guastatore:   [{ key: 'svelto', name: 'Mani svelte', desc: 'taglia il filo e piazza le cariche più in fretta' }, { key: 'carica', name: 'Carica in più', desc: 'una carica da demolizione in più' }],
+  mitragliere:  [{ key: 'caricatore', name: 'Caricatore in più', desc: 'un caricatore in più per la Villar Perosa' }, { key: 'raffica', name: 'Raffica precisa', desc: 'la raffica arriva più lontano e falcia chi sta accanto' }],
+  lanciafiamme: [{ key: 'vampata', name: 'Vampata in più', desc: 'una vampata in più' }, { key: 'getto', name: 'Getto lungo', desc: 'il lanciafiamme arriva una casella più in là' }],
+  caimano:      [{ key: 'nuoto', name: 'Bracciata forte', desc: 'nuota più veloce' }, { key: 'ombra', name: 'Ombra del fiume', desc: 'in acqua è ancora più difficile da vedere' }],
+};
+const VET_TOUGH = { key: 'pelle', name: 'Pelle dura', desc: 'regge un colpo in più' };
+const vetKey = s => s.short || ROLES[s.role].short;
+const vetLevelOf = xp => { let l = 0; VET_LEVELS.forEach((L, i) => { if (xp >= L.xp) l = i; }); return l; };
+// the skills a man has at a given level: the first two belong to his trade, the third is for everyone
+const vetSkills = (role, lvl) => { const S = VET_SKILLS[role] || []; return [S[0], S[1], VET_TOUGH].slice(0, lvl).filter(Boolean); };
+
 const ETYPES = {
   rifle:      { label: 'Fuciliere', range: 7, fov: 90, fire: 1.7, acc: 0.5, speed: 52 },
   sentry:     { label: 'Sentinella', range: 7, fov: 90, fire: 1.7, acc: 0.5, speed: 52 },
@@ -590,6 +733,8 @@ const ETYPES = {
   mg:         { label: 'Mitragliatrice Schwarzlose', range: 9, fov: 70, fire: 0.34, acc: 0.22, speed: 0, static: true },
   instructor: { label: 'Istruttore', range: 6, fov: 90, fire: 99, acc: 0, speed: 0, static: true, trainer: true },
   dummy:      { label: 'Fantoccio di paglia', range: 0, fov: 0, fire: 99, acc: 0, speed: 0, static: true, dummy: true },
+  // a guard dog sees little but smells everything within a few paces, crawling or hidden in a bush; it barks and bites
+  dog:        { label: 'Cane da guardia', range: 4.5, fov: 160, fire: 99, acc: 0, speed: 58, dog: true, smell: 3, whistle: 10 },
 };
 
 const DIFF = {
@@ -876,10 +1021,12 @@ const MISSIONS = [
       { id: 'r2', t: 'sentry', c: 34, r: 10, f: 90, scan: [45, 135] },
       { id: 'p4', t: 'rifle', c: 2, r: 9, patrol: [[2, 9], [12, 9]] },
       { id: 'p5', t: 'rifle', c: 31, r: 9, patrol: [[31, 9], [41, 9]] },
+      { id: 'k1', t: 'dog', c: 31, r: 10, handler: 'p5' },
       { id: 'i1', t: 'sentry', c: 20, r: 26, f: 90, scan: [60, 120] },
       { id: 'i2', t: 'sentry', c: 23, r: 26, f: 90, scan: [60, 120] },
       { id: 'i3', t: 'rifle', c: 4, r: 25, patrol: [[4, 25], [16, 25]] },
       { id: 'i4', t: 'rifle', c: 27, r: 25, patrol: [[27, 25], [39, 25]] },
+      { id: 'k2', t: 'dog', c: 28, r: 25, handler: 'i4', side: -1 },
     ],
     objects: [{ id: 'mine1', t: 'mine', c: 21, r: 21, armor: 'heavy', lock: ['a', 'b', 'c'] }, { id: 'mine2', t: 'mine', c: 22, r: 21, armor: 'heavy', lock: ['a', 'b', 'c'] }],
     collapse: { cols: [21, 22], rows: [16, 23] },
@@ -952,7 +1099,9 @@ const MISSIONS = [
       { id: 'e1', t: 'sentry', c: 31, r: 4, f: 90, scan: [45, 135] },
       { id: 'e2', t: 'sentry', c: 36, r: 4, f: 120, scan: [80, 160] },
       { id: 'e3', t: 'rifle', c: 29, r: 6, patrol: [[29, 6], [36, 6]] },
+      { id: 'k2', t: 'dog', c: 29, r: 7, handler: 'e3' },
       { id: 'n1', t: 'rifle', c: 3, r: 17, patrol: [[3, 17], [14, 17]] },
+      { id: 'k1', t: 'dog', c: 4, r: 17, handler: 'n1' },
     ],
     objects: [{ id: 'm1', t: 'mortar', c: 21, r: 7, armor: 'light' }, { id: 'm2', t: 'mortar', c: 24, r: 7, armor: 'light' }, { id: 'flag', t: 'flag', c: 33, r: 2 }],
     reinforce: { c: 40, r: 2, count: 3 },
@@ -1146,8 +1295,10 @@ const MISSIONS = [
       { id: 'n2', t: 'rifle', c: 7, r: 7, patrol: [[7, 7], [17, 7]] },
       { id: 'bg1', t: 'sentry', c: 12, r: 8, f: 90, scan: [50, 130] },
       { id: 'n4', t: 'rifle', c: 25, r: 7, patrol: [[25, 7], [37, 7]] },
+      { id: 'k2', t: 'dog', c: 25, r: 8, handler: 'n4', side: -1 },
       { id: 'bg2', t: 'sentry', c: 35, r: 8, f: 90, scan: [50, 130] },
       { id: 'pb', t: 'sentry', c: 27, r: 9, f: 90, scan: [60, 120] },
+      { id: 'k1', t: 'dog', c: 28, r: 9, f: 90, chain: 1.5 },
       { id: 'door', t: 'sentry', c: 21, r: 5, f: 90, scan: [60, 120] },
       { id: 'off', t: 'officer', c: 22, r: 3, f: 90, scan: [60, 120] },
       { id: 'n8', t: 'rifle', c: 3, r: 3, patrol: [[3, 3], [16, 3]] },
@@ -1223,6 +1374,7 @@ const MISSIONS = [
       { id: 't1', t: 'sentry', c: 6, r: 9, f: 90, scan: [60, 120] },
       { id: 't2', t: 'sentry', c: 19, r: 9, f: 90, scan: [60, 120] },
       { id: 't3', t: 'rifle', c: 26, r: 9, patrol: [[26, 9], [40, 9]] },
+      { id: 'k1', t: 'dog', c: 27, r: 8, handler: 't3', side: -1 },
       { id: 't4', t: 'sentry', c: 37, r: 9, f: 90, scan: [60, 120] },
       { id: 'c1', t: 'sentry', c: 4, r: 3, f: 90, scan: [45, 135] },
       { id: 'c2', t: 'sentry', c: 9, r: 4, f: 90, scan: [45, 135] },
@@ -1295,6 +1447,7 @@ const MISSIONS = [
       { id: 'o1', t: 'sentry', c: 6, r: 20, f: 90, scan: [45, 135] },
       { id: 'o2', t: 'sentry', c: 26, r: 20, f: 90, scan: [45, 135] },
       { id: 'o3', t: 'rifle', c: 10, r: 19, patrol: [[10, 19], [24, 19]] },
+      { id: 'k1', t: 'dog', c: 10, r: 20, handler: 'o3' },
       { id: 'o4', t: 'rifle', c: 28, r: 18, patrol: [[28, 18], [40, 18]] },
       { id: 's1', t: 'sentry', c: 19, r: 3, f: 90, scan: [45, 135] },
       { id: 's2', t: 'sentry', c: 25, r: 3, f: 90, scan: [45, 135] },
@@ -1579,7 +1732,7 @@ function createGame(mi, diffKey, opts = {}) {
     time: 0, paused: false, over: false, result: null, reason: '', overT: 0,
     waves: 0, lastWaveT: -999, pendingWave: null, wireCut: 0, alarmFlash: 0, whistleT: 0, msgT: {},
     stats: { kills: 0, silent: 0, alarms: 0, losses: 0 },
-    objectives: [], attract: !!opts.attract, dirtyTiles: [], onEvent: opts.onEvent || (() => {}),
+    objectives: [], attract: !!opts.attract, dirtyTiles: [], onEvent: opts.onEvent || (() => {}), vets: opts.vets || {},
   };
   if (!G.attract) M.squad.forEach((s, i) => G.units.push(makeUnit(G, s, i)));
   M.enemies.forEach(e => G.enemies.push(makeEnemy(G, e)));
@@ -1593,15 +1746,27 @@ function createGame(mi, diffKey, opts = {}) {
   G.objectives = G.attract ? [] : M.objectives.map(o => Object.assign({}, o, { done: false }));
   return G;
 }
+// what a veteran's skills add to his kit
+const VET_AMMO = { petardo: 'grenade', carica: 'charge', caricatore: 'burst', vampata: 'flame' };
 function makeUnit(G, s, i) {
   const R = ROLES[s.role], ammo = {}, base = Object.assign({}, R.ammo, s.ammo || {});
   for (const k in base) ammo[k] = base[k] > 0 ? Math.max(1, Math.round(base[k] * G.diff.ammo)) : 0;
+  const vet = G.vets[vetKey(s)] || 0, sk = {};
+  for (const S of vetSkills(s.role, vet)) sk[S.key] = true;
+  for (const k in VET_AMMO) if (sk[k] && ammo[VET_AMMO[k]] > 0) ammo[VET_AMMO[k]]++;
+  const hp = G.diff.hp + (sk.pelle ? 1 : 0);
   return {
     id: 'u' + i, idx: i, role: s.role, R, name: s.name || R.name, short: s.short || R.short,
-    x: ctr(s.c), y: ctr(s.r), facing: -Math.PI / 2, hp: G.diff.hp, maxHp: G.diff.hp, alive: true,
+    x: ctr(s.c), y: ctr(s.r), facing: -Math.PI / 2, hp, maxHp: hp, alive: true,
     crawl: false, path: [], order: null, busy: 0, busyMax: 1, busyKind: null, busyData: null,
     ammo, stoneCd: 0, carrying: null, swim: !!R.swim, hitT: 0, repathT: 0, aimT: 0, moving: false,
+    vet, sk, kills: 0, silent: 0,
   };
+}
+// a weapon's reach in tiles, with what experience adds to it
+function abilRange(u, a) {
+  const sk = (u && u.sk) || {};
+  return ABIL[a].range + (a === 'carbine' && sk.tiratore ? 1 : 0) + (a === 'grenade' && sk.braccio ? 1.5 : 0) + (a === 'burst' && sk.raffica ? 1.5 : 0) + (a === 'flame' && sk.getto ? 1 : 0);
 }
 function makeEnemy(G, d) {
   const T = ETYPES[d.t];
@@ -1615,6 +1780,7 @@ function makeEnemy(G, d) {
     discovered: false, hidden: false, carriedBy: null, dummy: !!T.dummy, static: !!T.static, trainer: !!T.trainer,
     bark: null, barkT: 0, say: null, sayT: 0, deadT: 0, spawned: !!d.spawned,
   };
+  if (T.dog) { e.dog = true; e.handler = d.handler || null; e.chain = d.chain ? d.chain * TILE : 0; e.biteCd = 0; e.barkSndT = 0; e.followT = 0; e.side = d.side || 1; }
   // after dark some sentries walk with a lantern: they see farther, and they can be seen from afar
   const dark = G.M.light === 'night' || G.M.light === 'dusk';
   if (dark && (d.t === 'sentry' || d.t === 'officer')) {
@@ -1633,7 +1799,7 @@ function msg(G, text, kind = 'info', key = null, every = 0) {
 }
 function bark(e, t) { e.bark = t; e.barkT = 1.6; }
 /* what the guards say, in the German of the k.u.k. army, with the Italian under it; the instructor at the Sdricca shouts in Italian */
-const VOICE = {
+const TALK = {
   sus: [['Was war das?', 'Cos’era?'], ['Wer da?', 'Chi va là?'], ['Hast du das gehört?', 'Hai sentito?'], ['Da drüben… ?', 'Laggiù… ?'], ['Hm? Was ist los?', 'Mh? Che succede?'], ['Ist da wer?', 'C’è qualcuno?']],
   alert: [['Achtung! Da ist jemand!', 'Attenzione! C’è qualcuno!'], ['Schnell, dorthin!', 'Presto, di là!'], ['Gewehr bereit!', 'Fucile pronto!'], ['Ausschwärmen!', 'Sparpagliatevi!']],
   spot: [['Alarm! Die Italiener!', 'Allarme! Gli italiani!'], ['Halt! Stehenbleiben!', 'Alt! Fermo!'], ['Feuer! Feuer!', 'Fuoco! Fuoco!'], ['Die Italiener kommen!', 'Arrivano gli italiani!'], ['Da! Schießt!', 'Là! Sparate!']],
@@ -1641,12 +1807,12 @@ const VOICE = {
   calm: [['Nichts. Nur der Wind.', 'Niente. Solo il vento.'], ['Wohl eine Ratte.', 'Sarà un topo.'], ['Zurück auf Posten.', 'Torno al mio posto.'], ['Ich seh’ schon Gespenster…', 'Comincio a vedere fantasmi…'], ['Verdammter Nebel…', 'Maledetta nebbia…']],
   trainer: [['Ti ho visto! Torna alla linea!', ''], ['Basso, ho detto! Da capo!', ''], ['Così ti ammazzano! Indietro!', '']],
 };
-const VOICE_RANK = { calm: 1, sus: 1, alert: 2, spot: 3, body: 3, trainer: 3 };
-function say(G, e, kind) {
-  if (G.attract || e.dummy || !e.alive) return;
-  const L = VOICE[kind]; if (!L) return;
-  const rank = VOICE_RANK[kind];
-  if (e.sayT > 0.5 && e.say && VOICE_RANK[e.say.kind] > rank) return;
+const TALK_RANK = { calm: 1, sus: 1, alert: 2, spot: 3, body: 3, trainer: 3 };
+function talk(G, e, kind) {
+  if (G.attract || e.dummy || !e.alive || e.dog) return;
+  const L = TALK[kind]; if (!L) return;
+  const rank = TALK_RANK[kind];
+  if (e.sayT > 0.5 && e.say && TALK_RANK[e.say.kind] > rank) return;
   if (e.sayT > 0 && e.say && e.say.kind === kind) return;
   G.sayAt = G.sayAt || {};
   if (rank < 3 && G.time - (G.sayAt[kind] || -9) < 1.1) return; // one voice at a time for the small talk
@@ -1659,6 +1825,8 @@ function say(G, e, kind) {
 }
 function floatText(G, x, y, txt, color) { G.texts.push({ x, y, txt, color, t: 0, T: 1.1 }); }
 function sound(G, kind, x, y) { if (!G.attract) G.onEvent('sfx', { kind, x, y }); }
+// a man speaks: the squad answers in Italian, the enemy shouts in German (the interface decides whether it is heard)
+function say(G, who, cat, enemy) { if (!G.attract) G.onEvent('vo', { who, cat, enemy: !!enemy }); }
 
 function effRange(G, e, lit) {
   const hot = e.state === 'alert' || e.state === 'combat';
@@ -1688,8 +1856,8 @@ function issueOrder(G, u, o) {
 function unitSpeed(G, u) {
   const t = tileAt(G, u.x, u.y);
   let s = 88;
-  if (t.water) s *= 0.62; else s *= t.walk || 1;
-  if (u.crawl && !t.water) s *= 0.45;
+  if (t.water) s *= u.sk && u.sk.nuoto ? 0.78 : 0.62; else s *= t.walk || 1;
+  if (u.crawl && !t.water) s *= u.sk && u.sk.felpato ? 0.54 : 0.45;
   if (u.carrying) s *= 0.6;
   return s * G.walkK;
 }
@@ -1725,13 +1893,13 @@ function updateOrder(G, u, dt) {
   } else if (o.kind === 'shoot') {
     const e = o.target;
     if (!e.alive) { u.order = null; u.path = []; return; }
-    const R = ABIL[o.abil].range * TILE;
+    const R = abilRange(u, o.abil) * TILE;
     if (dist(u, e) <= R && los(G, u.x, u.y, e.x, e.y)) {
       u.path = []; u.facing = angTo(u, e); u.aimT -= dt;
       if (u.aimT <= 0) { fireWeapon(G, u, o.abil, e); u.order = null; }
     } else pathToward(G, u, e.x, e.y, 0.5, R);
   } else if (o.kind === 'point') {
-    const R = ABIL[o.abil].range * TILE;
+    const R = abilRange(u, o.abil) * TILE;
     const d = Math.hypot(o.x - u.x, o.y - u.y);
     const needLos = o.abil === 'flame';
     if (d <= R && (!needLos || los(G, u.x, u.y, o.x, o.y))) {
@@ -1743,7 +1911,7 @@ function updateOrder(G, u, dt) {
     const wx = ctr(o.c), wy = ctr(o.r), d = Math.hypot(wx - u.x, wy - u.y);
     if (d <= TILE * 1.15 || (!u.path.length && d <= TILE * 1.55 && u.repathT < 0.8)) {
       u.path = []; u.facing = Math.atan2(wy - u.y, wx - u.x);
-      startBusy(u, 'cut', 1.4, { c: o.c, r: o.r }); u.order = null; return;
+      startBusy(u, 'cut', u.sk && u.sk.svelto ? 0.85 : 1.4, { c: o.c, r: o.r }); u.order = null; return;
     }
     if (u.repathT <= 0) {
       u.repathT = 1;
@@ -1761,7 +1929,7 @@ function updateOrder(G, u, dt) {
   } else if (o.kind === 'charge') {
     const d = Math.hypot(o.x - u.x, o.y - u.y);
     if (d <= TILE * 1.1 || (!u.path.length && d <= TILE * 1.6 && u.repathT < 0.8)) {
-      u.path = []; startBusy(u, 'charge', 1.0, { x: o.x, y: o.y }); u.order = null; return;
+      u.path = []; startBusy(u, 'charge', u.sk && u.sk.svelto ? 0.6 : 1.0, { x: o.x, y: o.y }); u.order = null; return;
     }
     pathToward(G, u, o.x, o.y, 1.2);
   } else if (o.kind === 'carry') {
@@ -1785,7 +1953,8 @@ function finishBusy(G, u) {
     if (lk) { msg(G, 'Non ancora! Il ponte salta solo quando tutta la squadra è passata e la testata sud è sgombra.', 'warn', 'lock', 2); return; }
     if ((u.ammo.charge || 0) > 0) {
       u.ammo.charge--;
-      G.charges.push({ x: d.x, y: d.y, fuse: 6, owner: u.id });
+      G.charges.push({ x: d.x, y: d.y, fuse: 6, owner: u.id, by: u.id });
+      say(G, u, 'special');
       sound(G, 'click', u.x, u.y);
       msg(G, `Carica innescata: 6 secondi. Allontana ${u.short}!`, 'warn');
     }
@@ -1811,6 +1980,8 @@ function killEnemy(G, e, how, by) {
   e.alive = false; e.state = 'dead'; e.path = []; e.deadT = G.time; e.meter = 0;
   G.stats.kills++;
   if (how === 'knife') G.stats.silent++;
+  if (by && !e.dummy) { by.kills++; if (how === 'knife') by.silent++; }
+  if (how !== 'knife' && !e.dog && !e.dummy && !e.trainer && Math.random() < 0.5) say(G, e, 'hurt', true);
   if (e.dummy) e.discovered = true;
   const t = tileAt(G, e.x, e.y);
   if (t.hide) e.hidden = true;
@@ -1827,6 +1998,7 @@ function damage(G, u, n) {
   if (!u.alive) return;
   u.hp -= n; u.hitT = 0.35;
   floatText(G, u.x, u.y - 14, '−' + n, '#e0604c');
+  if (u.hp > 0) say(G, u, 'hurt');
   if (u.hp <= 0) {
     u.hp = 0; u.alive = false; u.path = []; u.order = null; u.busy = 0;
     if (u.carrying) dropBody(G, u);
@@ -1840,21 +2012,22 @@ function tracer(G, x0, y0, x1, y1, hit, col) {
   G.fx.push({ k: 'flash', x: x0 + Math.cos(Math.atan2(y1 - y0, x1 - x0)) * 10, y: y0 + Math.sin(Math.atan2(y1 - y0, x1 - x0)) * 10, t: 0, T: 0.07 });
 }
 function fireWeapon(G, u, abil, e) {
-  const R = ABIL[abil].range * TILE, d = dist(u, e);
+  const R = abilRange(u, abil) * TILE, d = dist(u, e);
   if ((u.ammo[abil] || 0) <= 0) { msg(G, 'Munizioni esaurite.', 'warn'); return; }
   u.ammo[abil]--;
   if (abil === 'carbine') {
-    const p = clamp(0.95 - 0.4 * (d / R), 0.35, 0.95);
+    const p = clamp(0.95 - 0.4 * (d / R) + (u.sk && u.sk.tiratore ? 0.1 : 0), 0.35, 0.97);
     const hit = Math.random() < p;
     tracer(G, u.x, u.y, e.x + (hit ? 0 : 14), e.y + (hit ? 0 : -10), hit);
+    say(G, u, 'special');
     sound(G, 'shot', u.x, u.y);
     if (hit) killEnemy(G, e, 'shot', u); else floatText(G, e.x, e.y - 16, 'mancato', '#e9e0c8');
     makeNoise(G, u.x, u.y, 10, 'loud', { x: u.x, y: u.y });
   } else if (abil === 'burst') {
-    sound(G, 'burst', u.x, u.y);
+    sound(G, 'burst', u.x, u.y); say(G, u, 'special');
     for (let i = 0; i < 6; i++) G.fx.push({ k: 'tracer', x0: u.x, y0: u.y, x1: e.x + (Math.random() - .5) * 26, y1: e.y + (Math.random() - .5) * 26, t: -i * 0.04, T: 0.12 });
     if (Math.random() < 0.93) killEnemy(G, e, 'shot', u);
-    for (const o of G.enemies) if (o !== e && o.alive && !o.trainer && dist(o, e) < TILE * 1.4 && Math.random() < 0.55) killEnemy(G, o, 'shot', u);
+    for (const o of G.enemies) if (o !== e && o.alive && !o.trainer && dist(o, e) < TILE * 1.4 && Math.random() < (u.sk && u.sk.raffica ? 0.8 : 0.55)) killEnemy(G, o, 'shot', u);
     makeNoise(G, u.x, u.y, 12, 'loud', { x: u.x, y: u.y });
   }
 }
@@ -1868,15 +2041,15 @@ function pointAbility(G, u, abil, x, y) {
   if ((u.ammo[abil] || 0) <= 0) { msg(G, 'Esaurito.', 'warn'); return; }
   u.ammo[abil]--;
   if (abil === 'grenade') {
-    G.proj.push({ k: 'grenade', x0: u.x, y0: u.y, x1: x, y1: y, x: u.x, y: u.y, t: 0, T: Math.max(0.35, Math.hypot(x - u.x, y - u.y) / 290), landed: false, fuse: 0.45 });
-    sound(G, 'throw', u.x, u.y);
+    G.proj.push({ k: 'grenade', x0: u.x, y0: u.y, x1: x, y1: y, x: u.x, y: u.y, t: 0, T: Math.max(0.35, Math.hypot(x - u.x, y - u.y) / 290), landed: false, fuse: 0.45, by: u.id });
+    sound(G, 'throw', u.x, u.y); say(G, u, 'special');
   } else if (abil === 'flame') {
     flameCone(G, u, Math.atan2(y - u.y, x - u.x));
   }
 }
 function flameCone(G, u, a) {
-  const R = ABIL.flame.range * TILE;
-  sound(G, 'flame', u.x, u.y);
+  const R = abilRange(u, 'flame') * TILE;
+  sound(G, 'flame', u.x, u.y); say(G, u, 'special');
   for (let i = 0; i < 46; i++) {
     const aa = a + (Math.random() - .5) * 0.6, sp = 160 + Math.random() * 120;
     G.fx.push({ k: 'fire', x: u.x + Math.cos(a) * 10, y: u.y + Math.sin(a) * 10, vx: Math.cos(aa) * sp, vy: Math.sin(aa) * sp, t: -Math.random() * 0.25, T: 0.55 + Math.random() * 0.25 });
@@ -1886,11 +2059,11 @@ function flameCone(G, u, a) {
   for (const o of G.units) if (o !== u && o.alive && inCone(o)) damage(G, o, 2);
   makeNoise(G, u.x, u.y, 7, 'loud', { x: u.x, y: u.y });
 }
-function explode(G, x, y, power) {
-  const r = (power === 'charge' ? 2.2 : 1.6) * TILE;
+function explode(G, x, y, power, byId) {
+  const r = (power === 'charge' ? 2.2 : 1.6) * TILE, by = byId ? G.units.find(u => u.id === byId) : null;
   G.fx.push({ k: 'boom', x, y, r, t: 0, T: 1.1 });
   sound(G, 'boom', x, y);
-  for (const e of G.enemies) if (e.alive && !e.trainer && Math.hypot(e.x - x, e.y - y) <= r) killEnemy(G, e, 'blast');
+  for (const e of G.enemies) if (e.alive && !e.trainer && Math.hypot(e.x - x, e.y - y) <= r) killEnemy(G, e, 'blast', by);
   for (const u of G.units) if (u.alive) { const d = Math.hypot(u.x - x, u.y - y); if (d <= r) damage(G, u, power === 'charge' ? (d < r * 0.6 ? 5 : 2) : 2); }
   for (const o of G.objects) {
     if (o.destroyed || !o.armor || isLocked(G, o)) continue;
@@ -1941,10 +2114,15 @@ function setSuspicious(G, e, pt) {
   if (e.state === 'alert') return;
   e.state = 'suspicious'; e.point = { x: pt.x, y: pt.y }; e.susT = 7; e.lookT = 0;
   e.lookBase = Math.atan2(pt.y - e.y, pt.x - e.x);
-  e.path = e.static ? [] : (findPath(G, e.x, e.y, pt.x, pt.y, null) || []);
+  // a dog that catches a man's scent stands its ground and growls at it; a noise it goes to sniff out
+  const holds = e.static || (e.dog && pt.hp != null);
+  if (e.dog) e.holding = holds;
+  e.path = holds ? [] : (findPath(G, e.x, e.y, pt.x, pt.y, null) || []);
+  if (e.dog && holds) e.wantFace = e.lookBase;
   if (e.static) e.wantFace = e.lookBase;
   bark(e, '?');
-  say(G, e, 'sus');
+  if (e.dog) sound(G, 'growl', e.x, e.y); else if (Math.random() < 0.6) say(G, e, 'sus', true);
+  talk(G, e, 'sus');
 }
 function toAlert(G, e, pt) {
   e.state = 'alert'; e.point = { x: pt.x, y: pt.y }; e.alertT = e.spawned ? 30 : 14; e.lookT = 0; e.wary = true;
@@ -1952,10 +2130,10 @@ function toAlert(G, e, pt) {
   e.path = e.static ? [] : (findPath(G, e.x, e.y, pt.x, pt.y, null) || []);
   if (e.static) e.wantFace = e.lookBase;
   if (e.barkT <= 0 || e.bark !== '!') bark(e, '!?');
-  say(G, e, 'alert');
+  talk(G, e, 'alert');
 }
 function returnHome(G, e) {
-  if (e.state === 'suspicious' || e.state === 'alert') say(G, e, 'calm');
+  if (e.state === 'suspicious' || e.state === 'alert') talk(G, e, 'calm');
   e.meter = Math.min(e.meter, 0.25);
   if (e.static) { e.state = 'idle'; e.wantFace = e.homeFacing; return; }
   e.state = 'returning';
@@ -1969,10 +2147,13 @@ function raiseAlarm(G, e, pt, radiusT, why) {
     if (o === e || !o.alive || o.dummy || o.trainer || o.state === 'combat') continue;
     if (Math.hypot(o.x - e.x, o.y - e.y) <= radiusT * TILE) toAlert(G, o, pt);
   }
-  if (e.type === 'officer' || G.time - G.whistleT > 4) { sound(G, 'whistle', e.x, e.y); G.whistleT = G.time; }
+  if (e.dog) { sound(G, 'bark', e.x, e.y); e.barkSndT = 1.2; }
+  else if (e.type === 'officer' || G.time - G.whistleT > 4) { sound(G, 'whistle', e.x, e.y); G.whistleT = G.time; }
   msg(G, why, 'bad', 'alarm', 3);
   scheduleWave(G, pt);
-  if (G.flareT && !G.flares.some(f => f.t < 6) && Math.random() < 0.7) fireFlare(G, e, pt.x + (Math.random() - 0.5) * TILE * 2, pt.y + (Math.random() - 0.5) * TILE * 2);
+  // a star shell goes up from the nearest man (a dog cannot fire one)
+  const fs = e.dog ? G.enemies.filter(o => o.alive && !o.dog && !o.dummy && !o.trainer).sort((a, b) => Math.hypot(a.x - e.x, a.y - e.y) - Math.hypot(b.x - e.x, b.y - e.y))[0] : e;
+  if (fs && G.flareT && !G.flares.some(f => f.t < 6) && Math.random() < 0.7) fireFlare(G, fs, pt.x + (Math.random() - 0.5) * TILE * 2, pt.y + (Math.random() - 0.5) * TILE * 2);
 }
 function scheduleWave(G, pt) {
   const R = G.M.reinforce;
@@ -2007,7 +2188,7 @@ function visibleUnits(G, e) {
     const t = tileAt(G, u.x, u.y);
     if (t.hide && d > TILE * 1.3) continue;
     let eff = R;
-    if (t.water) eff *= 0.5;
+    if (t.water) eff *= u.sk && u.sk.ombra ? 0.35 : 0.5;
     else if (u.crawl) eff *= t.cover ? 0.35 : 0.55;
     else if (t.cover) eff *= 0.85;
     if (u.carrying) eff *= 1.1;
@@ -2021,7 +2202,7 @@ function visibleUnits(G, e) {
 }
 function perceive(G, e, dt) {
   if (!G.units.length) return;
-  const vis = visibleUnits(G, e);
+  const vis = e.dog ? dogSenses(G, e) : visibleUnits(G, e);
   let best = null;
   for (const v of vis) if (!best || v.d < best.d) best = v;
   if (e.state === 'combat') {
@@ -2032,7 +2213,7 @@ function perceive(G, e, dt) {
   }
   if (best) {
     const mult = e.state === 'alert' ? 2.3 : e.state === 'suspicious' ? 1.5 : 1;
-    const rate = G.diff.detect * mult * Math.max(0.35, 1.7 - best.d / best.eff) * 0.95;
+    const rate = G.diff.detect * mult * Math.max(0.35, 1.7 - best.d / best.eff) * 0.95 * (best.smell ? 0.9 : 1);
     e.meter = Math.min(1, e.meter + rate * dt);
     if (e.meter >= 1) { spot(G, e, best.u); return; }
     if (e.meter > 0.45) {
@@ -2040,8 +2221,9 @@ function perceive(G, e, dt) {
       else {
         e.point = { x: best.u.x, y: best.u.y };
         e.repathT -= dt;
-        if (!e.static && e.repathT <= 0) { e.repathT = 1; e.path = findPath(G, e.x, e.y, best.u.x, best.u.y, null) || []; }
-        if (e.static || !e.path.length) e.wantFace = Math.atan2(best.u.y - e.y, best.u.x - e.x);
+        if (!e.static && !e.dog && e.repathT <= 0) { e.repathT = 1; e.path = findPath(G, e.x, e.y, best.u.x, best.u.y, null) || []; }
+        if (e.dog) e.path = [];
+        if (e.static || e.dog || !e.path.length) e.wantFace = Math.atan2(best.u.y - e.y, best.u.x - e.x);
         if (e.state === 'suspicious') e.susT = Math.max(e.susT, 4);
       }
     } else if (e.meter > 0.15 && e.state === 'idle' && !e.patrol) {
@@ -2049,17 +2231,19 @@ function perceive(G, e, dt) {
     }
   } else e.meter = Math.max(0, e.meter - dt * 0.2);
   if (!e.trainer) checkBodies(G, e);
+  if (e.dog && e.alive && e.state !== 'combat') smellBodies(G, e);
 }
 function checkBodies(G, e) {
   const R = effRange(G, e), fov = effFov(e);
   for (const b of G.enemies) {
     if (b.alive || b.dummy || b.discovered || b.hidden || b.carriedBy) continue;
+    if (e.dog && b.id === e.handler) continue;
     const d = Math.hypot(b.x - e.x, b.y - e.y);
     if (d > R || (d > TILE * 0.8 && angDiff(e.facing, Math.atan2(b.y - e.y, b.x - e.x)) > fov / 2)) continue;
     if (tileAt(G, b.x, b.y).hide) continue;
     if (!los(G, e.x, e.y, b.x, b.y)) continue;
     b.discovered = true;
-    toAlert(G, e, { x: b.x, y: b.y }); bark(e, '!'); say(G, e, 'body');
+    toAlert(G, e, { x: b.x, y: b.y }); bark(e, '!'); talk(G, e, 'body');
     raiseAlarm(G, e, { x: b.x, y: b.y }, 7, 'È stato trovato un corpo! Il nemico perlustra la zona.');
     return;
   }
@@ -2068,13 +2252,15 @@ function spot(G, e, u) {
   if (e.trainer) { trainerCatch(G, e, u); return; }
   e.state = 'combat'; e.target = u; e.meter = 1; e.lostT = 0; e.lastKnown = { x: u.x, y: u.y }; e.path = [];
   e.fireCd = Math.max(e.fireCd, 0.75 / G.diff.fireRate);
-  bark(e, '!'); say(G, e, 'spot');
-  raiseAlarm(G, e, { x: u.x, y: u.y }, e.T.whistle || 8, `Allarme! ${u.short} è stato avvistato.`);
+  bark(e, '!'); talk(G, e, 'spot');
+  if (!e.dog) say(G, e, 'alarm', true);
+  say(G, u, 'spotted');
+  raiseAlarm(G, e, { x: u.x, y: u.y }, e.T.whistle || 8, e.dog ? `Un cane ha fiutato ${u.short}! Abbaia e chiama le sentinelle.` : `Allarme! ${u.short} è stato avvistato.`);
 }
 function trainerCatch(G, e, u) {
   const cp = G.M.checkpoint || [tc(u.x), tc(u.y)];
   u.x = ctr(cp[0]); u.y = ctr(cp[1]); u.path = []; u.order = null; u.busy = 0;
-  e.meter = 0; e.state = 'idle'; bark(e, '!'); say(G, e, 'trainer');
+  e.meter = 0; e.state = 'idle'; bark(e, '!'); talk(G, e, 'trainer');
   sound(G, 'whistle', e.x, e.y);
   msg(G, `Fischio! L’istruttore ha visto ${u.short}. Torna alla linea: striscia e usa i cespugli.`, 'bad');
 }
@@ -2088,14 +2274,172 @@ function enemyFire(G, e, u) {
   const hit = Math.random() < p;
   tracer(G, e.x, e.y, u.x + (hit ? 0 : (Math.random() - .5) * 30), u.y + (hit ? 0 : (Math.random() - .5) * 30), hit, '#f3c879');
   sound(G, e.type === 'mg' ? 'mg' : 'shot', e.x, e.y);
+  if (e.type === 'officer' && Math.random() < 0.3) say(G, e, 'fire', true);
   if (hit) damage(G, u, 1);
   e.fireCd = e.T.fire / G.diff.fireRate * (0.8 + Math.random() * 0.4);
   makeNoise(G, e.x, e.y, 7, 'loud', { x: u.x, y: u.y }, e);
 }
 
+/* ---------- guard dogs: they keep at their handler's heel, smell what they cannot see, bark, and bite ---------- */
+function smellRange(G, e) {
+  const wk = G.wx ? G.wx.kind : 'clear';
+  // rain and snow wash out the scent; an excited dog casts about more widely
+  const k = wk === 'storm' ? 0.65 : wk === 'rain' ? 0.75 : wk === 'snow' ? 0.85 : 1;
+  return e.T.smell * TILE * k * Math.sqrt(G.diff.vision) * (e.state === 'alert' || e.state === 'combat' ? 1.25 : 1);
+}
+function dogSenses(G, e) {
+  const R = smellRange(G, e), out = visibleUnits(G, e);
+  for (const u of G.units) {
+    if (!u.alive || out.some(v => v.u === u)) continue;
+    if (tileAt(G, u.x, u.y).water) continue; // the river carries the scent away
+    const d = Math.hypot(u.x - e.x, u.y - e.y);
+    if (d <= R) out.push({ u, d, eff: R, smell: true });
+  }
+  return out;
+}
+// a dog finds a body even in a bush, as long as it is close (not one the river took)
+function smellBodies(G, e) {
+  for (const b of G.enemies) {
+    if (b.alive || b.dummy || b.discovered || b.carriedBy || b.sunk || b === e) continue;
+    if (b.id === e.handler) continue; // its own master: handled apart
+    if (Math.hypot(b.x - e.x, b.y - e.y) > TILE * 1.7) continue;
+    b.discovered = true;
+    toAlert(G, e, { x: b.x, y: b.y }); bark(e, '!');
+    raiseAlarm(G, e, { x: b.x, y: b.y }, 9, 'Un cane ha fiutato un corpo e abbaia! Il nemico perlustra la zona.');
+    return;
+  }
+}
+function dogHandler(G, e) { return e.handler ? G.enemies.find(o => o.id === e.handler) : null; }
+// step along a path (or straight at a point) at a given speed
+function dogMove(G, e, speed, dt) {
+  if (!e.path.length || speed <= 0) return false;
+  const p = e.path[0], dx = p.x - e.x, dy = p.y - e.y, d = Math.hypot(dx, dy);
+  const sp = speed * (tileAt(G, e.x, e.y).walk || 1) * G.walkK * dt;
+  if (d <= sp) { e.x = p.x; e.y = p.y; e.path.shift(); }
+  else { e.x += dx / d * sp; e.y += dy / d * sp; }
+  if (d > 0.5) { const a = Math.atan2(dy, dx); e.facing = angNorm(e.facing + clamp(angNorm(a - e.facing), -9 * dt, 9 * dt)); }
+  // a chained dog stops at the end of its chain
+  if (e.chain) { const hx = e.x - e.homeX, hy = e.y - e.homeY, hd = Math.hypot(hx, hy); if (hd > e.chain) { e.x = e.homeX + hx / hd * e.chain; e.y = e.homeY + hy / hd * e.chain; e.path = []; } }
+  return true;
+}
+function dogGoTo(G, e, x, y, every) {
+  if (e.repathT > 0 && e.path.length) return;
+  e.repathT = every;
+  e.path = findPath(G, e.x, e.y, x, y, null) || [];
+}
+function dogAlarm(G, e, pt, why) {
+  if (!e.alive) return;
+  toAlert(G, e, pt); bark(e, '!'); e.alertT = 16;
+  raiseAlarm(G, e, pt, 9, why);
+}
+function updateDog(G, e, dt) {
+  e.fireCd = 0; e.barkT = Math.max(0, e.barkT - dt); e.biteCd = Math.max(0, e.biteCd - dt); e.repathT -= dt;
+  perceive(G, e, dt);
+  if (!e.alive) return;
+  const h = dogHandler(G, e);
+  // its master is down: the dog noses the body, whines, and then barks the post awake
+  if (h && !h.alive && !e.orphan) {
+    e.orphan = true; e.homeX = h.x; e.homeY = h.y;
+    if (Math.hypot(h.x - e.x, h.y - e.y) < 6 * TILE && e.state !== 'combat') {
+      e.state = 'suspicious'; e.point = { x: h.x, y: h.y }; e.susT = 99; e.howlT = 1.7; bark(e, '?');
+      sound(G, 'growl', e.x, e.y); e.path = findPath(G, e.x, e.y, h.x, h.y, null) || [];
+    }
+  }
+  if (e.howlT != null) {
+    e.howlT -= dt;
+    if (e.howlT <= 0) { e.howlT = null; h.discovered = true; dogAlarm(G, e, { x: h.x, y: h.y }, 'Il cane abbaia accanto al corpo del suo conduttore! Il nemico accorre.'); }
+  }
+  const T0 = e.T.speed;
+  switch (e.state) {
+    case 'idle':
+      if (h && h.alive) {
+        // at heel: a pace behind the handler and to one side (straight behind him if that side is blocked)
+        const f = h.facing, cf = Math.cos(f), sf = Math.sin(f);
+        let bx = h.x - cf * TILE * 0.85 - sf * TILE * 0.45 * e.side, by = h.y - sf * TILE * 0.85 + cf * TILE * 0.45 * e.side;
+        if (!passable(G, tc(bx), tc(by), null)) { bx = h.x - cf * TILE * 0.85; by = h.y - sf * TILE * 0.85; }
+        if (!passable(G, tc(bx), tc(by), null)) { bx = h.x; by = h.y; }
+        const d = Math.hypot(bx - e.x, by - e.y), dh = Math.hypot(h.x - e.x, h.y - e.y);
+        // while the handler stands still, the dog stays put close by him
+        const still = !h.path.length && dh < TILE * 1.6;
+        if (!still && d > TILE * 0.3) {
+          if (d > TILE * 1.6 || !walkLine(G, e.x, e.y, bx, by, null)) dogGoTo(G, e, bx, by, 0.5);
+          else e.path = [{ x: bx, y: by }];
+          dogMove(G, e, T0 * (d > TILE * 1.2 ? 1.7 : 1.1), dt);
+        } else { e.path = []; e.wantFace = h.facing + Math.sin(G.time * 0.7 + e.x) * 0.9; }
+      } else if (e.patrol) {
+        if (!e.path.length) {
+          if (e.waitT > 0) e.waitT -= dt;
+          else { e.pi = (e.pi + 1) % e.patrol.length; const t = e.patrol[e.pi]; e.path = findPath(G, e.x, e.y, t.x, t.y, null) || []; e.waitT = 1 + Math.random(); }
+        }
+        dogMove(G, e, T0, dt);
+      } else {
+        // on the chain, or left alone: pace about the spot, nose to the ground
+        e.scanT -= dt;
+        if (e.scanT <= 0) {
+          e.scanT = 2 + Math.random() * 3;
+          const a = Math.random() * TAU, r = (e.chain || TILE) * (0.3 + Math.random() * 0.6);
+          const x = e.homeX + Math.cos(a) * r, y = e.homeY + Math.sin(a) * r;
+          if (passable(G, tc(x), tc(y), null) && walkLine(G, e.x, e.y, x, y, null)) e.path = [{ x, y }];
+        }
+        dogMove(G, e, T0 * 0.7, dt);
+      }
+      break;
+    case 'suspicious':
+      e.susT -= dt;
+      if (e.point && !e.path.length && !e.holding && Math.hypot(e.point.x - e.x, e.point.y - e.y) > TILE * 0.8) dogGoTo(G, e, e.point.x, e.point.y, 1.5);
+      if (!dogMove(G, e, T0 * 0.9, dt)) { e.lookT += dt; e.wantFace = e.lookBase + Math.sin(e.lookT * 2.4) * 1.1; }
+      if (e.susT <= 0) dogReturn(G, e);
+      break;
+    case 'alert':
+      e.alertT -= dt;
+      if (!dogMove(G, e, T0 * 1.9, dt)) { e.lookT += dt; e.wantFace = e.lookBase + Math.sin(e.lookT * 2) * 1.5; }
+      if (e.alertT <= 0) dogReturn(G, e);
+      break;
+    case 'combat': {
+      const u = e.target;
+      if (!u || !u.alive) { e.state = 'alert'; e.alertT = 8; e.path = []; break; }
+      const d = Math.hypot(u.x - e.x, u.y - e.y);
+      e.wantFace = Math.atan2(u.y - e.y, u.x - e.x);
+      if (d > TILE * 0.7) { dogGoTo(G, e, u.x, u.y, 0.35); dogMove(G, e, T0 * 2.1, dt); }
+      else {
+        e.path = [];
+        // the bite: the man it reaches turns on it with his dagger
+        if (e.biteCd <= 0) {
+          e.biteCd = 1.2 / G.diff.fireRate; e.bite = 0.3;
+          sound(G, 'bite', e.x, e.y);
+          if (Math.random() < clamp(0.7 * G.diff.acc, 0.35, 0.95)) damage(G, u, 1);
+          if (u.alive && !u.order && !u.busy && !u.carrying && !tileAt(G, u.x, u.y).water) issueOrder(G, u, { kind: 'knife', target: e });
+        }
+      }
+      // barking that carries: whoever hears it comes running
+      e.barkSndT -= dt;
+      if (e.barkSndT <= 0) { e.barkSndT = 1.6 + Math.random() * 0.8; sound(G, 'bark', e.x, e.y); makeNoise(G, e.x, e.y, 6, 'loud', { x: u.x, y: u.y }, e); }
+      break;
+    }
+    case 'returning':
+      if (h && h.alive) { e.state = 'idle'; break; }
+      if (!dogMove(G, e, T0, dt)) { e.state = 'idle'; e.wantFace = e.homeFacing; }
+      break;
+  }
+  if (e.bite) e.bite = Math.max(0, e.bite - dt);
+  if (!e.path.length) {
+    const turn = (e.state === 'combat' ? 8 : e.state === 'alert' ? 4.5 : 2.4) * dt;
+    e.facing = angNorm(e.facing + clamp(angNorm(e.wantFace - e.facing), -turn, turn));
+  }
+}
+function dogReturn(G, e) {
+  e.meter = Math.min(e.meter, 0.25);
+  const h = dogHandler(G, e);
+  if (h && h.alive) { e.state = 'idle'; e.path = []; return; }
+  e.state = 'returning';
+  const t = e.patrol ? e.patrol[e.pi] : { x: e.homeX, y: e.homeY };
+  e.path = findPath(G, e.x, e.y, t.x, t.y, null) || [];
+}
+
 /* ---------- per-frame updates ---------- */
 function updateEnemy(G, e, dt) {
   if (!e.alive || e.dummy) return;
+  if (e.dog) { updateDog(G, e, dt); return; }
   e.fireCd = Math.max(0, e.fireCd - dt);
   e.barkT = Math.max(0, e.barkT - dt);
   if (e.sayT > 0) e.sayT = Math.max(0, e.sayT - dt);
@@ -2189,11 +2533,11 @@ function updateProjectiles(G, dt) {
       }
     } else if (p.k === 'grenade') {
       p.fuse -= dt;
-      if (p.fuse <= 0) { p.done = true; explode(G, p.x, p.y, 'grenade'); }
+      if (p.fuse <= 0) { p.done = true; explode(G, p.x, p.y, 'grenade', p.by); }
     }
   }
   G.proj = G.proj.filter(p => !p.done);
-  for (const c of G.charges) { c.fuse -= dt; if (c.fuse <= 0) { c.done = true; explode(G, c.x, c.y, 'charge'); } }
+  for (const c of G.charges) { c.fuse -= dt; if (c.fuse <= 0) { c.done = true; explode(G, c.x, c.y, 'charge', c.by); } }
   G.charges = G.charges.filter(c => !c.done);
 }
 function updateFx(G, dt) {
@@ -2627,7 +2971,26 @@ function drawArdito(ctx, G, u, sel, T) {
     ctx.beginPath(); ctx.arc(u.x, u.y, 13, -Math.PI / 2, -Math.PI / 2 + TAU * (1 - u.busy / u.busyMax)); ctx.stroke();
   }
 }
+function drawDog(ctx, e, T, dead) {
+  // seen from above: a tan body with a black saddle, head and ears, a tail
+  ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.facing + (dead ? 0.5 : 0));
+  if (!dead) { ctx.fillStyle = 'rgba(0,0,0,.28)'; ctx.beginPath(); ctx.ellipse(2, 3, 10, 5, 0, 0, TAU); ctx.fill(); }
+  const run = !dead && (e.state === 'combat' || e.state === 'alert'), w = dead ? 0 : Math.sin(T * (run ? 16 : 8) + e.x) * (run ? 2.2 : 1.2);
+  ctx.strokeStyle = '#3a2a1a'; ctx.lineWidth = 2.4; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-8, 0); ctx.quadraticCurveTo(-12, w * 0.5, -15, w * 1.6); ctx.stroke();
+  ctx.lineWidth = 1.6; for (const [x, s] of [[5, 1], [5, -1], [-5, 1], [-5, -1]]) { ctx.beginPath(); ctx.moveTo(x, s * 3); ctx.lineTo(x + (dead ? 3 : w * s * 0.8), s * (dead ? 8 : 6)); ctx.stroke(); }
+  ctx.lineCap = 'butt';
+  ctx.fillStyle = '#9b7448'; ctx.strokeStyle = '#2b1f14'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.ellipse(0, 0, 9.5, 4.2, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#2b241d'; ctx.beginPath(); ctx.ellipse(-1, 0, 6, 2.6, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#9b7448'; ctx.beginPath(); ctx.ellipse(10.5, 0, 3.8, 3.2, 0, 0, TAU); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = '#c29a68'; ctx.beginPath(); ctx.ellipse(14, 0, 2.6, 1.8, 0, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#111'; ctx.beginPath(); ctx.arc(16, 0, 1, 0, TAU); ctx.fill();
+  ctx.fillStyle = '#2b241d'; ctx.beginPath(); ctx.moveTo(9, -2); ctx.lineTo(8, -5.5); ctx.lineTo(11, -3); ctx.moveTo(9, 2); ctx.lineTo(8, 5.5); ctx.lineTo(11, 3); ctx.fill();
+  ctx.restore();
+}
 function drawEnemyBody(ctx, e) {
+  if (e.dog) { drawDog(ctx, e, 0, true); return; }
   ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.facing + 0.4);
   if (e.dummy) {
     ctx.fillStyle = '#7b6440'; ctx.beginPath(); ctx.ellipse(0, 0, 11, 4.5, 0, 0, TAU); ctx.fill();
@@ -2642,6 +3005,8 @@ function drawEnemyBody(ctx, e) {
 }
 function drawEnemy(ctx, G, e, T) {
   const x = e.x, y = e.y;
+  if (e.dog) drawDog(ctx, e, T, false);
+  else {
   ctx.save(); ctx.translate(x, y);
   ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(2.5, 4, 10, 8, 0, 0, TAU); ctx.fill();
   if (e.dummy) {
@@ -2681,6 +3046,7 @@ function drawEnemy(ctx, G, e, T) {
     ctx.fillStyle = '#5c666b'; ctx.beginPath(); ctx.arc(0, -1, 3.6, 0, TAU); ctx.fill();
   }
   ctx.restore();
+  }
   // awareness
   if (e.state !== 'combat' && e.meter > 0.05) {
     ctx.strokeStyle = e.meter > 0.6 ? '#e06a3c' : COL.gold; ctx.lineWidth = 2.5;
@@ -2759,6 +3125,11 @@ function drawMark(ctx, x, y, T) {
   ctx.restore();
 }
 function drawCone(ctx, G, e) {
+  if (e.dog) {
+    const r = smellRange(G, e), c = e.state === 'combat' ? '210,48,36' : e.state === 'alert' ? '226,96,52' : e.state === 'suspicious' ? '236,160,64' : '236,214,140';
+    ctx.setLineDash([5, 5]); ctx.strokeStyle = `rgba(${c},0.55)`; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(e.x, e.y, r, 0, TAU); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = `rgba(${c},0.07)`; ctx.fill();
+  }
   const R = effRange(G, e), fov = effFov(e);
   const N = Math.max(10, Math.round(fov / 0.06));
   const sc = tc(e.x), sr = tc(e.y);
@@ -2897,7 +3268,7 @@ function render(G, UI, T) {
   }
   // targeting ring & tap marker
   if (UI && UI.mode !== 'move' && sel.length === 1 && ABIL[UI.mode] && ABIL[UI.mode].range) {
-    const u = sel[0], R = ABIL[UI.mode].range * TILE;
+    const u = sel[0], R = abilRange(u, UI.mode) * TILE;
     ctx.save(); ctx.setLineDash([5, 5]); ctx.lineDashOffset = T * 10; ctx.strokeStyle = 'rgba(241,232,207,.7)'; ctx.lineWidth = 1.5;
     ctx.beginPath(); ctx.arc(u.x, u.y, R, 0, TAU); ctx.stroke(); ctx.restore();
     if (UI.mode === 'grenade' || UI.mode === 'charge') {
@@ -2941,7 +3312,7 @@ function drawThumb(canvas, mi) {
   const s = canvas.width / (M.w * TILE);
   ctx.save(); ctx.scale(s, s);
   M.objectives.forEach(o => { if (o.type === 'reach') { const [zc, zr, zw, zh] = o.zone; ctx.setLineDash([10, 8]); ctx.strokeStyle = 'rgba(214,170,76,.95)'; ctx.lineWidth = 6; ctx.strokeRect(zc * TILE, zr * TILE, zw * TILE, zh * TILE); ctx.setLineDash([]); } });
-  G.enemies.forEach(e => { ctx.fillStyle = e.dummy ? '#c9a65a' : e.type === 'mg' ? '#e24a33' : '#b0574a'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(e.x, e.y, e.type === 'mg' ? 13 : 10, 0, TAU); ctx.fill(); ctx.stroke(); });
+  G.enemies.forEach(e => { ctx.fillStyle = e.dummy ? '#c9a65a' : e.type === 'mg' ? '#e24a33' : e.dog ? '#d08a3a' : '#b0574a'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(e.x, e.y, e.type === 'mg' ? 13 : e.dog ? 7 : 10, 0, TAU); ctx.fill(); ctx.stroke(); });
   G.objects.forEach(o => { if (o.armor) { ctx.fillStyle = '#e9e0c8'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3; ctx.fillRect(o.x - 10, o.y - 10, 20, 20); ctx.strokeRect(o.x - 10, o.y - 10, 20, 20); } });
   G.units.forEach(u => { ctx.fillStyle = '#d6aa4c'; ctx.strokeStyle = '#111'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(u.x, u.y, 11, 0, TAU); ctx.fill(); ctx.stroke(); });
   ctx.restore();
@@ -4516,9 +4887,123 @@ function makeMGun() {
   K.beam(0xb59a4a, 0.06, 0.3, -0.02, 0.18, 0.12, -0.05, 0.03, 0.006);
   const m = K.mesh(); return m;
 }
+/* ---------- the guard dog: an Austro-Hungarian army shepherd, tan with a black saddle ---------- */
+function makeDog(a) {
+  const G0 = geo(), sd = idSeed(a), h = k => HASH(sd, k, 17);
+  const tan = col3(h(1) < 0.7 ? 0x9b7448 : 0x7d6a52), dark = col3(0x2b241d), light = col3(h(1) < 0.7 ? 0xc29a68 : 0xa59478), nose = col3(0x111111);
+  const root = new THREE.Group(), pose = new THREE.Group(); root.add(pose);
+  const torso = new THREE.Group(); torso.position.y = 0.34; pose.add(torso);
+  const kT = new Kit();
+  kT.add(G0.sph, tan, 0, 0, 0, 0.085, 0.095, 0.24);
+  kT.add(G0.sph, tan, 0, -0.005, 0.15, 0.09, 0.11, 0.12);
+  kT.add(G0.sph, tan, 0, 0.005, -0.15, 0.085, 0.095, 0.11);
+  kT.add(G0.sph, dark, 0, 0.035, -0.02, 0.08, 0.07, 0.2);
+  kT.add(G0.sph, light, 0, -0.045, 0.03, 0.06, 0.05, 0.18);
+  kT.beam(tan, 0, 0.03, 0.16, 0, 0.14, 0.27, 0.075, 0.085);
+  kT.beam(dark, 0, 0.07, 0.16, 0, 0.17, 0.25, 0.05, 0.04);
+  kT.add(G0.cyl8, col3(0x4a3322), 0, 0.09, 0.215, 0.047, 0.022, 0.047, -0.9, 0, 0);
+  const tm = kT.mesh(); tm.castShadow = true; torso.add(tm);
+  const head = new THREE.Group(); head.position.set(0, 0.16, 0.29); torso.add(head);
+  const kH = new Kit();
+  kH.add(G0.sph, tan, 0, 0, 0, 0.058, 0.055, 0.07);
+  kH.add(G0.sph6, dark, 0, 0.03, -0.012, 0.045, 0.03, 0.05);
+  kH.add(G0.cyl8, light, 0, -0.016, 0.075, 0.03, 0.09, 0.032, Math.PI / 2, 0, 0);
+  kH.add(G0.box, dark, 0, -0.001, 0.07, 0.03, 0.012, 0.07, 0.12, 0, 0);
+  kH.add(G0.sph6, nose, 0, -0.006, 0.122, 0.017, 0.014, 0.015);
+  for (const sx of [-1, 1]) {
+    kH.add(G0.cone, dark, sx * 0.03, 0.068, -0.012, 0.024, 0.072, 0.016, 0, 0, -sx * 0.22);
+    kH.add(G0.tiny, nose, sx * 0.03, 0.014, 0.05, 0.008, 0.008, 0.006);
+  }
+  head.add(kH.mesh());
+  const jaw = new THREE.Group(); jaw.position.set(0, -0.03, 0.03); head.add(jaw);
+  const kJ = new Kit(); kJ.add(G0.box, light, 0, -0.006, 0.045, 0.04, 0.012, 0.075); kJ.add(G0.box, col3(0x8a3a32), 0, 0.002, 0.05, 0.026, 0.004, 0.05); jaw.add(kJ.mesh(false));
+  // legs: the front ones straight, the hind ones with the bent hock of a shepherd
+  const legs = [];
+  for (const [x, z, back] of [[0.05, 0.14, 0], [-0.05, 0.14, 0], [0.055, -0.15, 1], [-0.055, -0.15, 1]]) {
+    const L = new THREE.Group(); L.position.set(x, -0.03, z); torso.add(L);
+    const kL = new Kit();
+    if (back) {
+      kL.add(G0.sph, tan, 0, -0.05, 0, 0.045, 0.085, 0.065);
+      kL.beam(tan, 0, -0.04, 0, 0, -0.16, -0.05, 0.034, 0.034);
+      kL.beam(light, 0, -0.16, -0.05, 0, -0.3, -0.01, 0.022, 0.022);
+    } else {
+      kL.beam(tan, 0, 0, 0, 0, -0.16, 0.0, 0.032, 0.034);
+      kL.beam(light, 0, -0.16, 0, 0, -0.3, 0.005, 0.022, 0.022);
+    }
+    kL.add(G0.sph6, light, 0, -0.305, 0.018, 0.022, 0.014, 0.032);
+    const lm = kL.mesh(); lm.castShadow = !!back; L.add(lm); legs.push(L);
+  }
+  const tail = new THREE.Group(); tail.position.set(0, 0.04, -0.245); torso.add(tail);
+  const kTl = new Kit(); kTl.beam(tan, 0, 0, 0, 0, -0.09, -0.17, 0.036, 0.04); kTl.add(G0.sph6, dark, 0, -0.095, -0.175, 0.022, 0.03, 0.022); tail.add(kTl.mesh(false));
+  root.scale.setScalar(0.95 + h(2) * 0.1);
+  return { root, pose, torso, head, jaw, legs, tail, dogM: true, phase: h(3) * 6, yaw: 0, px: null, pz: null, spd: 0, deadT: 0, seed: sd };
+}
+function syncDog(G, a, M, dt, T, y, t, moved, wx, wz) {
+  if (M.blob) { M.blob.scale.set(a.alive ? 0.2 : 0.3, 1, a.alive ? 0.36 : 0.4); }
+  const { pose, torso, head, jaw, legs, tail } = M;
+  if (!a.alive) {
+    M.tag.visible = false;
+    if (!M.layerOff) { M.layerOff = true; M.root.traverse(o => { if (o.isMesh) o.layers.disable(M.layer); }); }
+    if (a.sunk) { M.root.visible = false; M.blood.visible = false; return; }
+    if (!M.deadT) for (let i = 0; i < 5; i++) { const an = Math.random() * TAU, sp = 0.3 + Math.random() * 0.6; spawnParticle({ x: wx, y: y + 0.35, z: wz, vx: Math.cos(an) * sp, vy: 0.5 + Math.random() * 0.5, vz: Math.sin(an) * sp, T: 0.4, s0: 0.06, s1: 0.035, col: 0x5a1610, a0: 0.9, add: false, grav: true }); }
+    M.deadT += dt;
+    const k = Math.min(1, M.deadT / 0.35);
+    if (a.carriedBy) {
+      const cu = G.units.find(u => u.id === a.carriedBy);
+      if (cu) { const cy = groundY(cu.x / TILE, cu.y / TILE), cyaw = _yawOf(cu.facing); M.root.position.set(cu.x / TILE, cy + 0.62, cu.y / TILE); M.root.rotation.set(0, cyaw + Math.PI / 2, 0); }
+      pose.rotation.set(0, 0, 0); pose.position.y = 0; M.blood.visible = false;
+    } else {
+      pose.rotation.z = 1.5 * k; pose.position.y = -0.27 * k; pose.position.x = 0.06 * k;
+      M.blood.visible = !t.water && k >= 1; M.blood.position.set(wx, y + 0.03, wz); M.blood.scale.set(0.24, 1, 0.24);
+    }
+    legs.forEach((L, i) => { L.rotation.x = (i < 2 ? -0.5 : 0.45) * k; });
+    head.rotation.set(0.25 * k, 0, 0); tail.rotation.set(-0.15, 0, 0); jaw.rotation.x = 0.15;
+    return;
+  }
+  M.root.visible = true; M.blood.visible = false;
+  pose.rotation.set(0, 0, 0); pose.position.set(0, 0, 0);
+  const spd = dt > 0 ? moved / dt : 0; M.spd += (spd - M.spd) * Math.min(1, dt * 10);
+  const walking = M.spd > 0.15, gallop = M.spd > 2.4, st = a.state;
+  if (walking) M.phase += moved / (gallop ? 0.95 : 0.55) * TAU;
+  const ph = M.phase, s1 = Math.sin(ph);
+  let pitch = 0, bob = 0, crouch = 0, headX = 0, headY = 0, tailX = -0.1, tailY = 0, jawX = 0, lunge = 0;
+  if (walking && gallop) {
+    // the gallop: the front legs reach together, the hind legs drive together, the back flexes
+    const f = Math.sin(ph), b = Math.sin(ph + 2.4);
+    legs[0].rotation.x = legs[1].rotation.x = -0.75 * f; legs[1].rotation.x += 0.12;
+    legs[2].rotation.x = legs[3].rotation.x = 0.75 * b; legs[3].rotation.x -= 0.12;
+    pitch = 0.11 * Math.sin(ph + 1.2); bob = 0.035 * Math.abs(Math.sin(ph)); headX = 0.15; tailX = 0.35;
+  } else if (walking) {
+    // the trot: diagonal pairs swing together
+    legs[0].rotation.x = legs[3].rotation.x = -0.45 * s1; legs[1].rotation.x = legs[2].rotation.x = 0.45 * s1;
+    bob = 0.012 * Math.abs(Math.cos(ph)); headX = 0.1 + 0.05 * Math.sin(ph * 2);
+  } else legs.forEach(L => { L.rotation.x *= Math.max(0, 1 - dt * 10); });
+  if (st === 'idle' || st === 'returning') {
+    // nose down now and then, a look about, the tail low and easy
+    const sniff = Math.max(0, Math.sin(T * 0.5 + M.phase)) ** 3;
+    headX += walking ? 0.1 * sniff : 0.55 * sniff; headY = (walking ? 0.2 : 0.5) * Math.sin(T * 0.4 + M.phase * 2);
+    tailX = walking ? -0.1 : -0.3; tailY = 0.25 * Math.sin(T * 2.2 + M.phase);
+  } else if (st === 'suspicious') {
+    // stiff and low, nose into the wind, tail up, a growl in the throat
+    crouch = 0.03; headX = 0.18; tailX = 0.9; tailY = 0; jawX = 0.08 + 0.04 * Math.sin(T * 30);
+  } else {
+    tailX = 0.45; tailY = 0.5 * Math.sin(T * 9); headX = Math.min(headX, 0.05) - 0.05;
+    // barking: the jaw snaps with every bark
+    jawX = 0.32 * Math.max(0, Math.sin(T * 13)) * (st === 'combat' || a.barkT > 0 ? 1 : 0.5);
+  }
+  if (a.bite > 0) { const k = a.bite / 0.3; lunge = 0.12 * Math.sin(k * Math.PI); headX = 0.35; jawX = 0.45 * (1 - k); }
+  torso.position.set(0, 0.34 + bob - crouch, lunge); torso.rotation.x = pitch + (crouch ? 0.06 : 0);
+  head.rotation.x += (headX - head.rotation.x) * Math.min(1, dt * 8); head.rotation.y += (headY - head.rotation.y) * Math.min(1, dt * 5);
+  tail.rotation.x += (tailX - tail.rotation.x) * Math.min(1, dt * 6); tail.rotation.y = tailY;
+  jaw.rotation.x += (jawX - jaw.rotation.x) * Math.min(1, dt * 20);
+  // footprints in the snow, breath in the cold
+  if (R3.snow && walking) { M.stepD = (M.stepD || 0) + moved; if (M.stepD > 0.5) { M.stepD = 0; r3Footprint(a.x, a.y, a.facing); } }
+  enemyTag(a, M, y); M.tag.position.y = y + 0.95; M.tag.scale.set(0.5, 0.5, 1);
+}
 function actorModel(G, a, isUnit) {
   let M;
   if (a.dummy) M = makeDummy();
+  else if (a.dog) M = makeDog(a);
   else {
     const sp = actorSpec(G, a, isUnit), B = buildHuman(sp);
     M = { root: B.root, B, sp, W: mountWeapons(B, sp), P: poseIdle(), deadT: a.alive ? 0 : 9, phase: HASH(sp.seed, 1, 1) * 6, yaw: 0, px: null, pz: null, strike: 0, fire: 0, throwT: 0, spd: 0, deadT: 0, fallBack: HASH(sp.seed, 2, 2) < 0.5 };
@@ -4601,6 +5086,7 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     M.tag.visible = false; M.blood.visible = false;
     M.root.rotation.x = a.alive ? 0 : -1.45; return;
   }
+  if (M.dogM) { syncDog(G, a, M, dt, T, y, t, moved, wx, wz); return; }
   const B = M.B, P = poseIdle(), sp = M.sp;
   M.strike = Math.max(0, M.strike - dt); M.fire = Math.max(0, M.fire - dt); M.throwT = Math.max(0, M.throwT - dt);
   const spd = dt > 0 ? moved / dt : 0; M.spd += (spd - M.spd) * Math.min(1, dt * 10);
@@ -4918,6 +5404,24 @@ function syncCone(G, e, Lc) {
   if (!C) { C = { outer: coneMesh(0x45c24e, Lc), inner: coneMesh(0x45c24e, Lc * 1.6) }; R3.root.add(C.outer); R3.root.add(C.inner); R3.cones.set(e, C); }
   const vis = e.alive && !e.dummy;
   C.outer.visible = C.inner.visible = vis;
+  // a dog also smells all round: a faint dotted ring shows how close is too close
+  if (e.dog && !C.ring) {
+    const tex = cachedTex('scentRing', (g, w, h) => { g.clearRect(0, 0, w, h); g.strokeStyle = '#fff'; g.lineWidth = 5; g.setLineDash([10, 9]); g.beginPath(); g.arc(w / 2, h / 2, w / 2 - 5, 0, TAU); g.stroke(); }, 256, 256);
+    C.ring = new THREE.Mesh(geo().disc, own(new THREE.MeshBasicMaterial({ map: tex, transparent: true, opacity: 0.5, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2 })));
+    C.ring.renderOrder = 3; R3.root.add(C.ring);
+    C.fill = new THREE.Mesh(geo().disc, own(new THREE.MeshBasicMaterial({ map: softDot(), transparent: true, opacity: 0.12, depthWrite: false })));
+    C.fill.renderOrder = 3; R3.root.add(C.fill);
+  }
+  if (C.ring) {
+    C.ring.visible = C.fill.visible = vis;
+    if (vis) {
+      const r = smellRange(G, e) / TILE, col = CONE_COL[e.state] || CONE_COL.idle, yy = surfY(G, e.x / TILE, e.y / TILE) + 0.09;
+      C.ring.position.set(e.x / TILE, yy, e.y / TILE); C.ring.scale.set(r, 1, r); C.ring.rotation.y = R3.lastT * 0.15;
+      C.fill.position.set(e.x / TILE, yy - 0.005, e.y / TILE); C.fill.scale.set(r * 1.15, 1, r * 1.15);
+      C.ring.material.color.setHex(col); C.fill.material.color.setHex(col);
+      C.ring.material.opacity = Lc * (e.state === 'idle' || e.state === 'returning' ? 2.2 : 3.2);
+    }
+  }
   if (!vis) return;
   const R = effRange(G, e) / TILE, fov = effFov(e);
   const col = CONE_COL[e.state] || CONE_COL.idle;
@@ -5140,7 +5644,7 @@ function syncDyn(G, UI, T) {
   D.rdots.count = rn; D.rdots.instanceMatrix.needsUpdate = true;
   // ability range, draped over the ground
   if (UI && UI.mode !== 'move' && sel.length === 1 && ABIL[UI.mode] && ABIL[UI.mode].range) {
-    const u = sel[0], R = ABIL[UI.mode].range;
+    const u = sel[0], R = abilRange(u, UI.mode);
     D.rangeRing.visible = true; setRibbon(G, D.rangeRing, ringPts(u.x / TILE, u.y / TILE, R), 0.07, 0.09);
     D.rangeRing.material.opacity = 0.45 + Math.sin(T * 4) * 0.15;
   } else D.rangeRing.visible = false;
@@ -5680,7 +6184,8 @@ function r3Clamp(G) {
 }
 function r3BaseSize() {
   const aspect = V.w / Math.max(1, V.h);
-  const want = clamp(V.w / 42, 11, 24);
+  // about 42 screen pixels per tile: on a phone held upright the soldiers stay big enough to tap
+  const want = clamp(V.w / 42, 9, 24);
   return want / (2 * aspect);
 }
 function r3Pan(dx, dy) {
@@ -5797,7 +6302,12 @@ function initView() {
       centerOn: (G, x, y, instant) => r3CenterOn(G, x, y, instant),
       pan: (dx, dy) => r3Pan(dx, dy),
       zoomAt: (sx, sy, f) => r3ZoomAt(sx, sy, f),
-      zoomScale: (s0, f, mid) => { R3.cam.size = s0 / f; r3Clamp(R3.G); },
+      // a pinch zooms about the point between the fingers, so what you pinch stays under them
+      zoomScale: (s0, f, mid) => {
+        const before = mid ? r3Pick(mid.x, mid.y) : null;
+        R3.cam.size = s0 / f; r3Clamp(R3.G);
+        if (before) { r3UpdateCamera(); const after = r3Pick(mid.x, mid.y); R3.cam.tx += (before.x - after.x) / TILE; R3.cam.tz += (before.y - after.y) / TILE; R3.cam.goal = null; r3Clamp(R3.G); }
+      },
       size: () => R3.cam.size,
       rotate: step => r3Rotate(step),
       twist: da => { R3.cam.yaw += da; R3.cam.yawTo = R3.cam.yaw; },
@@ -5833,6 +6343,189 @@ function hitScreen(list, sx, sy, rPx, h) {
   let best = null, bd = rPx;
   for (const a of list) { const p = VIEW.project(a.x, a.y, h); const d = Math.hypot(p.x - sx, p.y - sy); if (d < bd) { bd = d; best = a; } }
   return best;
+}
+/* ================= MAP FILM: before each action, an animated map of the front closes in on the place and the attack ================= */
+const FILM = {
+  P: (lat, lon) => [(lon - 11.35) * 150, (46.36 - lat) * 215],
+  piave: [[46.6, 12.45], [46.36, 12.3], [46.14, 12.22], [46.02, 12.02], [45.93, 11.98], [45.87, 12.04], [45.83, 12.18], [45.8, 12.3], [45.72, 12.46], [45.63, 12.57], [45.53, 12.74]],
+  isonzo: [[46.5, 13.62], [46.36, 13.52], [46.25, 13.58], [46.18, 13.73], [46.09, 13.64], [45.94, 13.62], [45.85, 13.55], [45.76, 13.53]],
+  tagl: [[46.45, 12.6], [46.36, 12.8], [46.3, 12.93], [46.18, 12.94], [45.95, 12.95], [45.78, 13.0], [45.64, 13.1]],
+  brenta: [[46.05, 11.48], [45.98, 11.66], [45.85, 11.71], [45.77, 11.73], [45.6, 11.85], [45.42, 12.0], [45.2, 12.25]],
+  adige: [[46.1, 11.1], [45.9, 11.05], [45.75, 11.0], [45.55, 11.05], [45.43, 11.0], [45.25, 11.6], [45.15, 12.2]],
+  coast: [[44.9, 12.4], [45.2, 12.3], [45.42, 12.3], [45.44, 12.36], [45.53, 12.68], [45.6, 12.88], [45.66, 13.2], [45.69, 13.4], [45.78, 13.54], [45.7, 13.72], [45.6, 13.8], [45.55, 13.75], [45.4, 13.55], [45.1, 13.62], [44.85, 13.85], [44.6, 13.95]],
+  alps: [[48.5, 9.5], [48.5, 16], [46.28, 16], [46.22, 14.0], [46.27, 13.75], [46.14, 13.5], [46.2, 13.2], [46.15, 12.9], [46.04, 12.62], [45.98, 12.3], [45.93, 12.02], [45.9, 11.85], [45.84, 11.62], [45.8, 11.4], [45.73, 11.12], [45.68, 10.9], [45.62, 10.4], [45.6, 9.5]],
+  carso: [[46.14, 13.62], [46.14, 16], [45.55, 16], [45.68, 13.66], [45.83, 13.6], [45.97, 13.66], [46.07, 13.62]],
+  front1917: [[46.5, 13.42], [46.36, 13.5], [46.2, 13.7], [46.08, 13.68], [45.97, 13.69], [45.88, 13.63], [45.78, 13.6]],
+  front1918: [[45.95, 10.9], [45.92, 11.2], [45.86, 11.4], [45.87, 11.62], [45.86, 11.74], [45.89, 11.82], [45.88, 11.95], [45.86, 12.05], [45.82, 12.19], [45.79, 12.3], [45.71, 12.47], [45.62, 12.58], [45.52, 12.74]],
+  towns: [['Udine', 46.06, 13.24, 1], ['Gorizia', 45.94, 13.62, -1], ['Caporetto', 46.25, 13.58, -1], ['Treviso', 45.67, 12.24, 1], ['Venezia', 45.44, 12.33, 1], ['Vicenza', 45.55, 11.55, 1], ['Trieste', 45.65, 13.77, -1], ['Belluno', 46.14, 12.22, 1], ['Bassano', 45.77, 11.73, -1], ['Asiago', 45.88, 11.51, -1], ['Conegliano', 45.89, 12.3, 1], ['Padova', 45.41, 11.88, 1]],
+  hills: [[45.92, 11.8, 'Grappa'], [45.88, 11.55, 'Altopiano'], [45.8, 12.15, 'Montello'], [46.1, 13.72, 'Bainsizza'], [45.82, 13.66, 'Carso']],
+};
+/* each action: the line of the front at that moment, the arrows of the attack, and a line for the narrator */
+const FILM_SHOTS = {
+  sdricca: { front: '1917', arrows: [], narr: 'Estate del 1917. Sulle colline della Sdricca, vicino a Udine, nasce il primo reparto d’assalto. Qui i volontari imparano a combattere con il pugnale e con bombe vere.' },
+  fratta: { front: '1917', arrows: [{ a: [46.075, 13.585], b: [46.097, 13.648] }], narr: 'Agosto 1917, Undicesima battaglia dell’Isonzo. Nella notte gli arditi del primo reparto passano il fiume davanti alla fanteria, verso le trincee del Monte Fratta.' },
+  gabriele: { front: '1917', arrows: [{ a: [45.952, 13.615], b: [45.975, 13.664] }], narr: 'Quattro settembre 1917. Il Monte San Gabriele domina Gorizia, e intere brigate vi si sono infrante. All’alba escono gli arditi del colonnello Bassi.' },
+  priula: { front: 'caporetto', arrows: [{ a: [45.866, 12.272], b: [45.82, 12.252] }], narr: 'Novembre 1917. Dopo Caporetto l’esercito ripiega sul Piave. Al ponte della Priula, sotto la pioggia, gli arditi tengono la testa di ponte finché passano gli ultimi.' },
+  tremonti: { front: '1918', arrows: [{ a: [45.842, 11.58], b: [45.874, 11.628] }], narr: 'Gennaio 1918, Altopiano di Asiago. Il nemico è a pochi chilometri dalla pianura. Nella neve e nel vento, gli arditi vanno a riprendere i Tre Monti.' },
+  montello: { front: '1918', arrows: [{ a: [45.835, 12.175], b: [45.803, 12.152], au: true }, { a: [45.762, 12.118], b: [45.79, 12.145], d: 0.8 }], narr: 'Quindici giugno 1918, Battaglia del Solstizio. Gli austro-ungarici hanno passato il Piave e dilagano sul Montello. Il ventisettesimo reparto d’assalto contrattacca.' },
+  moschin: { front: '1918', arrows: [{ a: [45.82, 11.718], b: [45.849, 11.743] }], narr: 'Sedici giugno 1918. Sul Grappa il nemico ha preso il Col Moschin: se la linea cede, si apre la strada della pianura. Alle sette, gli arditi di Messe attaccano.' },
+  caimani: { front: '1918', arrows: [{ a: [45.714, 12.402], b: [45.748, 12.372] }], narr: 'Giugno 1918. Il Piave è la linea del fronte. Di notte, con un coltello e qualche bomba a mano, i Caimani del Piave lo attraversano a nuoto.' },
+  moriago: { front: '1918', arrows: [{ a: [45.834, 12.068], b: [45.874, 12.104] }], narr: 'Ottobre 1918, l’offensiva finale. Il Piave è in piena. Sulle passerelle del genio, gli arditi passano il fiume verso l’Isola dei Morti e Moriago.' },
+  berretta: { front: '1918', arrows: [{ a: [45.853, 11.775], b: [45.889, 11.8] }], narr: 'Ventinove ottobre 1918. Sul Grappa gli attacchi si infrangono da giorni. Nella nebbia del mattino, il nono reparto d’assalto esce verso il Col della Berretta.' },
+};
+// the German and Austro-Hungarian breakthrough at Caporetto, and the retreat to the Piave
+const FILM_ADVANCE = [[[46.25, 13.6], [46.12, 13.1], [45.98, 12.6], [45.9, 12.36]], [[45.98, 13.62], [45.88, 13.15], [45.8, 12.75], [45.76, 12.42]]];
+
+const easeIO = k => k < 0 ? 0 : k > 1 ? 1 : k * k * (3 - 2 * k);
+function filmPts(list) { return list.map(([a, b]) => FILM.P(a, b)); }
+function filmPath(pts, k) {
+  // the first k (0..1) of a polyline, by length: lines that draw themselves
+  if (k <= 0) return '';
+  let L = 0; const seg = [];
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); seg.push(d); L += d; }
+  let left = L * Math.min(1, k), s = 'M' + pts[0][0].toFixed(2) + ' ' + pts[0][1].toFixed(2);
+  for (let i = 1; i < pts.length; i++) {
+    if (left >= seg[i - 1]) { s += 'L' + pts[i][0].toFixed(2) + ' ' + pts[i][1].toFixed(2); left -= seg[i - 1]; continue; }
+    const f = left / seg[i - 1]; s += 'L' + (pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f).toFixed(2) + ' ' + (pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f).toFixed(2);
+    break;
+  }
+  return s;
+}
+// a gently curved arrow from a to b, as a polyline
+function filmCurve(a, b, bend) {
+  const [x0, y0] = FILM.P(a[0], a[1]), [x1, y1] = FILM.P(b[0], b[1]), mx = (x0 + x1) / 2 - (y1 - y0) * bend, my = (y0 + y1) / 2 + (x1 - x0) * bend, out = [];
+  for (let i = 0; i <= 24; i++) { const t = i / 24, u = 1 - t; out.push([u * u * x0 + 2 * u * t * mx + t * t * x1, u * u * y0 + 2 * u * t * my + t * t * y1]); }
+  return out;
+}
+function filmBuild(M) {
+  let el = $('#mapfilm');
+  if (!el) {
+    el = document.createElement('div'); el.id = 'mapfilm'; el.hidden = true; el.setAttribute('aria-live', 'polite');
+    el.innerHTML = `<svg id="mfSvg" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+      <div class="mf-cap"><div class="mf-date" id="mfDate"></div><div class="mf-name" id="mfName"></div><div class="mf-ctx" id="mfCtx"></div></div>
+      <p class="mf-sub" id="mfSub"></p><div class="mf-skip">Tocca per saltare</div>`;
+    document.body.append(el);
+    el.addEventListener('click', () => filmEnd(true));
+  }
+  const S = FILM_SHOTS[M.id] || { front: '1918', arrows: [], narr: '' }, g = GEO_PTS[M.id] || [45.9, 12.2], P = FILM.P;
+  const path = list => filmPts(list).map(([x, y], i) => (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1)).join(' ');
+  const poly = list => path(list) + 'Z';
+  const grat = [];
+  for (let lon = 10.5; lon <= 14.75; lon += 0.25) { const [x] = P(46, lon); grat.push(`M${x.toFixed(1)} -200V420`); }
+  for (let lat = 44.5; lat <= 47.25; lat += 0.25) { const [, y] = P(lat, 12); grat.push(`M-150 ${y.toFixed(1)}H560`); }
+  const [mx, my] = P(g[0], g[1]);
+  const svg = $('#mfSvg');
+  svg.innerHTML = `<defs>
+      <pattern id="mfHach" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 2.5h2.2" stroke="#7a5f3c" stroke-width=".7" opacity=".55"/></pattern>
+      <pattern id="mfWave" width="9" height="5" patternUnits="userSpaceOnUse"><path d="M0 3q2.2-2 4.5 0t4.5 0" fill="none" stroke="#6f8b95" stroke-width=".5" opacity=".6"/></pattern>
+    </defs>
+    <g id="mfMap">
+      <path d="${grat.join('')}" stroke="#8a7650" stroke-width=".6" opacity=".25" vector-effect="non-scaling-stroke" fill="none"/>
+      <path d="${poly(FILM.alps)}" fill="url(#mfHach)"/><path d="${poly(FILM.carso)}" fill="url(#mfHach)" opacity=".7"/>
+      <path d="${path(FILM.coast)} L900 ${P(44.6, 14)[1]} L900 1100 L${P(44.9, 12.4)[0]} 1100 Z" fill="#b9c4ba"/><path d="${path(FILM.coast)} L900 ${P(44.6, 14)[1]} L900 1100 L${P(44.9, 12.4)[0]} 1100 Z" fill="url(#mfWave)"/>
+      <path d="${path(FILM.coast)}" fill="none" stroke="#5c4a2e" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+      ${FILM.hills.map(([a, b]) => { const [x, y] = P(a, b); return `<ellipse cx="${x}" cy="${y}" rx="9" ry="4.5" fill="url(#mfHach)" stroke="#7a5f3c" stroke-width=".6" vector-effect="non-scaling-stroke" opacity=".9"/>`; }).join('')}
+      <g fill="none" stroke="#557a90" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke">
+        ${['piave', 'isonzo', 'tagl', 'brenta', 'adige'].map(k => `<path d="${path(FILM[k])}" stroke-width="${k === 'piave' || k === 'isonzo' ? 2.6 : 1.6}" vector-effect="non-scaling-stroke"/>`).join('')}
+      </g>
+      <g id="mfLines" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
+      <g id="mfLabels" class="mf-lab">
+        ${FILM.towns.map(([n, a, b, s]) => { const [x, y] = P(a, b); return `<g class="mf-town" data-x="${x}" data-y="${y}" data-s="${s}"><circle cx="${x}" cy="${y}" r="1"/><text x="${x}" y="${y}" text-anchor="${s > 0 ? 'start' : 'end'}">${n}</text></g>`; }).join('')}
+        ${FILM.hills.map(([a, b, n]) => { const [x, y] = P(a, b); return `<text class="mf-hill" x="${x}" y="${y}">${n}</text>`; }).join('')}
+        <text class="mf-river" x="${P(45.66, 12.62)[0]}" y="${P(45.66, 12.62)[1]}">Piave</text><text class="mf-river" x="${P(46.2, 13.8)[0]}" y="${P(46.2, 13.8)[1]}">Isonzo</text>
+        <text class="mf-sea" x="${P(45.25, 12.9)[0]}" y="${P(45.25, 12.9)[1]}">Mare Adriatico</text>
+      </g>
+      <g id="mfMark" opacity="0"><circle id="mfRing" cx="${mx}" cy="${my}" r="4" fill="none" stroke="#a3271b"/><circle id="mfDot" cx="${mx}" cy="${my}" r="2" fill="#a3271b"/><text id="mfMarkT" class="mf-mark" x="${mx}" y="${my}">${esc(M.name)}</text></g>
+    </g>`;
+  const F = { M, S, t: 0, el, mx, my, lines: $('#mfLines'), labels: $('#mfLabels'), front17: filmPts(FILM.front1917), front18: filmPts(FILM.front1918),
+    adv: FILM_ADVANCE.map(filmPts), arrows: S.arrows.map((A, i) => ({ pts: filmCurve(A.a, A.b, i % 2 ? -0.18 : 0.18), au: !!A.au, d: A.d || 0 })) };
+  return F;
+}
+function filmStart(M, done) {
+  const F = filmBuild(M); UI.film = F; F.done = done;
+  const narr = F.S.narr || '';
+  // the narrator's voice, when there is one; otherwise the line is only written, and the film keeps its own pace
+  F.voice = typeof voPlayNarr === 'function' ? voPlayNarr(M.id) : 0;
+  F.D = Math.max(9.5, (F.voice || narr.length / 15) + 2.2);
+  F.subDur = F.voice ? F.voice : Math.min(F.D - 2.5, narr.length / 16);
+  $('#mfDate').textContent = (M.num === 'Addestramento' ? 'Addestramento' : 'Azione ' + M.num) + ' · ' + M.date;
+  $('#mfName').textContent = M.name; $('#mfCtx').textContent = M.context + ' — ' + M.place;
+  $('#mfSub').textContent = '';
+  F.el.hidden = false; F.el.classList.remove('out'); F.el.style.opacity = 0;
+  for (const id of ['#mfDate', '#mfName', '#mfCtx']) $(id).classList.remove('on');
+  filmStep(0);
+}
+function filmEnd(skip) {
+  const F = UI.film; if (!F || F.ending) return;
+  F.ending = true;
+  if (skip && typeof voStopNarr === 'function') voStopNarr();
+  if (skip) { F.el.classList.add('out'); setTimeout(() => { if (!UI.film) { F.el.hidden = true; F.el.classList.remove('out'); } }, 520); }
+  else F.el.hidden = true;
+  UI.film = null;
+  if (F.done) F.done();
+}
+function filmView(F, cx, cy, E) {
+  const a = V.w / Math.max(1, V.h), vw = a < 1 ? E : E * a, vh = a < 1 ? E / a : E;
+  $('#mfSvg').setAttribute('viewBox', `${(cx - vw / 2).toFixed(2)} ${(cy - vh / 2).toFixed(2)} ${vw.toFixed(2)} ${vh.toFixed(2)}`);
+  return V.w / vw; // screen pixels per map unit
+}
+function filmStep(dt) {
+  const F = UI.film; if (!F) return;
+  F.t += dt; const t = F.t, D = F.D, S = F.S;
+  F.el.style.opacity = Math.min(1, t / 0.6, Math.max(0, (D - t) / 0.6)).toFixed(3);
+  if (t >= D) { filmEnd(false); return; }
+  // the camera: the whole front, then down onto the place, a little above the middle so the titles stay clear
+  const a = V.w / Math.max(1, V.h), Efull = a < 1 ? 410 : Math.max(232, 410 / a), Eclose = 44;
+  const z0 = S.front === 'caporetto' ? 3.0 : 2.1, zk = easeIO((t - z0) / 2.7);
+  const E = Math.exp(Math.log(Efull) + (Math.log(Eclose) - Math.log(Efull)) * zk);
+  const cx = 195 + (F.mx - 195) * zk, cy = 102 + (F.my + Eclose * 0.12 - 102) * zk;
+  const ppu = filmView(F, cx, cy, E), u = 1 / ppu;
+  // labels and marks keep their size on screen at any zoom
+  F.labels.style.fontSize = (12.5 * u).toFixed(3) + 'px';
+  for (const g of F.labels.querySelectorAll('.mf-town')) { const c = g.firstChild, tx = g.lastChild, s = +g.dataset.s; c.setAttribute('r', (2.6 * u).toFixed(3)); tx.setAttribute('x', (+g.dataset.x + s * 5 * u).toFixed(2)); tx.setAttribute('y', (+g.dataset.y + 4 * u).toFixed(2)); }
+  // the lines of the front, drawn as the film runs
+  let html = '';
+  const line = (pts, k, col, w, dash) => { const d = filmPath(pts, k); return d ? `<path d="${d}" stroke="${col}" stroke-width="${w}" vector-effect="non-scaling-stroke"${dash ? ` stroke-dasharray="${dash}"` : ''}/>` : ''; };
+  if (S.front === '1917') html += line(F.front17, easeIO((t - 0.4) / 1.8), '#8e2a1d', 4, '');
+  else if (S.front === '1918') html += line(F.front18, easeIO((t - 0.4) / 1.9), '#8e2a1d', 4, '');
+  else {
+    // Caporetto: the old line on the Isonzo breaks, the enemy pours west, the new line forms on the Piave
+    html += line(F.front17, 1, `rgba(110,90,60,${(1 - easeIO((t - 1.6) / 1)) * 0.8 + 0.2})`, 2.5, '6 5');
+    F.adv.forEach((p, i) => { const k = easeIO((t - 0.5 - i * 0.25) / 1.8); html += line(p, k, '#47606e', 7, ''); if (k > 0.05) html += filmHead(p, k, '#47606e', 7, u); });
+    html += line(F.front18, easeIO((t - 1.9) / 1.5), '#8e2a1d', 4, '');
+  }
+  // the attack
+  const ka = t - (z0 + 2.2);
+  for (const A of F.arrows) { const k = easeIO((ka - A.d) / 1.6), col = A.au ? '#47606e' : '#b3271a'; if (k > 0) { html += line(A.pts, k, col, 6, ''); html += filmHead(A.pts, k, col, 6, u); } }
+  F.lines.innerHTML = html;
+  // the place, with a slow pulse
+  const mk = clamp((t - (z0 + 1.6)) / 0.6, 0, 1), pulse = (t * 1.1) % 1;
+  $('#mfMark').setAttribute('opacity', mk.toFixed(3));
+  $('#mfDot').setAttribute('r', (4.5 * u).toFixed(3));
+  const ring = $('#mfRing'); ring.setAttribute('r', ((6 + pulse * 22) * u).toFixed(3)); ring.setAttribute('stroke-opacity', (1 - pulse).toFixed(3)); ring.setAttribute('stroke-width', (2.2 * u).toFixed(3));
+  const mt = $('#mfMarkT'); mt.setAttribute('x', (F.mx + 10 * u).toFixed(2)); mt.setAttribute('y', (F.my - 9 * u).toFixed(2)); mt.style.fontSize = (17 * u).toFixed(3) + 'px'; mt.style.strokeWidth = (3.5 * u).toFixed(3) + 'px';
+  // the hatching of the mountains and the waves of the sea keep their size on screen
+  $('#mfHach').setAttribute('patternTransform', `rotate(35) scale(${(1.5 * u).toFixed(4)})`);
+  $('#mfWave').setAttribute('patternTransform', `scale(${(1.6 * u).toFixed(4)})`);
+  // titles, and the narrator's words written out as he says them
+  if (t > 0.5) $('#mfDate').classList.add('on');
+  if (t > 1.4) $('#mfName').classList.add('on');
+  if (t > 2.4) $('#mfCtx').classList.add('on');
+  const narr = S.narr || '', k = clamp((t - 0.9) / F.subDur, 0, 1);
+  $('#mfSub').textContent = narr.slice(0, Math.round(narr.length * k));
+}
+// an arrowhead at the drawn end of a line, sized in screen pixels
+function filmHead(pts, k, col, w, u) {
+  let L = 0; for (let i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  let left = L * Math.min(1, k), x = pts[0][0], y = pts[0][1], ang = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); ang = Math.atan2(pts[i][1] - pts[i - 1][1], pts[i][0] - pts[i - 1][0]);
+    if (left >= d) { left -= d; x = pts[i][0]; y = pts[i][1]; continue; }
+    x = pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * left / d; y = pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * left / d; break;
+  }
+  const s = (w * 2.4 + 6) * u, c = Math.cos(ang), sn = Math.sin(ang);
+  const p = [[x + c * s, y + sn * s], [x - c * s * 0.35 - sn * s * 0.75, y - sn * s * 0.35 + c * s * 0.75], [x - c * s * 0.35 + sn * s * 0.75, y - sn * s * 0.35 - c * s * 0.75]];
+  return `<path d="M${p.map(q => q[0].toFixed(2) + ' ' + q[1].toFixed(2)).join('L')}Z" fill="${col}" stroke="none"/>`;
 }
 /* ================= MUSICA: una partitura originale, sintetizzata dal vivo con la Web Audio API =================
    Strumenti: ottoni, tromba militare, archi, armonium, mandolino, celesta, contrabbasso, tamburo, grancassa, timpani, piatti.
@@ -6199,169 +6892,105 @@ function musToggle() { SAVE.music = SAVE.music === false; persist(); auInit(); s
 function syncMusicButtons() {
   for (const id of ['#bMusicTitle', '#bMusicPause']) { const b = $(id); if (!b) continue; b.querySelector('span').textContent = SAVE.music === false ? 'Musica no' : 'Musica sì'; b.classList.toggle('off', SAVE.music === false); }
 }
-/* ================= MINIMAPPA TATTICA: il campo dall'alto, la squadra, le sentinelle, l'obiettivo e l'inquadratura ================= */
-const MM = { on: null, el: null, cv: null, g: null, terr: null, sig: '', sigT: 0, s: 4, dpr: 1, W: 0, H: 0, G: null, drag: false, fps: 0 };
-
-// the map's own colours: the ground keeps its palette, the rest gets a flat, readable tint
-const MM_COL = {
-  '|': '#8a6a44', '_': '#5f8088', '=': '#3a3124', 'o': '#4a3d2c', 'b': '#3c5628', 'x': '#6f6049', 'S': '#a6966c',
-  '#': '#6c6960', 'T': '#2d4720', 'W': '#3e382f', '~': '#35657a', 'v': '#56703a', 'd': '#5a4630', 'c': '#7b6848',
+/* recorded voices: generated by tools/pack.js */
+/* ================= VOICES: the arditi answer orders in Italian, the sentries shout in German =================
+   Recorded with ElevenLabs. Each voice is one small MP3 "sprite" holding all its lines, decoded once. */
+const VO_LINES = {
+  // Italian voices: 0 selected · 1-3 order taken · 4 attack · 5 weapon · 6 hit · 7 spotted
+  it: { sel: [0], ack: [1, 2, 3], atk: [4], special: [5], hurt: [6], spotted: [7] },
+  // the sentry: 0 halt · 1 what was that · 2 alarm · 3 over there · 4 help
+  sentry: { sus: [0, 1], alarm: [2, 3], hurt: [4] },
+  // the officer: 0 alarm · 1 fire · 2 who's there · 3 there, shoot · 4 medic
+  officer: { alarm: [0, 3], fire: [1, 3], sus: [2], hurt: [4] },
 };
-const MM_SNOW = { 'b': '#8fa3a8', 'T': '#4f6b5c', '#': '#9aa0a6', 'S': '#bdb7a8', 'v': '#a7b2a9', 'd': '#7b6a58', '=': '#8b8a86', 'o': '#9c9a95' };
-function mmTileCol(G, ch) {
-  if (GPAL[ch]) return GPAL[ch][0];
-  if (G.M.winter && MM_SNOW[ch]) return MM_SNOW[ch];
-  return MM_COL[ch] || GPAL['.'][0];
-}
-function mmLayout() {
-  const desk = matchMedia('(min-width: 900px) and (min-height: 560px)').matches;
-  const G = MM.G, maxW = desk ? 232 : 150, maxH = desk ? 168 : 112;
-  MM.s = Math.max(1.5, Math.min(maxW / G.W, maxH / G.H));
-  MM.dpr = Math.min(2, devicePixelRatio || 1);
-  const w = Math.round(G.W * MM.s), h = Math.round(G.H * MM.s);
-  MM.cv.style.width = w + 'px'; MM.cv.style.height = h + 'px';
-  MM.cv.width = Math.round(w * MM.dpr); MM.cv.height = Math.round(h * MM.dpr);
-  MM.terr = null; MM.sig = '';
-}
-// the terrain, painted once and again only when the map itself changes (a cut wire, a fallen bridge)
-function mmTerrain(G) {
-  const s = MM.s * MM.dpr, c = document.createElement('canvas');
-  c.width = MM.cv.width; c.height = MM.cv.height;
-  const g = c.getContext('2d');
-  for (let r = 0; r < G.H; r++) for (let q = 0; q < G.W; q++) {
-    const ch = G.map[r][q];
-    g.fillStyle = mmTileCol(G, ch);
-    g.fillRect(Math.floor(q * s), Math.floor(r * s), Math.ceil(s) + 1, Math.ceil(s) + 1);
-    if (ch === 'x') { g.fillStyle = 'rgba(20,16,10,.55)'; g.fillRect(q * s + s * 0.2, r * s + s * 0.4, s * 0.6, s * 0.2); }
+// whose voice each man has (the Caimani borrow the regional voices of the men they stand in for)
+const VO_OF = { Bellini: 'bellini', Marangoni: 'marangoni', Ferro: 'ferro', Riva: 'riva', Zanetti: 'zanetti', Toffolo: 'marangoni', Scarpa: 'ferro', Porcu: 'riva' };
+const VO = { buf: {}, loading: false, lastT: {}, lastLine: {}, busyUntil: 0, out: null };
+function voLoad() {
+  if (VO.loading || !AU.ctx || typeof VO_PACK === 'undefined') return;
+  VO.loading = true;
+  VO.out = AU.ctx.createGain(); VO.out.gain.value = 1; VO.out.connect(AU.master);
+  for (const k in VO_PACK) {
+    try {
+      const bin = atob(VO_PACK[k].b64), a = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i);
+      AU.ctx.decodeAudioData(a.buffer).then(b => { VO.buf[k] = b; }).catch(() => { });
+    } catch (e) { }
   }
-  // a soft relief: darker under walls, rocks and woods, so shapes read at a glance
-  g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgba(30,26,18,.18)';
-  for (let r = 0; r < G.H; r++) for (let q = 0; q < G.W; q++) { const t = TILES[G.map[r][q]]; if (t && !t.sight) g.fillRect(q * s + s * 0.35, r * s + s * 0.35, s, s); }
-  g.globalCompositeOperation = 'source-over';
-  return c;
 }
-function mmSync() {
-  if (!MM.el) return;
-  const G = UI.G, inGame = UI.screen === 'game' && G && !G.over && !UI.intro;
-  MM.el.hidden = !(inGame && MM.on);
-  $('#bMap').setAttribute('aria-pressed', String(!!MM.on));
-}
-function mmToggle(force) {
-  MM.on = force != null ? force : !MM.on;
-  SAVE.minimap = MM.on; persist();
-  if (MM.on && UI.G) { MM.G = null; }
-  mmSync(); sfx('click');
-}
-function mmInit() {
-  MM.el = $('#minimap'); MM.cv = $('#mmCv'); MM.g = MM.cv.getContext('2d');
-  if (MM.on == null) MM.on = SAVE.minimap != null ? SAVE.minimap : matchMedia('(min-width: 900px) and (min-height: 560px)').matches;
-  const toWorld = e => {
-    const b = MM.cv.getBoundingClientRect();
-    return { x: clamp((e.clientX - b.left) / MM.s, 0, MM.G.W) * TILE, y: clamp((e.clientY - b.top) / MM.s, 0, MM.G.H) * TILE };
-  };
-  MM.cv.addEventListener('pointerdown', e => {
-    if (!MM.G || !UI.G) return;
-    e.preventDefault(); e.stopPropagation(); MM.drag = true;
-    try { MM.cv.setPointerCapture(e.pointerId); } catch (_) { }
-    const w = toWorld(e); VIEW.centerOn(UI.G, w.x, w.y, false);
-  });
-  MM.cv.addEventListener('pointermove', e => { if (!MM.drag || !UI.G) return; const w = toWorld(e); VIEW.centerOn(UI.G, w.x, w.y, true); });
-  const up = () => { MM.drag = false; };
-  MM.cv.addEventListener('pointerup', up); MM.cv.addEventListener('pointercancel', up);
-  MM.cv.addEventListener('contextmenu', e => e.preventDefault());
-  addEventListener('resize', () => { if (MM.G) mmLayout(); });
-}
-function mmTick(dt) {
-  const G = UI.G;
-  mmSync();
-  if (MM.el.hidden) return;
-  if (MM.G !== G) { MM.G = G; mmLayout(); }
-  MM.fps -= dt; if (MM.fps > 0) return; MM.fps = 1 / 20;
-  MM.sigT -= dt;
-  if (!MM.terr || MM.sigT <= 0) {
-    MM.sigT = 0.5;
-    const sig = G.map.map(r => r.join('')).join('');
-    if (sig !== MM.sig || !MM.terr) { MM.sig = sig; MM.terr = mmTerrain(G); }
+function voOn() { return SAVE.sound && SAVE.voice !== false && AU.ctx; }
+// say a line: a man of the squad (heard as if close by) or an enemy (fainter with distance)
+function voSay(who, cat, enemy) {
+  if (!voOn() || !who || UI.screen !== 'game' || UI.film || UI.intro) return;
+  voLoad();
+  const key = enemy ? (who.type === 'officer' ? 'officer' : 'sentry') : VO_OF[who.short];
+  if (!key || !VO.buf[key] || !VO_PACK[key]) return;
+  const L = VO_LINES[enemy ? key : 'it'][cat]; if (!L) return;
+  const t = AU.ctx.currentTime, id = (enemy ? 'e' : 'u') + who.id, urgent = cat === 'hurt' || cat === 'spotted' || cat === 'alarm';
+  // nobody talks over another unless it is urgent, and no one repeats himself too often
+  if (!urgent && t < VO.busyUntil) return;
+  if (t - (VO.lastT[id] || -9) < (urgent ? 0.8 : 2.2)) return;
+  let v = 1;
+  if (enemy) {
+    const cc = VIEW.camCenter(); v = clamp(1.25 - Math.hypot(who.x - cc.x, who.y - cc.y) / 800, 0, 1);
+    if (v < 0.25) return;
   }
-  const g = MM.g, s = MM.s * MM.dpr, T = UI.T, P = v => v / TILE * s, lw = MM.dpr;
-  g.setTransform(1, 0, 0, 1, 0, 0);
-  g.drawImage(MM.terr, 0, 0);
-  const night = G.M.light === 'night' || G.M.light === 'dusk';
-  if (night) { g.fillStyle = 'rgba(8,12,30,.28)'; g.fillRect(0, 0, MM.cv.width, MM.cv.height); }
-
-  // the current objective: a pulsing gold frame, or rings round its targets
-  const cur = UI.currentObjective(G), pulse = 0.55 + 0.45 * Math.sin(T * 4);
-  if (cur) {
-    g.strokeStyle = `rgba(232,196,96,${0.55 + 0.45 * pulse})`; g.lineWidth = 1.6 * lw; g.setLineDash([3 * lw, 2 * lw]);
-    if (cur.type === 'reach') { const [zc, zr, zw, zh] = cur.zone; g.strokeRect(zc * s + lw, zr * s + lw, zw * s - 2 * lw, zh * s - 2 * lw); }
-    g.setLineDash([]);
-    const ring = (x, y) => { g.beginPath(); g.arc(P(x), P(y), (2.2 + pulse * 1.4) * lw * Math.max(1, MM.s / 4), 0, TAU); g.stroke(); };
-    if (cur.type === 'kill') for (const id of cur.targets) { const e = G.enemies.find(x => x.id === id); if (e && e.alive) ring(e.x, e.y); }
-    if (cur.type === 'destroy') for (const id of cur.targets) { const b = G.objects.find(x => x.id === id); if (b && !b.destroyed) ring(b.x, b.y); }
-    if (cur.type === 'collect') { const b = G.objects.find(x => x.id === cur.target); if (b && !b.collected) ring(b.x, b.y); }
-  }
-
-  // bodies the guards could still stumble on
-  g.fillStyle = 'rgba(30,24,18,.75)';
-  for (const e of G.enemies) if (!e.alive && !e.dummy && !e.carriedBy && !e.sunk) { g.fillRect(P(e.x) - 1.2 * lw, P(e.y) - 1.2 * lw, 2.4 * lw, 2.4 * lw); }
-
-  // the guards: a faint wedge of what they watch, a dot, and the colour of their mood
-  const dotR = Math.max(1.6, MM.s * 0.42) * lw;
-  for (const e of G.enemies) {
-    if (!e.alive || e.dummy) continue;
-    const hot = e.state === 'alert' || e.state === 'combat', sus = e.state === 'suspicious';
-    const x = P(e.x), y = P(e.y);
-    const R = P(effRange(G, e)), fov = effFov(e);
-    g.fillStyle = hot ? 'rgba(232,80,50,.22)' : sus ? 'rgba(232,196,58,.2)' : 'rgba(120,210,110,.13)';
-    g.beginPath(); g.moveTo(x, y); g.arc(x, y, R, e.facing - fov / 2, e.facing + fov / 2); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(10,10,8,.85)'; g.beginPath(); g.arc(x, y, dotR + lw, 0, TAU); g.fill();
-    g.fillStyle = hot ? (Math.sin(T * 12) > 0 ? '#ff5a3a' : '#c8402f') : sus ? '#e8c43a' : e.trainer ? '#9fb4c8' : '#c8402f';
-    g.beginPath(); g.arc(x, y, dotR, 0, TAU); g.fill();
-  }
-
-  // the guard you are looking at: his round
-  const ie = INSPECT.e;
-  if (ie && ie.alive) {
-    const route = patrolRoute(G, ie);
-    if (route) {
-      g.strokeStyle = 'rgba(255,120,90,.95)'; g.lineWidth = 1.3 * lw; g.setLineDash([2 * lw, 2 * lw]); g.lineDashOffset = -T * 8 * lw;
-      g.beginPath(); route.forEach((p, i) => { if (i) g.lineTo(P(p.x), P(p.y)); else g.moveTo(P(p.x), P(p.y)); }); g.stroke(); g.setLineDash([]);
-    }
-    g.strokeStyle = '#f6efdc'; g.lineWidth = 1.2 * lw; g.beginPath(); g.arc(P(ie.x), P(ie.y), dotR + 2.6 * lw, 0, TAU); g.stroke();
-  }
-
-  // the squad: gold, the selected men ringed in white
-  for (const u of G.units) {
-    if (!u.alive) continue;
-    const x = P(u.x), y = P(u.y), sel = UI.sel.includes(u);
-    g.fillStyle = 'rgba(10,10,8,.9)'; g.beginPath(); g.arc(x, y, dotR + 1.2 * lw, 0, TAU); g.fill();
-    g.fillStyle = u.crawl ? '#b8913c' : '#e6bd5c'; g.beginPath(); g.arc(x, y, dotR + 0.3 * lw, 0, TAU); g.fill();
-    if (sel) { g.strokeStyle = '#f6efdc'; g.lineWidth = 1.2 * lw; g.beginPath(); g.arc(x, y, dotR + 2.6 * lw, 0, TAU); g.stroke(); }
-  }
-
-  // what the camera sees: the four screen corners laid on the ground
+  let li = L[Math.floor(Math.random() * L.length)];
+  if (L.length > 1 && li === VO.lastLine[id]) li = L[(L.indexOf(li) + 1) % L.length];
+  const seg = VO_PACK[key].segs[li]; if (!seg) return;
+  VO.lastT[id] = t; VO.lastLine[id] = li; VO.busyUntil = t + seg[1] * 0.85;
   try {
-    const top = Math.max(0, V.insetTop || 0), bot = V.h - Math.max(0, V.insetBottom || 0);
-    const pts = [[0, top], [V.w, top], [V.w, bot], [0, bot]].map(([sx, sy]) => VIEW.pick(sx, sy));
-    if (pts.every(p => p && isFinite(p.x) && isFinite(p.y))) {
-      g.strokeStyle = 'rgba(246,239,220,.85)'; g.lineWidth = 1.1 * lw;
-      g.beginPath(); pts.forEach((p, i) => { const fx = P(p.x), fy = P(p.y); if (i) g.lineTo(fx, fy); else g.moveTo(fx, fy); }); g.closePath(); g.stroke();
-    }
+    const s = AU.ctx.createBufferSource(), g = AU.ctx.createGain();
+    s.buffer = VO.buf[key];
+    // each enemy gets a slightly different pitch, so two sentries do not sound like twins
+    if (enemy) { let h = 7; for (const ch of String(who.id)) h = (h * 31 + ch.charCodeAt(0)) >>> 0; s.playbackRate.value = 0.9 + (h % 100) / 100 * 0.2; }
+    g.gain.value = (enemy ? 0.85 : 1.05) * v;
+    s.connect(g); g.connect(VO.out); sendFx(g, enemy ? 0.35 : 0.12, enemy ? 0.2 : 0);
+    s.start(t + 0.02, Math.max(0, seg[0] - 0.01), seg[1] + 0.04);
   } catch (e) { }
-
-  // a thin red pulse at the edge while the alarm sounds
-  if (G.alarmFlash > 0) { g.strokeStyle = `rgba(220,60,40,${0.5 + 0.4 * Math.sin(T * 10)})`; g.lineWidth = 3 * lw; g.strokeRect(1.5 * lw, 1.5 * lw, MM.cv.width - 3 * lw, MM.cv.height - 3 * lw); }
 }
+function syncVoiceButtons() {
+  for (const id of ['#bVoiceTitle', '#bVoicePause']) { const b = $(id); if (!b) continue; b.hidden = typeof VO_PACK === 'undefined'; b.querySelector('span').textContent = SAVE.voice !== false ? 'Voci sì' : 'Voci no'; }
+}
+function toggleVoice() { SAVE.voice = SAVE.voice === false; persist(); auInit(); syncVoiceButtons(); sfx('click'); }
 /* ================= UI, INPUT, AUDIO ================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const SAVE_KEY = 'arditi-save-v1';
-const SAVE = { done: {}, medal: {}, diff: 'ardito', sound: true, music: true, gfx: null, minimap: null };
+const SAVE = { done: {}, medal: {}, diff: 'ardito', sound: true, music: true, gfx: null, vxp: {}, voice: true, minimap: null };
 try { const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (s && typeof s === 'object') Object.assign(SAVE, s); } catch (e) { }
 if (!DIFF[SAVE.diff]) SAVE.diff = 'ardito';
 // graphics: Ultra on a computer with a big screen, Alta on phones and tablets (the player can change it)
 if (!QUALITY[SAVE.gfx]) SAVE.gfx = (window.matchMedia && matchMedia('(pointer: fine)').matches && Math.max(screen.width, screen.height) >= 1200) ? 'ultra' : 'alta';
+if (!SAVE.vxp || typeof SAVE.vxp !== 'object') SAVE.vxp = {};
 function persist() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(SAVE)); } catch (e) { } }
+/* ---------------- veterans: experience is the sum of each mission's best ---------------- */
+function vetXp(key) { let x = 0; for (const m in SAVE.vxp) x += SAVE.vxp[m][key] || 0; return x; }
+function vetLevels() { const o = {}; for (const M of MISSIONS) for (const s of M.squad) { const k = vetKey(s); o[k] = vetLevelOf(vetXp(k)); } return o; }
+const vetStars = l => l ? '★'.repeat(l) : '';
+function missionXp(G, u) {
+  const win = G.result === 'win', md = medalFor(G);
+  let x = win ? (u.alive ? 60 : 30) : (u.alive ? 15 : 5);
+  x += u.kills * 10 + u.silent * 5;
+  if (md === 2) x += 30; else if (md === 1) x += 15;
+  x *= { recluta: 0.8, ardito: 1, fiamma: 1.3 }[G.diffKey] || 1;
+  return Math.round(x / 5) * 5;
+}
+function awardXp(G) {
+  const log = SAVE.vxp[G.M.id] || (SAVE.vxp[G.M.id] = {}), res = [];
+  for (const u of G.units) {
+    const k = u.short, before = vetXp(k), gain = missionXp(G, u), prev = log[k] || 0;
+    if (gain > prev) log[k] = gain;
+    const after = vetXp(k);
+    res.push({ u, gain, prev, add: after - before, after, l0: vetLevelOf(before), l1: vetLevelOf(after) });
+  }
+  persist(); return res;
+}
+function xpBar(xp) {
+  const l = vetLevelOf(xp), cur = VET_LEVELS[l], nx = VET_LEVELS[l + 1];
+  const k = nx ? (xp - cur.xp) / (nx.xp - cur.xp) : 1;
+  return { l, k: clamp(k, 0, 1), label: nx ? `${xp}/${nx.xp} per «${nx.title}»` : `${xp} · grado massimo` };
+}
 
 const UI = {
   screen: 'title', mi: 0, G: null, bg: null, sel: [], mode: 'move', tap: null, hintClosedFor: null,
@@ -6389,7 +7018,7 @@ function auInit() {
     for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
     AU.noise = b;
   } catch (e) { AU.ctx = null; }
-  if (AU.ctx) setTimeout(musSync, 0);
+  if (AU.ctx) { setTimeout(musSync, 0); setTimeout(voLoad, 50); }
 }
 // the field's acoustics: a short outdoor reverb and, in the mountains, a slapback echo off the rock
 function auFx() {
@@ -6445,6 +7074,8 @@ function sfx(kind, x, y) {
         break;
       }
       case 'voice': case 'shout': {
+        // once the recorded voices are in, they speak instead of this murmur
+        if (typeof VO_PACK !== 'undefined' && SAVE.voice !== false) break;
         // not words: the shape of a voice at a distance, a few syllables through a throat and a closed mouth
         const c = AU.ctx, loud = kind === 'shout', n = 3 + Math.floor(Math.random() * 3);
         const o = c.createOscillator(), f1 = c.createBiquadFilter(), f2 = c.createBiquadFilter(), lp = c.createBiquadFilter(), g = c.createGain(), m = c.createGain();
@@ -6479,6 +7110,28 @@ function sfx(kind, x, y) {
         nz(t + d, 0.25, 'highpass', 1800, 0.6, 0.35); nz(t + d + 0.05, 2.8, 'lowpass', 260, 0.6, 1.1); nz(t + d + 0.5, 3.4, 'lowpass', 120, 0.5, 0.9); tone(t + d, 55, 2.4, 'sine', 0.35, 30);
         break;
       }
+      case 'bark': {
+        // two or three woofs: a falling, buzzy voice through the dog's throat, with the snap of the jaw
+        const c = AU.ctx, n = Math.random() < 0.4 ? 3 : 2, f0 = 430 + Math.random() * 160;
+        for (let i = 0; i < n; i++) {
+          const t0 = t + i * (0.17 + Math.random() * 0.05), o = c.createOscillator(), bp = c.createBiquadFilter(), g = c.createGain();
+          o.type = 'sawtooth'; o.frequency.setValueAtTime(f0 * (i === n - 1 ? 0.92 : 1), t0); o.frequency.exponentialRampToValueAtTime(f0 * 0.5, t0 + 0.12);
+          bp.type = 'bandpass'; bp.frequency.value = 1050; bp.Q.value = 1.1;
+          g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.42 * v, t0 + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.14);
+          o.connect(bp); bp.connect(g); g.connect(AU.master); sendFx(g, 0.5, ec ? 0.5 : 0); o.start(t0); o.stop(t0 + 0.16);
+          nz(t0, 0.05, 'bandpass', 1700, 1.2, 0.22 * v, 0.3);
+        }
+        break;
+      }
+      case 'growl': {
+        const c = AU.ctx, o = c.createOscillator(), lp = c.createBiquadFilter(), g = c.createGain(), l = c.createOscillator(), lg = c.createGain();
+        o.type = 'sawtooth'; o.frequency.value = 78 + Math.random() * 14; lp.type = 'lowpass'; lp.frequency.value = 640;
+        l.type = 'square'; l.frequency.value = 26; lg.gain.value = 0.05 * v; l.connect(lg); lg.connect(g.gain);
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.09 * v, t + 0.15); g.gain.setValueAtTime(0.09 * v, t + 0.6); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.95);
+        o.connect(lp); lp.connect(g); g.connect(AU.master); o.start(t); l.start(t); o.stop(t + 1); l.stop(t + 1);
+        break;
+      }
+      case 'bite': nz(t, 0.04, 'highpass', 2200, 0.7, 0.3 * v); tone(t, 320, 0.08, 'square', 0.06 * v, 120); nz(t + 0.03, 0.18, 'bandpass', 600, 1.4, 0.18 * v); break;
       case 'collapse': nz(t, 2.2, 'lowpass', 300, 0.6, 1.3 * v); for (let i = 0; i < 6; i++) tone(t + 0.1 + i * 0.13, 300 - i * 30, 0.25, 'square', 0.05 * v, 90); nz(t + 0.9, 1.8, 'lowpass', 900, 0.7, 0.8 * v); break;
       case 'obj': [523, 659, 784].forEach((f, i) => tone(t + i * 0.1, f, 0.2, 'triangle', 0.13)); break;
       case 'win': [392, 523, 659, 784, 659, 784].forEach((f, i) => tone(t + i * 0.16, f, i === 5 ? 0.7 : 0.2, 'square', 0.06)); break;
@@ -6594,7 +7247,7 @@ function setGfx(k, quiet) {
 function cycleGfx() { auInit(); sfx('click'); setGfx(QUALITY_ORDER[(QUALITY_ORDER.indexOf(SAVE.gfx) + 1) % QUALITY_ORDER.length]); }
 // if Ultra is too heavy for this device, step down once, early in the first mission
 function perfWatch(dt) {
-  if (UI.perfDone || VIEW.mode !== '3d' || UI.intro || !UI.G || UI.G.paused || UI.G.over || document.hidden) return;
+  if (UI.perfDone || VIEW.mode !== '3d' || UI.intro || UI.film || !UI.G || UI.G.paused || UI.G.over || document.hidden) return;
   const P = UI.perf || (UI.perf = { t: 0, n: 0, sum: 0 });
   P.t += dt; if (P.t < 1.5) return;
   P.n++; P.sum += dt;
@@ -6614,7 +7267,7 @@ function toast(text, kind = 'info') {
 }
 function show(name) {
   UI.lastScreen = UI.screen; UI.screen = name;
-  if (name !== 'game') { ambStop(); if (UI.intro) { UI.intro = null; $('#intro').hidden = true; $('#hud').classList.remove('intro'); } }
+  if (name !== 'game') { ambStop(); if (UI.intro) { UI.intro = null; $('#intro').hidden = true; $('#hud').classList.remove('intro'); } if (UI.film) { UI.film = null; $('#mapfilm').hidden = true; if (typeof voStopNarr === 'function') voStopNarr(); } }
   for (const k in SCREENS) $(SCREENS[k]).hidden = k !== name;
   $('#hud').hidden = name !== 'game';
   $('#pause').hidden = true;
@@ -6656,6 +7309,7 @@ function diffControl(box, desc) {
 
 /* ---------------- missions list ---------------- */
 function showMissions() {
+  $('#roster').innerHTML = rosterHtml();
   $('#mlist').innerHTML = MISSIONS.map((M, i) => {
     const d = SAVE.done[M.id];
     return `<li><button class="mcard" data-i="${i}">
@@ -6671,15 +7325,16 @@ function showMissions() {
 const AMMO_WORDS = { carbine: ['colpo', 'colpi'], grenade: ['petardo', 'petardi'], charge: ['carica da demolizione', 'cariche da demolizione'], burst: ['caricatore', 'caricatori'], flame: ['vampata', 'vampate'] };
 function ammoLine(s) {
   const R = ROLES[s.role], base = Object.assign({}, R.ammo, s.ammo || {}), d = DIFF[SAVE.diff], parts = [];
-  for (const k in base) if (base[k] > 0) { const n = Math.max(1, Math.round(base[k] * d.ammo)); parts.push(`${n} ${AMMO_WORDS[k][n === 1 ? 0 : 1]}`); }
+  const sk = {}; for (const S of vetSkills(s.role, vetLevelOf(vetXp(vetKey(s))))) sk[S.key] = true;
+  for (const k in base) if (base[k] > 0) { const n = Math.max(1, Math.round(base[k] * d.ammo)) + (Object.keys(VET_AMMO).some(x => sk[x] && VET_AMMO[x] === k) ? 1 : 0); parts.push(`${n} ${AMMO_WORDS[k][n === 1 ? 0 : 1]}`); }
   return parts.length ? `Porta ${parts.join(', ')}.` : '';
 }
 function showBrief(mi) {
   UI.mi = mi;
   const M = MISSIONS[mi];
   const squadHtml = () => M.squad.map(s => {
-    const R = ROLES[s.role];
-    return `<li><svg class="ic"><use href="#i-${R.icon}"/></svg><div><b>${esc(s.name || R.name)}</b><span class="role">${esc(R.title)}</span><p>${esc(R.kit)}. ${esc(ammoLine(s))}</p></div></li>`;
+    const R = ROLES[s.role], xp = vetXp(vetKey(s)), l = vetLevelOf(xp), sks = vetSkills(s.role, l);
+    return `<li><svg class="ic"><use href="#i-${R.icon}"/></svg><div><b>${esc(s.name || R.name)}</b><span class="role">${esc(R.title)}</span>${l ? `<span class="vst" title="${esc(VET_LEVELS[l].title)}">${vetStars(l)} ${esc(VET_LEVELS[l].title)}</span>` : ''}<p>${esc(R.kit)}. ${esc(ammoLine(s))}</p>${sks.length ? `<p class="vsk">${sks.map(S => `<b>${esc(S.name)}</b>: ${esc(S.desc)}`).join(' · ')}</p>` : ''}</div></li>`;
   }).join('');
   $('#briefSheet').innerHTML = `
     <div class="lh"><span>Ordine d’operazione</span><span>${mi === 0 ? 'Addestramento' : 'Azione ' + esc(M.num)}</span></div>
@@ -6687,9 +7342,10 @@ function showBrief(mi) {
     <p class="meta">${esc(M.place)} · ${esc(M.date)}</p>
     <p class="meta">${esc(M.unit)} · ${esc(M.context)}</p>
     <div class="thumbwrap"><canvas class="thumb" id="thumb" aria-label="Mappa della zona d’operazione"></canvas></div>
-    <div class="legend"><span><i style="background:#d6aa4c"></i>La tua squadra</span><span><i style="background:#b0574a"></i>Nemico</span><span><i style="background:#e24a33"></i>Mitragliatrice</span><span><i style="background:#e9e0c8;border-radius:0"></i>Bersaglio</span><span>Tratteggio: area dell’obiettivo</span></div>
+    <div class="legend"><span><i style="background:#d6aa4c"></i>La tua squadra</span><span><i style="background:#b0574a"></i>Nemico</span><span><i style="background:#e24a33"></i>Mitragliatrice</span>${M.enemies.some(e => e.t === 'dog') ? '<span><i style="background:#d08a3a"></i>Cane da guardia</span>' : ''}<span><i style="background:#e9e0c8;border-radius:0"></i>Bersaglio</span><span>Tratteggio: area dell’obiettivo</span></div>
     ${M.brief.map(p => `<p>${esc(p)}</p>`).join('')}
     ${briefWeather(M)}
+    ${briefDogs(M)}
     <h3>Obiettivi</h3>
     <ol class="olist">${M.objectives.map(o => `<li>${esc(o.text)}</li>`).join('')}</ol>
     <h3>La squadra</h3>
@@ -6709,6 +7365,11 @@ function showBrief(mi) {
   show('brief');
 }
 
+function briefDogs(M) {
+  const n = M.enemies.filter(e => e.t === 'dog').length; if (!n) return '';
+  const chained = M.enemies.some(e => e.t === 'dog' && e.chain);
+  return `<div class="wxbox dogbox"><b>${n === 1 ? 'Un cane da guardia' : n + ' cani da guardia'}.</b> Il cerchio tratteggiato è il loro fiuto: lì dentro ti sentono anche se strisci o sei in un cespuglio, e trovano i corpi nascosti. Strisciare non serve: o giri al largo, o lo attiri via con un sasso, o lo prendi di corsa col pugnale prima che abbai. Se uccidi il conduttore, il cane abbaia dopo un istante.${chained ? ' Uno è legato alla catena: non può inseguirti, ma abbaia.' : ''} La pioggia e la neve smorzano il fiuto.</div>`;
+}
 function briefWeather(M) {
   const wx = missionWx(M), W = WEATHER[wx.kind], L = { day: 'Giorno', dawn: 'Alba', dusk: 'Tramonto', night: 'Notte' }[M.light] || 'Giorno';
   const wind = wx.wind > 0.7 ? 'vento forte' : wx.wind > 0.45 ? 'vento' : 'vento debole';
@@ -6725,7 +7386,8 @@ function startMission(mi, restart) {
   auInit();
   if (UI.quick && UI.quick.mi !== mi) UI.quick = null;
   UI.mi = mi;
-  UI.G = createGame(mi, SAVE.diff, { onEvent: onGameEvent });
+  UI.G = createGame(mi, SAVE.diff, { onEvent: onGameEvent, vets: vetLevels() });
+  UI.vetRes = null;
   UI.sel = [UI.G.units[0]]; UI.mode = 'move'; UI.debriefShown = false; UI.hintClosedFor = null; UI.sig = '';
   $('#objPanel').hidden = true; $('#bObj').setAttribute('aria-expanded', 'false'); $('#toasts').innerHTML = '';
   show('game');
@@ -6737,14 +7399,20 @@ function startMission(mi, restart) {
   const us = UI.G.units, cx = us.reduce((s, u) => s + u.x, 0) / us.length, cy = us.reduce((s, u) => s + u.y, 0) / us.length;
   if (VIEW.mode === '3d') {
     // lean the opening view toward the middle of the map, so the squad is not framed against the void past the edge
-    const mx = UI.G.W * TILE / 2, my = UI.G.H * TILE / 2;
-    VIEW.centerOn(UI.G, cx + (mx - cx) * 0.28, cy + (my - cy) * 0.28, true);
+    const mx = UI.G.W * TILE / 2, my = UI.G.H * TILE / 2, lean = V.w < 600 ? 0.08 : 0.28;
+    VIEW.centerOn(UI.G, cx + (mx - cx) * lean, cy + (my - cy) * lean, true);
   } else VIEW.centerOn(UI.G, cx, cy - 40, true);
   sfx('click');
   ambStart(UI.G.M);
-  musPlay('game', UI.G.M);
-  if (!restart && SAVE.sound && SAVE.music !== false) setTimeout(() => { if (UI.screen === 'game') musSting('start'); }, 350);
-  if (VIEW.mode === '3d' && !restart) startIntro();
+  const go = () => {
+    musPlay('game', UI.G.M);
+    if (!restart && SAVE.sound && SAVE.music !== false) setTimeout(() => { if (UI.screen === 'game') musSting('start'); }, 350);
+    if (VIEW.mode === '3d' && !restart) startIntro();
+    else if (UI.G) { UI.G.paused = false; $('#hud').classList.remove('intro'); }
+  };
+  // first the map of the front closes in on the place, then the camera flies over the field
+  if (!restart) { UI.G.paused = true; $('#hud').classList.add('intro'); filmStart(UI.G.M, () => { if (UI.screen === 'game' && UI.G) go(); }); }
+  else go();
 }
 /* the camera opens on the objective and travels back to the squad, under the mission title */
 function startIntro() {
@@ -6785,11 +7453,12 @@ function measureInsets() {
   document.documentElement.style.setProperty('--hudb', Math.round(V.h - bot.top) + 'px');
 }
 function onGameEvent(k, d) {
-  if (k === 'msg') toast(d.text, d.kind);
+  if (k === 'msg') { toast(d.text, d.kind); if (d.kind === 'bad') buzz([30, 50, 30]); }
   else if (k === 'sfx') sfx(d.kind, d.x, d.y);
+  else if (k === 'vo') voSay(d.who, d.cat, d.enemy);
   else if (k === 'bolt') sfx('thunder');
   else if (k === 'collapse') { if (VIEW.mode === '3d') r3Collapse(UI.G, d.c, d.rows); const o = UI.G.objects.find(b => b.type === 'mine'); sfx('collapse', o ? o.x : null, o ? o.y : null); }
-  else if (k === 'objective') { toast('Obiettivo raggiunto: ' + d.text, 'good'); sfx('obj'); UI.sig = ''; }
+  else if (k === 'objective') { toast('Obiettivo raggiunto: ' + d.text, 'good'); sfx('obj'); UI.sig = ''; buzz(20); }
   else if (k === 'end') {
     if (SAVE.music === false) sfx(d.result === 'win' ? 'win' : 'lose'); else musPlay(d.result === 'win' ? 'win' : 'lose', UI.G.M);
     // the camera drifts to where it was decided and closes in, while the bugle plays
@@ -6801,6 +7470,7 @@ function onGameEvent(k, d) {
       if (d.result !== 'win') { const u = G.units.find(v => v.alive) || G.units[0]; if (u) { x = u.x; y = u.y; } }
       if (x != null) { VIEW.centerOn(G, x, y); UI.outro = { t: 0, size0: R3.cam.size, yaw0: R3.cam.yaw }; }
     }
+    if (!UI.G.attract) UI.vetRes = awardXp(UI.G);
     if (d.result === 'win') {
       const M = UI.G.M, idx = DIFF_ORDER.indexOf(UI.G.diffKey);
       if (SAVE.done[M.id] == null || SAVE.done[M.id] < idx) { SAVE.done[M.id] = idx; persist(); }
@@ -6837,6 +7507,28 @@ function medalWhy(G, i) {
   if (i === 1) return `Per l’oro: ${s.losses ? 'nessun ardito perduto' : ''}${s.losses && many ? ' e ' : ''}${many ? `al massimo ${lim === 1 ? 'un allarme' : 'due allarmi'}` : ''}.`;
   return 'Per l’argento: al massimo un ardito perduto e non più di cinque allarmi.';
 }
+function vetSection() {
+  const R = UI.vetRes; if (!R || !R.length) return '';
+  return `<h3>Esperienza</h3><ul class="vetlist">${R.map(r => {
+    const u = r.u, b = xpBar(r.after), up = r.l1 > r.l0, sk = up ? vetSkills(u.role, r.l1).slice(r.l0) : [];
+    const note = r.add > 0 ? `+${r.add} esperienza` : r.prev >= r.gain && r.prev > 0 ? `Nessun punto in più: qui ne ha già guadagnati ${r.prev}` : 'Nessun punto';
+    return `<li><img class="vface" src="${portrait(u)}" alt=""><div class="vbody"><div class="vhead"><b>${esc(u.short)}</b>${b.l ? `<span class="vst">${vetStars(b.l)} ${esc(VET_LEVELS[b.l].title)}</span>` : ''}<span class="vadd ${r.add > 0 ? 'pos' : ''}">${esc(note)}</span></div>
+      <div class="xpbar" role="img" aria-label="${esc(b.label)}"><i style="width:${Math.round(b.k * 100)}%"></i></div><small>${esc(b.label)}${u.kills ? ` · ${u.kills} ${u.kills === 1 ? 'nemico fermato' : 'nemici fermati'}${u.silent ? `, ${u.silent} col pugnale` : ''}` : ''}${u.alive ? '' : ' · caduto'}</small>
+      ${up ? `<p class="promo">Ora è <b>${esc(VET_LEVELS[r.l1].title)}</b>. ${sk.map(S => `Nuova abilità «${esc(S.name)}»: ${esc(S.desc)}.`).join(' ')}</p>` : ''}</div></li>`;
+  }).join('')}</ul>`;
+}
+function rosterHtml() {
+  // the five men of the campaign, and the Caimani once they have been in the water
+  const men = [], seen = new Set();
+  for (const M of MISSIONS) for (const s of M.squad) { const k = vetKey(s); if (seen.has(k)) continue; seen.add(k); if (s.role === 'caimano' && !vetXp(k)) continue; men.push(s); }
+  return `<section class="roster"><h3>La squadra</h3><p class="rnote">Ogni missione dà esperienza (conta il risultato migliore di ciascuna). Con l’esperienza gli arditi sbloccano abilità.</p><ul>${men.map(s => {
+    const R = ROLES[s.role], k = vetKey(s), xp = vetXp(k), b = xpBar(xp), all = vetSkills(s.role, 3);
+    const u = { name: s.name || R.name, role: s.role, short: k, hat: s.role === 'caimano' ? 'bare' : 'fez' };
+    return `<li><img class="vface" src="${portrait(u)}" alt=""><div class="vbody"><div class="vhead"><b>${esc(k)}</b><span class="role">${esc(R.title)}</span>${b.l ? `<span class="vst">${vetStars(b.l)} ${esc(VET_LEVELS[b.l].title)}</span>` : `<span class="vst dim">${esc(VET_LEVELS[0].title)}</span>`}</div>
+      <div class="xpbar"><i style="width:${Math.round(b.k * 100)}%"></i></div><small>${esc(b.label)}</small>
+      <ol class="sklist">${all.map((S, i) => `<li class="${i < b.l ? 'on' : ''}"><b>${esc(S.name)}</b> <span>${i < b.l ? esc(S.desc) : esc(VET_LEVELS[i + 1].title)}</span></li>`).join('')}</ol></div></li>`;
+  }).join('')}</ul></section>`;
+}
 function showDebrief() {
   const G = UI.G, M = G.M, win = G.result === 'win', next = UI.mi + 1 < MISSIONS.length ? UI.mi + 1 : null;
   UI.debriefShown = true;
@@ -6848,6 +7540,7 @@ function showDebrief() {
     <h2>${esc(M.name)}</h2>
     ${md >= 0 ? `<div class="medalrow">${medalSvg(md)}<div><b>${esc(MEDALS[md].label)}</b><span>${esc(medalWhy(G, md))}</span></div></div>` : ''}
     ${win ? '' : `<p class="reason">${esc(G.reason)}</p>`}
+    ${vetSection()}
     <dl class="stats">
       <div><dt>Tempo</dt><dd>${fmtTime(G.time)}</dd></div>
       <div><dt>Nemici fermati</dt><dd>${G.stats.kills}</dd></div>
@@ -6880,7 +7573,7 @@ const MODE_TEXT = {
 function hudSig() {
   const G = UI.G;
   return G.units.map(u => [u.alive ? 1 : 0, u.hp, u.crawl ? 1 : 0, u.carrying ? 1 : 0, Object.values(u.ammo).join('.'), u.stoneCd > 0 ? 1 : 0, UI.sel.includes(u) ? 1 : 0].join(',')).join('|')
-    + '#' + UI.mode + '#' + G.objectives.map(o => o.done ? 1 : 0).join('') + '#' + UI.hintClosedFor;
+    + '#' + UI.mode + '#' + G.objectives.map(o => o.done ? 1 : 0).join('') + '#' + UI.hintClosedFor + '#' + (UI.hintMin ? 1 : 0);
 }
 function refreshHud(force) {
   const G = UI.G; if (!G) return;
@@ -6895,7 +7588,7 @@ function refreshHud(force) {
     b.setAttribute('aria-label', `${u.name}, ${u.R.title}${u.alive ? '' : ', caduto'}`);
     b.setAttribute('aria-pressed', String(UI.sel.includes(u)));
     const pips = Array.from({ length: u.maxHp }, (_, k) => `<i class="${k < u.hp ? '' : 'x'}"></i>`).join('');
-    b.innerHTML = `<img class="face" src="${portrait(u)}" alt=""><span class="k">${i + 1}</span><svg class="ic role"><use href="#i-${u.crawl ? 'crawl' : u.R.icon}"/></svg><span class="nm">${esc(u.short)}</span><span class="hp">${pips}</span>`;
+    b.innerHTML = `<img class="face" src="${portrait(u)}" alt=""><span class="k">${i + 1}</span>${u.vet ? `<span class="vs">${vetStars(u.vet)}</span>` : ''}<svg class="ic role"><use href="#i-${u.crawl ? 'crawl' : u.R.icon}"/></svg><span class="nm">${esc(u.short)}</span><span class="hp">${pips}</span>`;
     b.disabled = !u.alive;
     b.onclick = () => portraitTap(u);
     sq.append(b);
@@ -6945,12 +7638,16 @@ function refreshHud(force) {
   $('#objList').innerHTML = G.objectives.map(o => `<li class="${o.done ? 'done' : o === cur ? 'cur' : ''}"><span class="box"></span><span>${esc(o.text)}</span></li>`).join('');
   // hint
   const h = $('#hint');
+  if (cur && UI.hintFor !== cur.id) { UI.hintFor = cur.id; UI.hintMin = false; UI.hintT = 0; }
   if (!cur || UI.hintClosedFor === cur.id) h.hidden = true;
-  else { h.hidden = false; $('#hintText').innerHTML = `<b>${esc(cur.text)}</b>${esc(cur.hint)}`; }
+  else { h.hidden = false; h.classList.toggle('min', !!UI.hintMin); $('#hintText').innerHTML = `<b>${esc(cur.text)}</b><span class="htx">${esc(cur.hint)}</span>`; }
   requestAnimationFrame(measureInsets);
 }
+function smallScreen() { return V.w < 900 || V.h < 560; }
 function hudTick(dt) {
   const G = UI.G;
+  // on a small screen the advice folds away into a one-line note after a while (tap it to read it again)
+  if (!UI.hintMin && !UI.intro && !UI.film && !G.paused && smallScreen() && !$('#hint').hidden) { UI.hintT = (UI.hintT || 0) + dt; if (UI.hintT > 9) { UI.hintMin = true; refreshHud(true); } }
   $('#hClock').textContent = fmtTime(G.time) + (G.wx && G.wx.kind !== 'clear' ? ' · ' + WEATHER[G.wx.kind].short : '');
   $('#hud').classList.toggle('alarm', G.alarmFlash > 0);
   $('#hud').classList.toggle('paused', G.paused);
@@ -6966,7 +7663,7 @@ function portraitTap(u) {
   UI.lastPortrait = { id: u.id, t: now };
   selectUnit(u);
 }
-function selectUnit(u) { if (!u || !u.alive) return; UI.sel = [u]; UI.mode = 'move'; sfx('click'); refreshHud(true); }
+function selectUnit(u) { if (!u || !u.alive) return; const was = UI.sel.length === 1 && UI.sel[0] === u; UI.sel = [u]; UI.mode = 'move'; sfx('click'); refreshHud(true); if (!was) voSay(u, 'sel'); }
 function selectAll() { UI.sel = UI.G.units.filter(u => u.alive); UI.mode = 'move'; sfx('click'); refreshHud(true); }
 function onAbility(a) {
   const G = UI.G, sel = UI.sel.filter(u => u.alive); if (!sel.length) return;
@@ -6989,6 +7686,7 @@ function onAbility(a) {
 /* ---------------- portraits ---------------- */
 const PORTRAITS = new Map();
 function hatFor(u) {
+  if (u.hat) return u.hat;
   const M = UI.G ? UI.G.M : MISSIONS[0];
   return u.role === 'caimano' ? 'bare' : M.hat || (M.id === 'sdricca' ? 'cap' : (M.era || 1918) >= 1918 ? 'fez' : 'adrian');
 }
@@ -7110,7 +7808,7 @@ function inspectLabel(e) {
 }
 function inspectTick(dt) {
   const G = UI.G, el = $('#inspect');
-  if (!G || G.over || UI.intro) { INSPECT.e = null; el.hidden = true; return; }
+  if (!G || G.over || UI.intro || UI.film) { INSPECT.e = null; el.hidden = true; return; }
   const live = G.enemies.filter(e => e.alive && !e.dummy);
   if (INSPECT.mouse && !PTR.size && UI.mode === 'move') {
     const h = hitScreen(live, INSPECT.mouse.x, INSPECT.mouse.y, 30, 0.6);
@@ -7134,7 +7832,7 @@ const BUB = new Map();
 function bubbleTick() {
   const G = UI.G, box = $('#bubbles');
   const want = new Set();
-  if (G && !UI.intro) for (const e of G.enemies) {
+  if (G && !UI.intro && !UI.film) for (const e of G.enemies) {
     if (!e.alive || !(e.sayT > 0) || !e.say) continue;
     const p = VIEW.project(e.x, e.y, 2.4);
     if (p.x < -80 || p.y < -40 || p.x > V.w + 80 || p.y > V.h + 40) continue;
@@ -7171,59 +7869,234 @@ function findWireNear(G, w) {
   return best;
 }
 const FORMATION = [[0, 0], [-20, 10], [20, 10], [-12, -18], [12, -18], [0, 24]];
-function mapTap(sx, sy) {
+function mapTap(sx, sy, touch) {
   const G = UI.G; if (!G || G.over) return;
   auInit();
   const w = VIEW.pick(sx, sy), r = hitRadius();
   UI.tap = { x: w.x, y: w.y, t: UI.T };
+  // fingers are less precise than a mouse: on a touch screen the soldiers and targets are easier to hit
+  const k = touch ? 1.35 : 1;
   const alive = G.units.filter(u => u.alive);
   const sel = UI.sel.filter(u => u.alive);
   const enemies = G.enemies.filter(e => e.alive);
   const bodies = G.enemies.filter(e => !e.alive && !e.dummy && !e.carriedBy && !e.sunk);
-  const hitU = hitScreen(alive, sx, sy, 28, 0.6);
+  const hitU = hitScreen(alive, sx, sy, 28 * k, 0.6);
   if (UI.mode !== 'move') {
     if (hitU && !sel.includes(hitU) && UI.mode !== 'stone' && UI.mode !== 'grenade') { selectUnit(hitU); return; }
     const u = sel[0], a = UI.mode;
     if (!u) return;
-    const e = hitScreen(enemies, sx, sy, 32, 0.6), b = hitScreen(bodies, sx, sy, 30, 0.15);
-    if (a === 'knife') { if (!e) return toast('Tocca un nemico.'); if (e.trainer) return toast('È il tuo istruttore! Devi passargli accanto senza farti vedere.', 'warn'); issueOrder(G, u, { kind: 'knife', target: e }); }
+    // a weapon that needs a man to aim at takes the nearest one to the tap, within a generous reach
+    const wantsEnemy = a === 'knife' || a === 'carbine' || a === 'burst';
+    const e = hitScreen(enemies, sx, sy, 32 * k, 0.6) || (wantsEnemy ? hitScreen(enemies, sx, sy, 58 * k, 0.6) : null);
+    const b = hitScreen(bodies, sx, sy, 30 * k, 0.15) || (a === 'carry' ? hitScreen(bodies, sx, sy, 54 * k, 0.15) : null);
+    buzz(8);
+    if (a === 'knife') { if (!e) return toast('Tocca un nemico.'); if (e.trainer) return toast('È il tuo istruttore! Devi passargli accanto senza farti vedere.', 'warn'); if (issueOrder(G, u, { kind: 'knife', target: e })) voSay(u, 'atk'); }
     else if (a === 'carbine' || a === 'burst') { if (!e) return toast('Tocca un nemico.'); if (e.trainer) return toast('È il tuo istruttore! Devi passargli accanto senza farti vedere.', 'warn'); issueOrder(G, u, { kind: 'shoot', abil: a, target: e }); }
-    else if (a === 'grenade' || a === 'stone' || a === 'flame') issueOrder(G, u, { kind: 'point', abil: a, x: w.x, y: w.y });
+    else if (a === 'grenade' || a === 'stone' || a === 'flame') { if (issueOrder(G, u, { kind: 'point', abil: a, x: w.x, y: w.y }) && a === 'stone') voSay(u, 'ack'); }
     else if (a === 'charge') {
       let x = w.x, y = w.y;
       const o = G.objects.find(o => o.armor && !o.destroyed && Math.hypot(o.x - x, o.y - y) < r + 10);
       if (o) { x = o.x; y = o.y; }
-      issueOrder(G, u, { kind: 'charge', x, y });
-    } else if (a === 'cut') { const t = findWireNear(G, w); if (!t) return toast('Tocca il reticolato.'); issueOrder(G, u, { kind: 'cut', c: t[0], r: t[1] }); }
+      if (issueOrder(G, u, { kind: 'charge', x, y })) voSay(u, 'ack');
+    } else if (a === 'cut') { const t = findWireNear(G, w); if (!t) return toast('Tocca il reticolato.'); if (issueOrder(G, u, { kind: 'cut', c: t[0], r: t[1] })) voSay(u, 'ack'); }
     else if (a === 'carry') { if (!b) return toast('Tocca un corpo.'); issueOrder(G, u, { kind: 'carry', target: b }); }
     UI.mode = 'move'; refreshHud(true); return;
   }
   if (hitU) { selectUnit(hitU); return; }
   if (!sel.length) return toast('Seleziona prima un ardito.');
+  buzz(8);
   if (sel.length === 1) {
     const u = sel[0];
-    const e = hitScreen(enemies, sx, sy, 32, 0.6);
+    const e = hitScreen(enemies, sx, sy, 32 * (touch ? 1.1 : 1), 0.6);
     if (e) {
       if (e.trainer) return toast('È il tuo istruttore! Devi passargli accanto senza farti vedere.', 'warn');
-      issueOrder(G, u, { kind: 'knife', target: e }); return;
+      if (issueOrder(G, u, { kind: 'knife', target: e })) voSay(u, 'atk'); return;
     }
-    const b = hitScreen(bodies, sx, sy, 30, 0.15);
+    const b = hitScreen(bodies, sx, sy, 30 * k, 0.15);
     if (b && u.R.abilities.includes('carry') && !u.carrying) { issueOrder(G, u, { kind: 'carry', target: b }); return; }
     if (u.R.abilities.includes('cut')) { const t = findWireNear(G, w); if (t && Math.hypot(ctr(t[0]) - w.x, ctr(t[1]) - w.y) < 20) { issueOrder(G, u, { kind: 'cut', c: t[0], r: t[1] }); return; } }
   }
   const lead = sel.slice().sort((a, b) => Math.hypot(a.x - w.x, a.y - w.y) - Math.hypot(b.x - w.x, b.y - w.y));
-  lead.forEach((u, i) => { const [ox, oy] = sel.length > 1 ? FORMATION[i % FORMATION.length] : [0, 0]; issueOrder(G, u, { kind: 'move', x: w.x + ox, y: w.y + oy }); });
+  let ok = false;
+  lead.forEach((u, i) => { const [ox, oy] = sel.length > 1 ? FORMATION[i % FORMATION.length] : [0, 0]; if (issueOrder(G, u, { kind: 'move', x: w.x + ox, y: w.y + oy })) ok = true; });
+  if (ok && Math.random() < 0.55) voSay(lead[0], 'ack');
+}
+
+/* ================= MINIMAPPA TATTICA: il campo dall'alto, la squadra, le sentinelle, l'obiettivo e l'inquadratura ================= */
+const MM = { on: null, el: null, cv: null, g: null, terr: null, sig: '', sigT: 0, s: 4, dpr: 1, W: 0, H: 0, G: null, drag: false, fps: 0 };
+
+// the map's own colours: the ground keeps its palette, the rest gets a flat, readable tint
+const MM_COL = {
+  '|': '#8a6a44', '_': '#5f8088', '=': '#3a3124', 'o': '#4a3d2c', 'b': '#3c5628', 'x': '#6f6049', 'S': '#a6966c',
+  '#': '#6c6960', 'T': '#2d4720', 'W': '#3e382f', '~': '#35657a', 'v': '#56703a', 'd': '#5a4630', 'c': '#7b6848',
+};
+const MM_SNOW = { 'b': '#8fa3a8', 'T': '#4f6b5c', '#': '#9aa0a6', 'S': '#bdb7a8', 'v': '#a7b2a9', 'd': '#7b6a58', '=': '#8b8a86', 'o': '#9c9a95' };
+function mmTileCol(G, ch) {
+  if (GPAL[ch]) return GPAL[ch][0];
+  if (G.M.winter && MM_SNOW[ch]) return MM_SNOW[ch];
+  return MM_COL[ch] || GPAL['.'][0];
+}
+function mmLayout() {
+  const desk = matchMedia('(min-width: 900px) and (min-height: 560px)').matches;
+  const G = MM.G, maxW = desk ? 232 : 150, maxH = desk ? 168 : 112;
+  MM.s = Math.max(1.5, Math.min(maxW / G.W, maxH / G.H));
+  MM.dpr = Math.min(2, devicePixelRatio || 1);
+  const w = Math.round(G.W * MM.s), h = Math.round(G.H * MM.s);
+  MM.cv.style.width = w + 'px'; MM.cv.style.height = h + 'px';
+  MM.cv.width = Math.round(w * MM.dpr); MM.cv.height = Math.round(h * MM.dpr);
+  MM.terr = null; MM.sig = '';
+}
+// the terrain, painted once and again only when the map itself changes (a cut wire, a fallen bridge)
+function mmTerrain(G) {
+  const s = MM.s * MM.dpr, c = document.createElement('canvas');
+  c.width = MM.cv.width; c.height = MM.cv.height;
+  const g = c.getContext('2d');
+  for (let r = 0; r < G.H; r++) for (let q = 0; q < G.W; q++) {
+    const ch = G.map[r][q];
+    g.fillStyle = mmTileCol(G, ch);
+    g.fillRect(Math.floor(q * s), Math.floor(r * s), Math.ceil(s) + 1, Math.ceil(s) + 1);
+    if (ch === 'x') { g.fillStyle = 'rgba(20,16,10,.55)'; g.fillRect(q * s + s * 0.2, r * s + s * 0.4, s * 0.6, s * 0.2); }
+  }
+  // a soft relief: darker under walls, rocks and woods, so shapes read at a glance
+  g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgba(30,26,18,.18)';
+  for (let r = 0; r < G.H; r++) for (let q = 0; q < G.W; q++) { const t = TILES[G.map[r][q]]; if (t && !t.sight) g.fillRect(q * s + s * 0.35, r * s + s * 0.35, s, s); }
+  g.globalCompositeOperation = 'source-over';
+  return c;
+}
+function mmSync() {
+  if (!MM.el) return;
+  const G = UI.G, inGame = UI.screen === 'game' && G && !G.over && !UI.intro && !UI.film;
+  MM.el.hidden = !(inGame && MM.on);
+  $('#bMap').setAttribute('aria-pressed', String(!!MM.on));
+}
+function mmToggle(force) {
+  MM.on = force != null ? force : !MM.on;
+  SAVE.minimap = MM.on; persist();
+  if (MM.on && UI.G) { MM.G = null; }
+  mmSync(); sfx('click');
+}
+function mmInit() {
+  MM.el = $('#minimap'); MM.cv = $('#mmCv'); MM.g = MM.cv.getContext('2d');
+  if (MM.on == null) MM.on = SAVE.minimap != null ? SAVE.minimap : matchMedia('(min-width: 900px) and (min-height: 560px)').matches;
+  const toWorld = e => {
+    const b = MM.cv.getBoundingClientRect();
+    return { x: clamp((e.clientX - b.left) / MM.s, 0, MM.G.W) * TILE, y: clamp((e.clientY - b.top) / MM.s, 0, MM.G.H) * TILE };
+  };
+  MM.cv.addEventListener('pointerdown', e => {
+    if (!MM.G || !UI.G) return;
+    e.preventDefault(); e.stopPropagation(); MM.drag = true;
+    try { MM.cv.setPointerCapture(e.pointerId); } catch (_) { }
+    const w = toWorld(e); VIEW.centerOn(UI.G, w.x, w.y, false);
+  });
+  MM.cv.addEventListener('pointermove', e => { if (!MM.drag || !UI.G) return; const w = toWorld(e); VIEW.centerOn(UI.G, w.x, w.y, true); });
+  const up = () => { MM.drag = false; };
+  MM.cv.addEventListener('pointerup', up); MM.cv.addEventListener('pointercancel', up);
+  MM.cv.addEventListener('contextmenu', e => e.preventDefault());
+  addEventListener('resize', () => { if (MM.G) mmLayout(); });
+}
+function mmTick(dt) {
+  const G = UI.G;
+  mmSync();
+  if (MM.el.hidden) return;
+  if (MM.G !== G) { MM.G = G; mmLayout(); }
+  MM.fps -= dt; if (MM.fps > 0) return; MM.fps = 1 / 20;
+  MM.sigT -= dt;
+  if (!MM.terr || MM.sigT <= 0) {
+    MM.sigT = 0.5;
+    const sig = G.map.map(r => r.join('')).join('');
+    if (sig !== MM.sig || !MM.terr) { MM.sig = sig; MM.terr = mmTerrain(G); }
+  }
+  const g = MM.g, s = MM.s * MM.dpr, T = UI.T, P = v => v / TILE * s, lw = MM.dpr;
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.drawImage(MM.terr, 0, 0);
+  const night = G.M.light === 'night' || G.M.light === 'dusk';
+  if (night) { g.fillStyle = 'rgba(8,12,30,.28)'; g.fillRect(0, 0, MM.cv.width, MM.cv.height); }
+
+  // the current objective: a pulsing gold frame, or rings round its targets
+  const cur = UI.currentObjective(G), pulse = 0.55 + 0.45 * Math.sin(T * 4);
+  if (cur) {
+    g.strokeStyle = `rgba(232,196,96,${0.55 + 0.45 * pulse})`; g.lineWidth = 1.6 * lw; g.setLineDash([3 * lw, 2 * lw]);
+    if (cur.type === 'reach') { const [zc, zr, zw, zh] = cur.zone; g.strokeRect(zc * s + lw, zr * s + lw, zw * s - 2 * lw, zh * s - 2 * lw); }
+    g.setLineDash([]);
+    const ring = (x, y) => { g.beginPath(); g.arc(P(x), P(y), (2.2 + pulse * 1.4) * lw * Math.max(1, MM.s / 4), 0, TAU); g.stroke(); };
+    if (cur.type === 'kill') for (const id of cur.targets) { const e = G.enemies.find(x => x.id === id); if (e && e.alive) ring(e.x, e.y); }
+    if (cur.type === 'destroy') for (const id of cur.targets) { const b = G.objects.find(x => x.id === id); if (b && !b.destroyed) ring(b.x, b.y); }
+    if (cur.type === 'collect') { const b = G.objects.find(x => x.id === cur.target); if (b && !b.collected) ring(b.x, b.y); }
+  }
+
+  // bodies the guards could still stumble on
+  g.fillStyle = 'rgba(30,24,18,.75)';
+  for (const e of G.enemies) if (!e.alive && !e.dummy && !e.carriedBy && !e.sunk) { g.fillRect(P(e.x) - 1.2 * lw, P(e.y) - 1.2 * lw, 2.4 * lw, 2.4 * lw); }
+
+  // the guards: a faint wedge of what they watch, a dot, and the colour of their mood
+  const dotR = Math.max(1.6, MM.s * 0.42) * lw;
+  for (const e of G.enemies) {
+    if (!e.alive || e.dummy) continue;
+    const hot = e.state === 'alert' || e.state === 'combat', sus = e.state === 'suspicious';
+    const x = P(e.x), y = P(e.y);
+    const R = P(effRange(G, e)), fov = effFov(e);
+    g.fillStyle = hot ? 'rgba(232,80,50,.22)' : sus ? 'rgba(232,196,58,.2)' : 'rgba(120,210,110,.13)';
+    g.beginPath(); g.moveTo(x, y); g.arc(x, y, R, e.facing - fov / 2, e.facing + fov / 2); g.closePath(); g.fill();
+    g.fillStyle = 'rgba(10,10,8,.85)'; g.beginPath(); g.arc(x, y, dotR + lw, 0, TAU); g.fill();
+    g.fillStyle = hot ? (Math.sin(T * 12) > 0 ? '#ff5a3a' : '#c8402f') : sus ? '#e8c43a' : e.trainer ? '#9fb4c8' : '#c8402f';
+    g.beginPath(); g.arc(x, y, dotR, 0, TAU); g.fill();
+  }
+
+  // the guard you are looking at: his round
+  const ie = INSPECT.e;
+  if (ie && ie.alive) {
+    const route = patrolRoute(G, ie);
+    if (route) {
+      g.strokeStyle = 'rgba(255,120,90,.95)'; g.lineWidth = 1.3 * lw; g.setLineDash([2 * lw, 2 * lw]); g.lineDashOffset = -T * 8 * lw;
+      g.beginPath(); route.forEach((p, i) => { if (i) g.lineTo(P(p.x), P(p.y)); else g.moveTo(P(p.x), P(p.y)); }); g.stroke(); g.setLineDash([]);
+    }
+    g.strokeStyle = '#f6efdc'; g.lineWidth = 1.2 * lw; g.beginPath(); g.arc(P(ie.x), P(ie.y), dotR + 2.6 * lw, 0, TAU); g.stroke();
+  }
+
+  // the squad: gold, the selected men ringed in white
+  for (const u of G.units) {
+    if (!u.alive) continue;
+    const x = P(u.x), y = P(u.y), sel = UI.sel.includes(u);
+    g.fillStyle = 'rgba(10,10,8,.9)'; g.beginPath(); g.arc(x, y, dotR + 1.2 * lw, 0, TAU); g.fill();
+    g.fillStyle = u.crawl ? '#b8913c' : '#e6bd5c'; g.beginPath(); g.arc(x, y, dotR + 0.3 * lw, 0, TAU); g.fill();
+    if (sel) { g.strokeStyle = '#f6efdc'; g.lineWidth = 1.2 * lw; g.beginPath(); g.arc(x, y, dotR + 2.6 * lw, 0, TAU); g.stroke(); }
+  }
+
+  // what the camera sees: the four screen corners laid on the ground
+  try {
+    const top = Math.max(0, V.insetTop || 0), bot = V.h - Math.max(0, V.insetBottom || 0);
+    const pts = [[0, top], [V.w, top], [V.w, bot], [0, bot]].map(([sx, sy]) => VIEW.pick(sx, sy));
+    if (pts.every(p => p && isFinite(p.x) && isFinite(p.y))) {
+      g.strokeStyle = 'rgba(246,239,220,.85)'; g.lineWidth = 1.1 * lw;
+      g.beginPath(); pts.forEach((p, i) => { const fx = P(p.x), fy = P(p.y); if (i) g.lineTo(fx, fy); else g.moveTo(fx, fy); }); g.closePath(); g.stroke();
+    }
+  } catch (e) { }
+
+  // a thin red pulse at the edge while the alarm sounds
+  if (G.alarmFlash > 0) { g.strokeStyle = `rgba(220,60,40,${0.5 + 0.4 * Math.sin(T * 10)})`; g.lineWidth = 3 * lw; g.strokeRect(1.5 * lw, 1.5 * lw, MM.cv.width - 3 * lw, MM.cv.height - 3 * lw); }
 }
 
 /* ---------------- pointer input ---------------- */
 const PTR = new Map();
-let gest = { drag: false, pinch: false, dist0: 0, z0: 1, mid: null };
+let gest = { drag: false, pinch: false, long: false, lpT: 0, dist0: 0, z0: 1, mid: null };
+// a light tap of the phone's motor when an order is taken, a stronger one when things go wrong (Android only)
+function buzz(p) { try { if (UI.touch && SAVE.sound && navigator.vibrate) navigator.vibrate(p); } catch (e) { } }
+// after a quick swipe the view keeps gliding for a moment, like a map pushed across a table
+function stepFling(dt) {
+  const f = UI.fling; if (!f) return;
+  if (PTR.size || UI.screen !== 'game' || UI.intro) { UI.fling = null; return; }
+  VIEW.pan(f.vx * dt, f.vy * dt);
+  const k = Math.exp(-dt * 4.2); f.vx *= k; f.vy *= k;
+  if (Math.hypot(f.vx, f.vy) < 25) UI.fling = null;
+}
 function setupInput() {
   const cv = V.cv;
   cv.addEventListener('pointerdown', e => {
     if (UI.screen !== 'game') return;
     try { cv.setPointerCapture(e.pointerId); } catch (_) { }
-    PTR.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, rot: e.button === 2 });
+    if (e.pointerType === 'touch') UI.touch = true;
+    UI.fling = null;
+    PTR.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, rot: e.button === 2, touch: e.pointerType === 'touch', t: performance.now(), vx: 0, vy: 0 });
     if (PTR.size === 1) {
       gest.drag = false; gest.pinch = false; gest.long = false;
       clearTimeout(gest.lpT);
@@ -7235,7 +8108,7 @@ function setupInput() {
           const h = hitScreen(UI.G.enemies.filter(x => x.alive && !x.dummy), sx, sy, 36, 0.6);
           if (!h) return;
           gest.long = true; INSPECT.e = h; INSPECT.t = 3.5; sfx('click');
-          try { navigator.vibrate && navigator.vibrate(12); } catch (_) { }
+          buzz(12);
         }, 430);
       }
     } else clearTimeout(gest.lpT);
@@ -7243,30 +8116,39 @@ function setupInput() {
       const [a, b] = [...PTR.values()];
       gest.pinch = true; gest.dist0 = Math.hypot(a.x - b.x, a.y - b.y); gest.s0 = VIEW.size();
       gest.mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; gest.ang = Math.atan2(b.y - a.y, b.x - a.x);
+      gest.twistAcc = 0; gest.twisting = false;
     }
   });
   cv.addEventListener('pointermove', e => {
     const p = PTR.get(e.pointerId); if (!p || UI.screen !== 'game') return;
-    const dx = e.clientX - p.x, dy = e.clientY - p.y;
-    p.x = e.clientX; p.y = e.clientY;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y, now = performance.now(), dts = Math.max(1, now - p.t) / 1000;
+    p.x = e.clientX; p.y = e.clientY; p.t = now;
+    // smoothed finger speed, for the glide after a swipe
+    p.vx = p.vx * 0.6 + (dx / dts) * 0.4; p.vy = p.vy * 0.6 + (dy / dts) * 0.4;
     if (PTR.size >= 2) {
       const [a, b] = [...PTR.values()];
       const d = Math.hypot(a.x - b.x, a.y - b.y), mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
       VIEW.zoomScale(gest.s0, d / (gest.dist0 || 1), mid);
       VIEW.pan(mid.x - gest.mid.x, mid.y - gest.mid.y);
-      const ang = Math.atan2(b.y - a.y, b.x - a.x);
-      VIEW.twist(angNorm(ang - gest.ang)); gest.ang = ang;
+      // a pinch should only zoom: the view turns only once the fingers clearly twist
+      const ang = Math.atan2(b.y - a.y, b.x - a.x), da = angNorm(ang - gest.ang); gest.ang = ang;
+      if (gest.twisting) VIEW.twist(da);
+      else { gest.twistAcc += da; if (Math.abs(gest.twistAcc) > 0.24) { gest.twisting = true; VIEW.twist(gest.twistAcc * 0.5); } }
       gest.mid = mid; return;
     }
-    if (!gest.drag && Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > 9) gest.drag = true;
+    if (!gest.drag && Math.hypot(e.clientX - p.sx, e.clientY - p.sy) > (p.touch ? 12 : 9)) gest.drag = true;
     if (gest.drag) { if (p.rot) VIEW.twist(dx * 0.008); else VIEW.pan(dx, dy); }
   });
   const end = e => {
     const p = PTR.get(e.pointerId); if (!p) return;
     PTR.delete(e.pointerId);
     clearTimeout(gest.lpT);
-    if (e.type === 'pointerup' && !gest.drag && !gest.pinch && !gest.long && PTR.size === 0 && UI.screen === 'game') mapTap(e.clientX, e.clientY);
-    if (PTR.size === 0) { gest.drag = false; gest.pinch = false; gest.long = false; }
+    if (e.type === 'pointerup' && !gest.drag && !gest.pinch && !gest.long && PTR.size === 0 && UI.screen === 'game') mapTap(e.clientX, e.clientY, p.touch);
+    // a swipe that is still moving when the finger lifts keeps the map gliding
+    if (e.type === 'pointerup' && gest.drag && !gest.pinch && !p.rot && PTR.size === 0 && performance.now() - p.t < 60 && Math.hypot(p.vx, p.vy) > 320) {
+      const s = Math.min(1, 2600 / Math.hypot(p.vx, p.vy)); UI.fling = { vx: p.vx * s, vy: p.vy * s };
+    }
+    if (PTR.size === 0) { gest.drag = false; gest.pinch = false; gest.twisting = false; gest.long = false; }
   };
   cv.addEventListener('pointerup', end);
   cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') INSPECT.mouse = { x: e.clientX, y: e.clientY }; });
@@ -7289,6 +8171,7 @@ function onKey(e) {
     return;
   }
   const G = UI.G; if (!G) return;
+  if (UI.film) { if (k === 'escape' || k === ' ' || k === 'enter') { e.preventDefault(); filmEnd(true); } return; }
   if (UI.intro) { endIntro(); return; }
   if (e.key === 'F5') { e.preventDefault(); quickSave(); return; }
   if (e.key === 'F9') { e.preventDefault(); quickLoad(); return; }
@@ -7313,7 +8196,7 @@ function onKey(e) {
   if (a && (u.R.abilities.includes(a) || a === 'crawl')) onAbility(a);
 }
 function togglePause() {
-  const G = UI.G; if (!G || G.over || UI.intro) return;
+  const G = UI.G; if (!G || G.over || UI.intro || UI.film) return;
   G.paused = !G.paused;
   $('#pause').hidden = !G.paused; syncQuick();
   if (G.paused) setTimeout(() => $('#bResume').focus(), 0);
@@ -7326,7 +8209,7 @@ function syncQuick() {
   if (b) { b.disabled = !ok; b.querySelector('span').textContent = ok ? 'Riprendi da ' + fmtTime(UI.quick.t) : 'Nessun salvataggio'; }
 }
 function quickSave() {
-  const G = UI.G; if (!G || G.over || UI.intro) return;
+  const G = UI.G; if (!G || G.over || UI.intro || UI.film) return;
   try { UI.quick = { snap: cloneGame(G), mi: UI.mi, t: G.time }; } catch (e) { toast('Salvataggio non riuscito.', 'bad'); return; }
   toast('Partita salvata · ' + fmtTime(G.time), 'good'); sfx('obj'); syncQuick();
 }
@@ -7410,6 +8293,7 @@ const ARCHIVE = [
   { id: 'enemy', label: 'Il nemico', html: () => `
     <p>L’esercito imperial-regio (k.u.k.) dell’Austria-Ungheria teneva le montagne e le linee dei fiumi. La sua fanteria era armata del fucile <b>Mannlicher M1895</b>, e le sue posizioni si reggevano sulla mitragliatrice raffreddata ad acqua <b>Schwarzlose M07/12</b>, l’arma che gli arditi impararono a temere e a prendere alle spalle.</p>
     <p>Anche l’Austria-Ungheria formò dal 1917 truppe d’assalto proprie, le Sturmtruppen; una circolare italiana del marzo 1917 ne avvertiva i comandi al fronte. A Caporetto, nell’ottobre 1917, reparti d’assalto tedeschi e austro-ungarici armati di mitragliatrici, bombe a mano e lanciafiamme sfondarono la linea italiana.</p>
+    <p>Entrambi gli eserciti impiegarono migliaia di cani: per portare messaggi sotto il fuoco, per trascinare carrette e soprattutto come sentinelle davanti alle trincee e lungo i fiumi, dove un buon cane sentiva una pattuglia molto prima di un uomo. Nel gioco i cani da guardia seguono il loro conduttore, fiutano chi striscia o si nasconde, trovano i corpi e abbaiano dando l’allarme.</p>
     <p>Nel gioco il fante nemico veste il grigio-azzurro da campo, porta l’elmetto d’acciaio M16, lo zaino con il pastrano arrotolato e il Mannlicher con la baionetta inastata. Gli ufficiali hanno il berretto morbido con visiera e, se ti avvistano, danno l’allarme su un’area più ampia.</p>
     <div class="tbl-wrap"><table class="dtab"><thead><tr><th>Livello</th><th>Vista</th><th>Rapidità nel notarti</th><th>Colpi retti</th><th>Rinforzi</th></tr></thead>
     <tbody>${DIFF_ORDER.map(k => { const d = DIFF[k]; return `<tr><td>${d.label}</td><td>${Math.round(d.vision * 100)}%</td><td>${Math.round(d.detect * 100)}%</td><td>${d.hp}</td><td>${d.reinf ? d.reinf + (d.reinf > 1 ? ' ondate' : ' ondata') : 'Nessuno'}</td></tr>`; }).join('')}</tbody></table></div>` },
@@ -7489,11 +8373,15 @@ function loop(ts) {
   try {
     musUpdate(dt);
     if (UI.screen === 'game' && UI.G) {
+      if (UI.film) filmStep(dt);
       if (UI.intro) stepIntro(dt);
+      stepFling(dt);
       if (UI.outro && UI.G && UI.G.over && VIEW.mode === '3d') { const O = UI.outro; O.t += dt; const k = Math.min(1, O.t / 3); R3.cam.size = O.size0 * (1 - 0.22 * k * k * (3 - 2 * k)); R3.cam.yawTo = R3.cam.yaw = O.yaw0 + 0.25 * k; } else if (UI.outro && (!UI.G || !UI.G.over)) UI.outro = null;
       step(UI.G, dt);
       ambTick(dt); perfWatch(dt); footsteps(dt);
-      VIEW.render(UI.G, UI, T);
+      // while the map film covers the screen, the battlefield is not drawn (once it has been built)
+      const covered = UI.film && UI.film.t > 0.8 && UI.film.t < UI.film.D - 0.8 && (VIEW.mode !== '3d' || R3.G === UI.G);
+      if (!covered) VIEW.render(UI.G, UI, T);
       hudTick(dt);
       mmTick(dt);
       inspectTick(dt);
@@ -7516,6 +8404,7 @@ function wire() {
   $('#bSoundTitle').onclick = toggleSound; $('#bSoundPause').onclick = toggleSound;
   $('#bGfxTitle').onclick = cycleGfx; $('#bGfxPause').onclick = cycleGfx;
   $('#bMusicTitle').onclick = musToggle; $('#bMusicPause').onclick = musToggle;
+  $('#bVoiceTitle').onclick = toggleVoice; $('#bVoicePause').onclick = toggleVoice;
   $('#bHelpTitle').onclick = () => { $('#help').hidden = false; $('#bHelpClose').focus(); };
   $('#bHelpPause').onclick = () => { $('#help').hidden = false; $('#bHelpClose').focus(); };
   $('#bHelpClose').onclick = () => { $('#help').hidden = true; };
@@ -7531,11 +8420,45 @@ function wire() {
   $('#bMap').onclick = () => { auInit(); mmToggle(); };
   $('#bObj').onclick = () => { const p = $('#objPanel'); p.hidden = !p.hidden; $('#bObj').setAttribute('aria-expanded', String(!p.hidden)); };
   $('#objPanel').onclick = () => { $('#objPanel').hidden = true; $('#bObj').setAttribute('aria-expanded', 'false'); };
-  $('#bHintClose').onclick = () => { const c = UI.currentObjective(UI.G); UI.hintClosedFor = c ? c.id : null; refreshHud(true); };
+  $('#bHintClose').onclick = e => { e.stopPropagation(); const c = UI.currentObjective(UI.G); UI.hintClosedFor = c ? c.id : null; refreshHud(true); };
+  $('#hint').onclick = () => { UI.hintMin = !UI.hintMin; UI.hintT = 0; refreshHud(true); };
   $('#bModeCancel').onclick = () => { UI.mode = 'move'; refreshHud(true); };
-  syncSoundButtons(); syncGfxButtons(); syncMusicButtons();
+  syncSoundButtons(); syncGfxButtons(); syncMusicButtons(); syncVoiceButtons();
   addEventListener('resize', () => { VIEW.resize(); if (UI.screen === 'game') measureInsets(); });
   document.addEventListener('visibilitychange', () => { if (document.hidden && UI.screen === 'game' && UI.G && !UI.G.paused && !UI.G.over) togglePause(); });
+}
+/* ---------------- playing offline: install the game, or download it as one file ---------------- */
+function setupOffline() {
+  const web = !!window.ARDITI_WEB, file = !!window.ARDITI_FILE, row = $('#offRow'), note = $('#offNote');
+  const standalone = (window.matchMedia && matchMedia('(display-mode: standalone), (display-mode: fullscreen)').matches) || navigator.standalone === true;
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const say = t => { note.hidden = !t; note.textContent = t || ''; };
+  if (file) { say('Versione da file: funziona senza internet.'); return; }
+  if (!web) return;
+  row.hidden = standalone; $('#bDownload').hidden = standalone;
+  const inst = $('#bInstall');
+  addEventListener('beforeinstallprompt', e => { e.preventDefault(); UI.installEvt = e; if (!standalone) { inst.hidden = false; row.hidden = false; } });
+  addEventListener('appinstalled', () => { inst.hidden = true; UI.installEvt = null; toast('Arditi è installato: lo trovi tra le tue app e funziona anche senza internet.', 'good'); });
+  if (ios && !standalone) { inst.hidden = false; inst.querySelector('span').textContent = 'Aggiungi alla Home'; }
+  inst.onclick = () => {
+    auInit(); sfx('click');
+    if (UI.installEvt) { UI.installEvt.prompt(); UI.installEvt.userChoice.then(() => { UI.installEvt = null; inst.hidden = true; }).catch(() => { }); }
+    else if (ios) toast('Su iPhone e iPad: tocca il pulsante Condividi di Safari e poi «Aggiungi alla schermata Home». Il gioco si aprirà a tutto schermo, anche senza internet.', 'info');
+  };
+  // once the whole game is stored on the device, say so (and a single time per version, show a note)
+  const online = () => navigator.onLine !== false;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('message', e => {
+      const d = e.data || {}; if (!d.offline) return;
+      UI.offlineReady = true;
+      say(online() ? 'Pronto anche senza internet: il gioco è salvato su questo dispositivo.' : 'Senza connessione: stai giocando offline.');
+      if (SAVE.offV !== d.v) { if (SAVE.offV) toast('Gioco aggiornato. Funziona anche senza internet.', 'good'); else toast('Il gioco ora funziona anche senza internet.', 'good'); SAVE.offV = d.v; persist(); }
+    });
+    const ask = () => navigator.serviceWorker.ready.then(r => { if (r.active) r.active.postMessage('ready?'); }).catch(() => { });
+    ask(); navigator.serviceWorker.addEventListener('controllerchange', ask);
+  }
+  addEventListener('offline', () => { if (UI.offlineReady) say('Senza connessione: stai giocando offline.'); });
+  addEventListener('online', () => { if (UI.offlineReady) say('Pronto anche senza internet: il gioco è salvato su questo dispositivo.'); });
 }
 function makeGrain() {
   try {
@@ -7549,7 +8472,7 @@ function boot(data) {
   makeGrain();
   initView();
   if (VIEW.mode !== '3d') $('#bRotate').hidden = true;
-  setupInput(); wire(); mmInit();
+  setupInput(); wire(); mmInit(); setupOffline();
   data = data || {};
   if (data.diff && DIFF[data.diff]) { SAVE.diff = data.diff; diffControl($('#diffTitle'), $('#diffTitleDesc')); }
   const mi = Number.isInteger(data.mi) && MISSIONS[data.mi] ? data.mi : 0;
@@ -7562,5 +8485,6 @@ function boot(data) {
 try { window.claude?.hot?.snapshot?.(() => ({ screen: UI.screen, mi: UI.mi, diff: SAVE.diff })); } catch (e) { }
 if (window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
 </script>
+<script>if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => { }));</script>
 </body>
 </html>
