@@ -9859,11 +9859,11 @@ function showMissions() {
 }
 
 /* ---------------- briefing ---------------- */
-const AMMO_WORDS = { carbine: ['colpo', 'colpi'], grenade: ['bomba a mano', 'bombe a mano'], charge: ['carica', 'cariche'], burst: ['caricatore', 'caricatori'], flame: ['vampata', 'vampate'], torpedo: ['siluro', 'siluri'], depth: ['bomba di profondità', 'bombe di profondità'] };
+const AMMO_WORDS = { carbine: ['colpo', 'colpi'], grenade: ['bomba a mano', 'bombe a mano'], charge: ['carica', 'cariche'], burst: ['caricatore', 'caricatori'], flame: ['vampata', 'vampate'], torpedo: ['siluro', 'siluri'], depth: ['bomba di profondità', 'bombe di profondità'], cannon: ['colpo di cannone', 'colpi di cannone'], ram: ['carica da 300 kg', 'cariche da 300 kg'] };
 function ammoLine(s) {
   const R = ROLES[s.role], base = Object.assign({}, R.ammo, s.ammo || {}), d = DIFF[SAVE.diff], parts = [];
   const sk = {}; for (const S of vetSkills(s.role, vetLevelOf(vetXp(vetKey(s))))) sk[S.key] = true;
-  for (const k in base) if (base[k] > 0) { const n = Math.max(1, Math.round(base[k] * d.ammo)) + (Object.keys(VET_AMMO).some(x => sk[x] && VET_AMMO[x] === k) ? 1 : 0); parts.push(`${n} ${((R.words && R.words[k]) || AMMO_WORDS[k])[n === 1 ? 0 : 1]}`); }
+  for (const k in base) if (base[k] > 0) { const n = Math.max(1, Math.round(base[k] * d.ammo)) + (Object.keys(VET_AMMO).some(x => sk[x] && VET_AMMO[x] === k) ? 1 : 0); parts.push(`${n} ${((R.words && R.words[k]) || AMMO_WORDS[k] || [k, k])[n === 1 ? 0 : 1]}`); }
   return parts.length ? `Porta ${parts.join(', ')}.` : '';
 }
 function showBrief(mi) {
