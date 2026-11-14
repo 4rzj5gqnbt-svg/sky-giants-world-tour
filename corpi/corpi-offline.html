@@ -4899,15 +4899,15 @@ const EXT = 14;      // tiles of scenery drawn past each edge of the playable ma
 let GK = 1.5;        // ground texture pixels per simulation pixel (shrinks on big maps)
 const L3 = {
   day:   { bg: 0x1a1e16, sky: 0xe4ecf0, gnd: 0x5c5a44, hemi: 0.82, sun: 0xfff0d8, sunI: 1.15, dir: [-0.45, 1, 0.55], water: 0x5f97a6, foam: 0xe6eee4, wEm: 0x000000, spark: 0.4, fog: [78, 130], cone: 0.18 },
-  dawn:  { bg: 0x1c1922, sky: 0xcfb9dd, gnd: 0x4a4036, hemi: 0.72, sun: 0xffb27a, sunI: 1.12, dir: [0.9, 0.5, 0.3], water: 0x6f8aa6, foam: 0xf2dccb, wEm: 0x0b0d16, spark: 0.34, fog: [74, 124], cone: 0.2 },
-  dusk:  { bg: 0x121119, sky: 0x8a7ea6, gnd: 0x2c2724, hemi: 0.6, sun: 0xff9a5c, sunI: 0.78, dir: [0.95, 0.34, -0.25], water: 0x5a6a80, foam: 0xd0c4c0, wEm: 0x0a0c14, spark: 0.3, fog: [70, 118], cone: 0.22 },
+  dawn:  { bg: 0x1a1c24, sky: 0xb4bed4, gnd: 0x4a4238, hemi: 0.72, sun: 0xffc68e, sunI: 1.1, dir: [0.9, 0.5, 0.3], water: 0x6f8aa6, foam: 0xf2dccb, wEm: 0x0b0d16, spark: 0.34, fog: [74, 124], cone: 0.2 },
+  dusk:  { bg: 0x121119, sky: 0x8c8aa8, gnd: 0x302a26, hemi: 0.66, sun: 0xffa466, sunI: 0.82, dir: [0.95, 0.34, -0.25], water: 0x5a6a80, foam: 0xd0c4c0, wEm: 0x0a0c14, spark: 0.3, fog: [70, 118], cone: 0.22 },
   night: { bg: 0x080b12, sky: 0x4a5c8c, gnd: 0x151515, hemi: 0.52, sun: 0xa4b8ff, sunI: 0.52, dir: [-0.3, 1, -0.45], water: 0x34507a, foam: 0x9fb4cc, wEm: 0x0d1a2c, spark: 0.2, fog: [66, 112], cone: 0.24 },
 };
 // the river's own colour where it is famous for it
 const WATER_STYLE = {
   emerald: { day: [0x3f9c8c, 0xe2f2e8], dawn: [0x4f9a94, 0xf4e2d4], night: [0x2c6070, 0x9fc0c8] },
   flood:   { day: [0x6e8472, 0xe8e6d4], dawn: [0x667c70, 0xf0e2cf], dusk: [0x56665e, 0xc8c2b8], night: [0x3e5060, 0xa8b0b8] },
-  sea:     { day: [0x3d6f8a, 0xe2ecf0], dawn: [0x4f6f8c, 0xf2e0d2], dusk: [0x3e5470, 0xcfc6c4], night: [0x1c3352, 0x8ea6c4] },
+  sea:     { day: [0x346c8e, 0xe2ecf0], dawn: [0x3e6890, 0xf2e0d2], dusk: [0x3e5470, 0xcfc6c4], night: [0x1c3352, 0x8ea6c4] },
   harbour: { day: [0x456c74, 0xdfe6e2], dawn: [0x52707a, 0xf0e2d2], dusk: [0x3e5560, 0xc8c4be], night: [0x203444, 0x8c9eae] },
 };
 const CONE_COL = { idle: 0x45c24e, returning: 0x45c24e, suspicious: 0xe8c43a, alert: 0xec8434, combat: 0xe23c2c };
@@ -4961,7 +4961,12 @@ function aoGeo(base, g) {
   const P = a.attributes.position, bb = a.boundingBox, h = Math.max(1e-4, bb.max.y - bb.min.y), col = new Float32Array(P.count * 3);
   const lo = { crown: 0.62, ico: 0.5, ico1: 0.5, sph: 0.5, cone: 0.55, dod: 0.62, tuft: 0.45, bag: 0.62, box: 0.78, cyl: 0.72, cyl8: 0.75, stone: 0.7, torus: 1 }[base.startsWith('crown') ? 'crown' : base.startsWith('rock') ? 'stone' : base] || 0.8;
   const tint = g.userData && g.userData.tint;
-  for (let i = 0; i < P.count; i++) { const k = (P.getY(i) - bb.min.y) / h; let v = lo + (1 - lo) * smooth(k, 0, 0.85); if (tint) v *= tint[i]; col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = v; }
+  const trgb = g.userData && g.userData.tintRGB;
+  for (let i = 0; i < P.count; i++) {
+    const k = (P.getY(i) - bb.min.y) / h; let v = lo + (1 - lo) * smooth(k, 0, 0.85); if (tint) v *= tint[i];
+    if (trgb) { col[i * 3] = v * trgb[i * 3]; col[i * 3 + 1] = v * trgb[i * 3 + 1]; col[i * 3 + 2] = v * trgb[i * 3 + 2]; }
+    else col[i * 3] = col[i * 3 + 1] = col[i * 3 + 2] = v;
+  }
   a.setAttribute('color', new THREE.BufferAttribute(col, 3));
   AO_GEO.set(base + g.uuid, a); return a;
 }
@@ -5025,28 +5030,41 @@ function crownGeo(seed, kind, fine) {
   g.userData.tint = new Float32Array(tint);
   return g;
 }
-/* ---------- rocks: a ball broken into weathered faces, with bands of strata and dark cracks between them ---------- */
+/* ---------- rocks: a ball broken along a few fracture planes into flat faces, with lichen on the tops and dark cracks below ---------- */
 function rockGeo(seed, fine) {
   const g = new THREE.IcosahedronGeometry(1, fine ? 1 : 0), P = g.attributes.position, ph = seed * 1.37;
+  const rnd = (() => { let s = seed * 7919 + 104729; return () => { s = (s * 16807) % 2147483647; return (s - 1) / 2147483646; }; })();
   const key = (x, y, z) => vnoise(x * 1.7 + ph, z * 1.7 + y * 1.3) - 0.5;
+  // the fractures: planes that shear the rounded mass into facets, none of them on the underside
+  const cuts = [];
+  for (let k = 0, n = fine ? 7 : 5; k < n; k++) {
+    const a = rnd() * Math.PI * 2, el = -0.15 + rnd() * 1.2, c = Math.cos(el);
+    cuts.push([Math.cos(a) * c, Math.sin(el), Math.sin(a) * c, 0.6 + rnd() * 0.28]);
+  }
   for (let i = 0; i < P.count; i++) {
     const x = P.getX(i), y = P.getY(i), z = P.getZ(i);
     const n1 = key(x, y, z), n2 = vnoise(x * 3.9 - ph, y * 3.9 + z * 2.7) - 0.5;
-    let r = 1 + n1 * 0.55 + n2 * 0.18;
+    const r = 1 + n1 * 0.45 + n2 * 0.12;
+    let px = x * r, py = y * r, pz = z * r;
+    for (const [nx, ny, nz, d] of cuts) { const o = px * nx + py * ny + pz * nz - d; if (o > 0) { px -= o * nx; py -= o * ny; pz -= o * nz; } }
     // a flatter top, as limestone breaks along its beds
-    let yy = y * r; if (yy > 0.35) yy = 0.35 + (yy - 0.35) * 0.45;
-    P.setXYZ(i, x * r, yy, z * r);
+    if (py > 0.38) py = 0.38 + (py - 0.38) * 0.4;
+    P.setXYZ(i, px, py, pz);
   }
   g.computeVertexNormals();
-  // per face: the tops catch the light, the undersides and the cracks go dark, and the strata band across
-  const tint = new Float32Array(P.count);
+  // per face: the tops catch the light and carry lichen, the undersides and the cracks go dark, the strata band across
+  const tint = new Float32Array(P.count), rgb = new Float32Array(P.count * 3), N = g.attributes.normal;
   for (let f = 0; f < P.count; f += 3) {
-    const cy = (P.getY(f) + P.getY(f + 1) + P.getY(f + 2)) / 3, ny = (g.attributes.normal.getY(f) + g.attributes.normal.getY(f + 1) + g.attributes.normal.getY(f + 2)) / 3;
-    const n = vnoise(P.getX(f) * 5 + ph, P.getZ(f) * 5 + cy * 3) - 0.5;
-    const t = clamp(0.84 + ny * 0.16 + n * 0.26 + Math.sin(cy * 11 + ph) * 0.05, 0.55, 1.15);
-    tint[f] = tint[f + 1] = tint[f + 2] = t;
+    const cy = (P.getY(f) + P.getY(f + 1) + P.getY(f + 2)) / 3, ny = (N.getY(f) + N.getY(f + 1) + N.getY(f + 2)) / 3;
+    const fx = (P.getX(f) + P.getX(f + 1) + P.getX(f + 2)) / 3, fz = (P.getZ(f) + P.getZ(f + 1) + P.getZ(f + 2)) / 3;
+    const n = vnoise(fx * 5 + ph, fz * 5 + cy * 3) - 0.5, m = vnoise(fx * 3.1 - ph, fz * 3.1 + 9) ;
+    const t = clamp(0.8 + ny * 0.22 + n * 0.3 + Math.sin(cy * 11 + ph) * 0.05 - (ny < -0.2 ? 0.12 : 0), 0.5, 1.18);
+    // lichen and moss on the faces that look up, a warmer or cooler cast from face to face elsewhere
+    const lich = ny > 0.45 && m > 0.6 ? Math.min(1, (m - 0.6) * 4) : 0, warm = n * 0.12;
+    const r = (1 + warm) * (1 - lich * 0.06), gg = 1 + lich * 0.01, b = (1 - warm) * (1 - lich * 0.14);
+    for (let v = f; v < f + 3; v++) { tint[v] = t; rgb[v * 3] = r; rgb[v * 3 + 1] = gg; rgb[v * 3 + 2] = b; }
   }
-  g.userData.tint = tint;
+  g.userData.tint = tint; g.userData.tintRGB = rgb;
   return g;
 }
 function rocks(fine) {
@@ -5206,6 +5224,16 @@ function initR3(canvas) {
     if (!r.getContext()) return false;
     r.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
     r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap;
+    // highlights roll off instead of burning to white: below the knee nothing changes
+    const TM0 = 'vec3 CustomToneMapping( vec3 color ) { return color; }', TS = THREE.ShaderChunk.tonemapping_pars_fragment;
+    if (THREE.CustomToneMapping && TS && TS.includes(TM0)) {
+      THREE.ShaderChunk.tonemapping_pars_fragment = TS.replace(TM0, `vec3 CustomToneMapping( vec3 color ) {
+  color *= toneMappingExposure;
+  vec3 k = vec3(0.72), over = max(color - k, 0.0);
+  return min(color, k) + (1.0 - k) * (1.0 - exp(-over / (1.0 - k)));
+}`);
+    }
+    if (THREE.ShaderChunk.tonemapping_pars_fragment.includes('vec3(0.72)')) { r.toneMapping = THREE.CustomToneMapping; r.toneMappingExposure = 1; }
     R3.renderer = r;
     R3.Q = QUALITY[(typeof SAVE !== 'undefined' && SAVE.gfx) || 'alta'] || QUALITY.alta;
   } catch (e) { return false; }
@@ -5329,8 +5357,8 @@ function r3Grade(G) {
   if (kind === 'rain') { sat *= 0.88; gain = gain.map((g, i) => g * [0.97, 0.99, 1.03][i]); }
   if (kind === 'storm') { sat *= 0.8; con *= 1.08; gain = gain.map((g, i) => g * [0.94, 0.97, 1.04][i]); vig = 0.62; }
   if (kind === 'snow') { sat *= 0.86; gain = gain.map((g, i) => g * [0.98, 1.0, 1.05][i]); lift = [0.02, 0.025, 0.035]; con = 1.04; }
-  if (kind === 'fog') { sat *= 0.72; con *= 0.9; lift = [0.05, 0.05, 0.05]; gain = [0.93, 0.94, 0.95]; vig = 0.3; }
-  if (kind === 'ash') { sat *= 0.82; gain = [1.0, 0.97, 0.93]; }
+  if (kind === 'fog') { sat *= 0.82; con *= 0.95; lift = [0.03, 0.03, 0.032]; gain = [0.95, 0.96, 0.97]; vig = 0.34; }
+  if (kind === 'ash') { sat *= 0.84; gain = [1.0, 0.98, 0.955]; }
   U.uSat.value = sat; U.uContrast.value = con; U.uVig.value = vig;
   // how much glows: lanterns and fires at night; on the snow and in the fog only the very brightest
   const dark = lt === 'night' || lt === 'dusk' || kind === 'storm';
@@ -5503,7 +5531,9 @@ function buildGround(G, root) {
   const tex = own(new THREE.CanvasTexture(cv));
   tex.anisotropy = Math.min(Q.aniso, R3.renderer.capabilities.getMaxAnisotropy());
   R3.gCanvas = cv; R3.gCtx = ctx; R3.gTex = tex;
-  const mat = own(new THREE.MeshLambertMaterial({ map: tex }));
+  // pale ground (sand, limestone, snow) is toned down a little so the sun does not burn it white
+  const gx = G.M.winter ? 0.92 : G.M.ground === 'desert' ? 0.78 : G.M.fill === ':' ? 0.84 : 1;
+  const mat = own(new THREE.MeshLambertMaterial({ map: tex, color: new THREE.Color(gx, gx, gx * (G.M.ground === 'desert' ? 0.96 : 1)) }));
   if (Q.detail) groundDetail(mat, Wt, Ht);
   enhanceMat(mat, 0, 'ground' + (Q.detail ? 'd' : ''));
   const mesh = new THREE.Mesh(g, mat); mesh.receiveShadow = true;
@@ -5559,7 +5589,7 @@ function waterTex(spark) {
   let s = spark ? 77 : 31; const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
   if (!spark) {
     for (let i = 0; i < 70; i++) {
-      const x = rnd() * S, y = rnd() * S, r = 14 + rnd() * 34, a = 0.05 + rnd() * 0.08, dark = rnd() < 0.55;
+      const x = rnd() * S, y = rnd() * S, r = 14 + rnd() * 34, a = 0.03 + rnd() * 0.05, dark = rnd() < 0.55;
       wrap(() => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, dark ? `rgba(40,70,80,${a})` : `rgba(255,255,255,${a})`); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, r * 1.6, r, 0, 0, TAU); g.fill(); });
     }
   }
@@ -5571,16 +5601,65 @@ function waterTex(spark) {
   const t = own(new THREE.CanvasTexture(cv)); t.wrapS = t.wrapT = THREE.RepeatWrapping;
   return t;
 }
-// the river surface: long sheen bands that drift with the current, and rings where raindrops land
+// the water surface: a swell of moving waves that catch the sun or the moon, darker and lighter patches,
+// whitecaps on the open sea, surf running in to the shore, and rings where raindrops land
+function waterU() {
+  if (!R3.wU) R3.wU = { uSunDir: { value: new THREE.Vector3(0, 1, 0) }, uSunCol: { value: new THREE.Color() }, uSkyCol: { value: new THREE.Color() }, uFoamCol: { value: new THREE.Color() }, uOpen: { value: 0 }, uGlit: { value: 1 }, uSwell: { value: 1 }, uSurf: { value: 0.4 } };
+  return R3.wU;
+}
 function waterEnhance(m) {
   enhanceMat(m, 0, 'water');
-  const prev = m.onBeforeCompile, U = { uRain: R3.rainK, uSheen: R3.sheenK };
+  const prev = m.onBeforeCompile, U = Object.assign({ uRain: R3.rainK, uSheen: R3.sheenK }, waterU());
   m.onBeforeCompile = (sh, r) => {
     prev(sh, r); Object.assign(sh.uniforms, U);
-    sh.fragmentShader = 'uniform float uRain, uSheen;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
-  { vec2 wp = vWorldG.xz;
+    sh.vertexShader = 'attribute float aShore;\nvarying float vShore;\n' + sh.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\n  vShore = aShore;');
+    sh.fragmentShader = 'uniform float uRain, uSheen, uOpen, uGlit, uSwell, uSurf;\nuniform vec3 uSunDir, uSunCol, uSkyCol, uFoamCol;\nvarying float vShore;\n' + sh.fragmentShader.replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+  { vec2 wp = vWorldG.xz; float t = uTimeE;
+    // the swell: three trains of long waves, stronger and weaker in patches, and a two-scale chop on top
+    vec2 D1 = vec2(0.8, 0.6), D2 = vec2(-0.45, 0.89), D3 = vec2(0.97, -0.24);
+    float p1 = dot(D1, wp) * 1.25 + t * 1.05, p2 = dot(D2, wp) * 2.1 + t * 1.45, p3 = dot(D3, wp) * 3.6 + t * 2.1;
+    float am = 0.35 + 0.9 * vn2(wp * 0.11 + vec2(t * 0.03, -t * 0.02));
+    vec2 gr = (D1 * cos(p1) * 0.13 + D2 * cos(p2) * 0.12 + D3 * cos(p3) * 0.1) * am;
+    float hgt = (sin(p1) * 0.5 + sin(p2) * 0.3 + sin(p3) * 0.2) * am;
+    float e = 0.08;
+    vec2 cp = wp * 1.6 + vec2(t * 0.2, -t * 0.13);
+    float c0 = vn2(cp), cx = vn2(cp + vec2(e, 0.0)), cz = vn2(cp + vec2(0.0, e));
+    gr += vec2(cx - c0, cz - c0) / e * 0.1;
+    vec2 cq = wp * 4.1 + vec2(-t * 0.31, t * 0.27);
+    float d0 = vn2(cq), dx = vn2(cq + vec2(e, 0.0)), dz = vn2(cq + vec2(0.0, e));
+    gr += vec2(dx - d0, dz - d0) / e * 0.07;
+    gr *= uSwell;
+    vec3 N = normalize(vec3(-gr.x, 1.0, -gr.y));
+    vec3 Vw = normalize(vec3(viewMatrix[0][2], viewMatrix[1][2], viewMatrix[2][2]));
+    vec3 Ls = normalize(vec3(uSunDir.x, max(uSunDir.y, 0.25), uSunDir.z));
+    // light and shade on the faces of the waves
+    float sl = dot(N, Ls) - Ls.y;
+    diffuseColor.rgb *= 1.0 + sl * 0.9;
+    // deeper and shallower water: broad patches drifting very slowly
+    float dp = vn2(wp * 0.05 + vec2(t * 0.004, 0.0)) * 0.6 + vn2(wp * 0.14 - vec2(0.0, t * 0.006)) * 0.4;
+    diffuseColor.rgb *= 0.82 + dp * 0.36;
+    // the sky in the water, stronger on the faces that tilt away from us
+    float fr = pow(1.0 - clamp(dot(N, Vw), 0.0, 1.0), 2.0);
+    totalEmissiveRadiance += uSkyCol * fr * 0.2 * (0.5 + 0.5 * uGlit);
+    // glitter: only the facets tipped towards the sun (or the moon) flash, twinkling as the chop moves
+    vec2 sd = length(uSunDir.xz) > 0.01 ? normalize(uSunDir.xz) : vec2(0.0, 1.0);
+    vec3 Hh = normalize(vec3(sd.x * 0.3, 1.0, sd.y * 0.3)); float nh = max(dot(N, Hh), 0.0);
+    float tw = vn2(wp * 6.5 + vec2(t * 1.4, -t * 0.9));
+    totalEmissiveRadiance += uSunCol * (pow(nh, 110.0) * (0.2 + 1.9 * smoothstep(0.6, 0.92, tw)) + pow(nh, 12.0) * 0.04) * uGlit;
+    // whitecaps on the open sea: short streaks on the crests
+    if (uOpen > 0.0) {
+      float wc = vn2(wp * vec2(0.6, 1.5) + vec2(t * 0.35, t * 0.1)) * 0.6 + vn2(wp * 3.3 + t * 0.4) * 0.4;
+      float cap = smoothstep(0.7, 0.82, wc * (0.8 + 0.25 * hgt)) * smoothstep(0.45, 0.85, vn2(wp * 7.0 - t * 0.3));
+      diffuseColor.rgb = mix(diffuseColor.rgb, uFoamCol, cap * min(uOpen, 1.0) * 0.75);
+    }
+    // the surf: bands of foam running in to the shore
+    if (vShore > 0.01) {
+      float nb = vn2(wp * 1.7 + t * 0.05);
+      float band = smoothstep(0.55, 1.0, sin(vShore * 9.0 - t * 1.3 + nb * 5.0) * 0.5 + 0.5) * smoothstep(0.2, 0.95, vShore);
+      diffuseColor.rgb = mix(diffuseColor.rgb, uFoamCol, band * uSurf);
+    }
     float sk = vn2(wp * vec2(0.09, 0.45) + vec2(uTimeE * 0.06, 0.0)) * 0.7 + vn2(wp * vec2(0.3, 1.1) - vec2(uTimeE * 0.11, 0.0)) * 0.3;
-    totalEmissiveRadiance += vec3(0.75, 0.82, 0.9) * smoothstep(0.55, 0.85, sk) * 0.07 * uSheen;
+    totalEmissiveRadiance += vec3(0.75, 0.82, 0.9) * smoothstep(0.55, 0.85, sk) * 0.05 * uSheen;
     if (uRain > 0.0) {
       for (int j = 0; j < 2; j++) {
         vec2 q = wp * (2.4 + float(j) * 1.3) + float(j) * 17.0; vec2 cell = floor(q); vec2 f = fract(q) - 0.5;
@@ -5590,7 +5669,7 @@ function waterEnhance(m) {
       }
     } }`);
   };
-  const k = m.customProgramCacheKey(); m.customProgramCacheKey = () => k + '-ripple';
+  const k = m.customProgramCacheKey(); m.customProgramCacheKey = () => k + '-sea2';
 }
 function buildWater(G, root, L) {
   const isW = (c, r) => isWaterCh(vch(G, c, r));
@@ -5599,10 +5678,10 @@ function buildWater(G, root, L) {
   const pal = ws ? ws[G.M.light] || ws.day : [L.water, L.foam];
   const cw = new THREE.Color(pal[0]), cf = new THREE.Color(pal[1]), cm = cw.clone().lerp(cf, 0.5), y = -0.14, EX = 0.42;
   const cs = cw.clone().lerp(cf, 0.25); // fords run pale over the shingle
-  const pos = [], col = [], uv = [], idx = [];
-  const quad = (x0, z0, x1, z1, c00, c10, c01, c11) => {
+  const pos = [], col = [], uv = [], idx = [], shr = [];
+  const quad = (x0, z0, x1, z1, c00, c10, c01, c11, s00 = 1, s10 = 1, s01 = 1, s11 = 1) => {
     const n = pos.length / 3;
-    pos.push(x0, y, z0, x1, y, z0, x0, y, z1, x1, y, z1);
+    pos.push(x0, y, z0, x1, y, z0, x0, y, z1, x1, y, z1); shr.push(s00, s10, s01, s11);
     for (const c of [c00, c10, c01, c11]) col.push(c.r, c.g, c.b);
     uv.push(x0 / 3, -z0 / 3, x1 / 3, -z0 / 3, x0 / 3, -z1 / 3, x1 / 3, -z1 / 3);
     idx.push(n, n + 2, n + 1, n + 1, n + 2, n + 3);
@@ -5612,7 +5691,8 @@ function buildWater(G, root, L) {
     const ford = vch(G, c, r) === '_';
     const k = (cx, cz) => shoreAt(cx, cz) ? cm : ford ? cs : cw;
     const a = k(c, r), b = k(c + 1, r), d = k(c, r + 1), e = k(c + 1, r + 1);
-    quad(c, r, c + 1, r + 1, a, b, d, e);
+    const sv = (cx, cz) => shoreAt(cx, cz) ? 1 : 0;
+    quad(c, r, c + 1, r + 1, a, b, d, e, sv(c, r), sv(c + 1, r), sv(c, r + 1), sv(c + 1, r + 1));
     if (!isW(c - 1, r)) quad(c - EX, r, c, r + 1, cf, a, cf, d);
     if (!isW(c + 1, r)) quad(c + 1, r, c + 1 + EX, r + 1, b, cf, e, cf);
     if (!isW(c, r - 1)) quad(c, r - EX, c + 1, r, cf, cf, a, b);
@@ -5623,12 +5703,24 @@ function buildWater(G, root, L) {
   g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
   g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setAttribute('aShore', new THREE.Float32BufferAttribute(shr, 1));
   g.setIndex(idx); g.computeVertexNormals();
+  // the light the waves play with: the sun or the moon, the sky they mirror, the foam on the open sea
+  const U = waterU(), dn = Math.hypot(...L.dir), sty = G.M.style && G.M.style.water, wk = G.wx ? G.wx.kind : 'clear', wind = G.wx ? G.wx.wind : 0.3;
+  U.uSunDir.value.set(L.dir[0] / dn, L.dir[1] / dn, L.dir[2] / dn);
+  U.uSunCol.value.set(L.sun).multiplyScalar(L.sunI);
+  U.uSkyCol.value.set(L.sky).multiplyScalar(L.hemi);
+  U.uFoamCol.value.copy(cf);
+  U.uOpen.value = (sty === 'sea' ? 1 : sty === 'harbour' ? 0.3 : 0) * (0.4 + wind * 1.2);
+  U.uSwell.value = sty === 'sea' ? 0.8 + wind * 0.6 : sty === 'harbour' ? 0.65 : 0.5;
+  const nightK = G.M.light === 'night' ? 0.55 : G.M.light === 'dusk' || G.M.light === 'dawn' ? 0.8 : 1;
+  U.uGlit.value = (wk === 'rain' || wk === 'storm' ? 0.35 : wk === 'fog' ? 0.3 : wk === 'haze' ? 0.6 : 1) * (G.M.light === 'night' ? 0.75 : nightK);
+  U.uSurf.value = 0.42 * nightK;
   const tex = waterTex(false), glint = waterTex(true);
   const m = own(new THREE.MeshLambertMaterial({ map: tex, vertexColors: true, emissive: L.wEm, transparent: true, opacity: 0.9, depthWrite: false }));
   waterEnhance(m);
   const mesh = new THREE.Mesh(g, m); mesh.receiveShadow = true; mesh.renderOrder = 1; root.add(mesh);
-  const m2 = own(new THREE.MeshBasicMaterial({ map: glint, transparent: true, opacity: L.spark, blending: THREE.AdditiveBlending, depthWrite: false }));
+  const m2 = own(new THREE.MeshBasicMaterial({ map: glint, transparent: true, opacity: L.spark * 0.6, blending: THREE.AdditiveBlending, depthWrite: false }));
   const top = new THREE.Mesh(g, m2); top.position.y = 0.012; top.renderOrder = 2; root.add(top);
   R3.water = { mesh, tex, glint };
 }
@@ -5768,7 +5860,7 @@ function buildDecor(G, root) {
       const edge = !inside || c === 0 || r === 0 || c === G.W - 1 || r === G.H - 1;
       for (let k = 0; k < 2; k++) {
         const s = 0.55 + hs(k) * 0.35, hy = (edge ? 0.9 : 0.6) + hs(k + 3) * (edge ? 1.0 : 0.9);
-        const base = G.M.ground === 'desert' ? 0xa89474 : lime ? 0x948f80 : 0x6d695f, tone = shadeHex(base, (hs(k + 7) - 0.5) * 0.35);
+        const base = G.M.ground === 'desert' ? 0x96805e : lime ? 0x86826f : 0x6d695f, tone = shadeHex(base, (hs(k + 7) - 0.5) * 0.4);
         I.push('rock' + Math.floor(hs(k + 17) * 4), cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.3, cz + (hs(k + 13) - 0.5) * 0.5, (hs(k + 1) - 0.5) * 0.5, hs(k + 2) * 6, (hs(k + 4) - 0.5) * 0.5, s, hy * 0.62, s, tone);
         if (R3.snow) I.push('bag', cx + (hs(k + 11) - 0.5) * 0.5, gy + hy * 0.62, cz + (hs(k + 13) - 0.5) * 0.5, 0, hs(k + 2) * 6, 0, s * 0.8, hy * 0.16, s * 0.8, SNOWC);
       }
@@ -7871,7 +7963,7 @@ function buildWeather(G, root) {
   if (kind === 'fog' || kind === 'snow') {
     // two layers of drifting fog over the whole field, above the soldiers' heads and below the tree tops
     const sheets = [];
-    for (const [hgt, op, sc] of kind === 'fog' ? [[1.4, 0.5, 1], [2.6, 0.36, 1.7]] : [[2.2, 0.16, 1.3]]) {
+    for (const [hgt, op, sc] of kind === 'fog' ? [[1.4, 0.36, 1], [2.6, 0.26, 1.7]] : [[2.2, 0.16, 1.3]]) {
       const tex = fogTex().clone(); tex.needsUpdate = true; tex.wrapS = tex.wrapT = THREE.RepeatWrapping; own(tex);
       const span = 160; tex.repeat.set(span / (14 * sc), span / (14 * sc));
       const m = own(new THREE.MeshBasicMaterial({ map: tex, color: kind === 'fog' ? 0xdfe2e0 : 0xf2f5f8, transparent: true, opacity: op, depthWrite: false, fog: false }));
@@ -7982,10 +8074,10 @@ function r3Build(G) {
 // the weather changes the light: overcast for rain, near darkness under a storm, a white glare off the snow, a grey wall of fog
 function wxLight(L, kind, light) {
   const o = Object.assign({}, L), dark = light === 'night' || light === 'dusk';
-  if (kind === 'rain') Object.assign(o, { sun: 0xd9d6cf, sunI: L.sunI * 0.5, hemi: L.hemi * 1.12, sky: dark ? 0x7d8794 : 0xbfc4c8, gnd: 0x4a4a44, bg: dark ? 0x121418 : 0x1e2124, fog: [L.fog[0] - 8, L.fog[1] - 24], spark: L.spark * 0.6 });
+  if (kind === 'rain') Object.assign(o, { sun: 0xd9d6cf, sunI: L.sunI * 0.5, hemi: L.hemi * 1.12, sky: dark ? 0x939eac : 0xbfc4c8, gnd: 0x4a4a44, bg: dark ? 0x121418 : 0x1e2124, fog: [L.fog[0] - 8, L.fog[1] - 24], spark: L.spark * 0.6 });
   if (kind === 'storm') Object.assign(o, { sun: 0xb4bcc8, sunI: L.sunI * 0.32, hemi: L.hemi * 0.95, sky: 0x8692a2, gnd: 0x34362f, bg: 0x111317, fog: [L.fog[0] - 14, L.fog[1] - 34], spark: L.spark * 0.5, cone: L.cone * 1.15 });
   if (kind === 'snow') Object.assign(o, { sun: 0xf6f4ee, sunI: L.sunI * 0.62, hemi: 1.02, sky: 0xe2e8f0, gnd: 0xb8c0c8, bg: 0x9aa3ac, fogC: 0xc6ced6, fog: [L.fog[0] - 16, L.fog[1] - 30], spark: L.spark * 0.8, cone: L.cone * 1.1 });
-  if (kind === 'fog') Object.assign(o, { sun: 0xe8e6e0, sunI: L.sunI * 0.34, hemi: L.hemi * 1.18, sky: 0xd4d8d8, gnd: 0x6a6a62, bg: 0x8d9290, fogC: 0xa9aeac, fog: [52, 96], spark: L.spark * 0.4, cone: L.cone * 1.2 });
+  if (kind === 'fog') Object.assign(o, { sun: 0xe8e6e0, sunI: L.sunI * 0.34, hemi: L.hemi * 1.18, sky: 0xd4d8d8, gnd: 0x6a6a62, bg: 0x8d9290, fogC: 0xa9aeac, fog: [64, 128], spark: L.spark * 0.4, cone: L.cone * 1.2 });
   if (kind === 'ash') Object.assign(o, { fog: [L.fog[0] - 4, L.fog[1] - 10] });
   return o;
 }

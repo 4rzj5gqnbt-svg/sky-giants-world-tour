@@ -1,5 +1,5 @@
-/* Corpi Scelti: lets the game run with no connection. Version corpi-85f80149ec */
-const V = 'corpi-85f80149ec';
+/* Corpi Scelti: lets the game run with no connection. Version corpi-475bba0317 */
+const V = 'corpi-475bba0317';
 const CORE = ["./","fonts/barlow-condensed-latin-500-normal.woff2","fonts/barlow-condensed-latin-600-normal.woff2","fonts/barlow-condensed-latin-700-normal.woff2","fonts/bodoni-moda-latin-opsz-italic.woff2","fonts/bodoni-moda-latin-opsz-normal.woff2","fonts/courier-prime-latin-400-italic.woff2","fonts/courier-prime-latin-400-normal.woff2","fonts/courier-prime-latin-700-normal.woff2","icon-180.png","icon-192.png","icon-512.png","icon-maskable-512.png","icon.svg","manifest.webmanifest","three.min.js"];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
