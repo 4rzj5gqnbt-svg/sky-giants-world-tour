@@ -10164,98 +10164,119 @@ function marchBar(T, bar, root, type, opts) {
     if (opts.kick) { T.add('drums', 'kick', s, null, 1, 0.9); T.add('drums', 'kick', s + 8, null, 1, 0.7); }
   }
 }
+/* ---------- the songs of the corps ----------
+   Each corps marches to its own tune, written in C and moved to the key of the mission. Eight bars of sixteen steps.
+   Three are openings of old soldiers' songs, set down by ear: «Sul cappello» for the alpini, «La leggenda del Piave» (1918)
+   for the infantry of the Great War, and a running-pace fanfare in the manner of the bersaglieri's. The others are new
+   marches in the manner of each corps: their own songs are later than 1929 or cannot be given faithfully from memory. */
+const TUNES = {
+  alpini: { name: 'Sul cappello', bpm: 104, lead: 'mandolin', band: 'harmonium',
+    bars: ['r:8 G4:4 G4:4', 'E5:4 E5:4 G4:4 G4:4', 'E5:4 E5:4 E5:4 D5:4', 'C5:4 D5:4 E5:8', 'r:8 G4:4 G4:4', 'D5:4 D5:4 G4:4 G4:4', 'D5:4 D5:4 D5:4 C5:4', 'B4:4 D5:4 C5:8'],
+    prog: [[0, 'M'], [0, 'M'], [0, 'M'], [0, 'M'], [7, 'M'], [7, 'M'], [7, '7'], [0, 'M']] },
+  piave: { name: 'La leggenda del Piave', bpm: 100, lead: 'mandolin', band: 'harmonium',
+    bars: ['r:12 G4:4', 'C5:4 C5:4 C5:2 B4:2 C5:4', 'D5:10 r:2 D5:4', 'E5:4 E5:4 E5:2 D5:2 E5:4', 'F5:10 r:2 F5:4', 'G5:6 F5:2 E5:4 D5:4', 'C5:6 D5:2 E5:4 D5:4', 'C5:12 r:4'],
+    prog: [[0, 'M'], [0, 'M'], [7, 'M'], [0, 'M'], [5, 'M'], [0, 'M'], [7, '7'], [0, 'M']] },
+  bersa: { name: 'Passo di corsa', bpm: 132, lead: 'bugle', band: 'brass',
+    bars: ['C5:2 C5:1 C5:1 E5:2 E5:1 E5:1 G5:4 E5:4', 'C5:2 E5:2 G5:2 E5:2 C5:4 G4:4', 'C5:2 C5:1 C5:1 E5:2 E5:1 E5:1 G5:4 C6:4', 'G5:2 E5:2 G5:2 E5:2 C5:8', 'D5:2 D5:1 D5:1 G5:2 G5:1 G5:1 B5:4 G5:4', 'D5:2 G5:2 B5:2 G5:2 D5:4 G4:4', 'C5:2 E5:2 G5:2 C6:2 G5:2 E5:2 C5:2 E5:2', 'G5:4 G5:2 G5:2 C6:8'],
+    prog: [[0, 'M'], [0, 'M'], [0, 'M'], [0, 'M'], [7, 'M'], [7, 'M'], [0, 'M'], [0, 'M']] },
+  arditi: { name: 'Marcia d’assalto', bpm: 116, lead: 'bugle', band: 'brass',
+    bars: ['A4:4 C5:2 E5:2 A5:4 G5:4', 'E5:6 D5:2 C5:8', 'G4:4 B4:2 D5:2 G5:4 F5:4', 'E5:12 r:4', 'C5:4 E5:2 G5:2 C6:4 B5:4', 'A5:6 G5:2 E5:8', 'F5:4 E5:4 D5:4 B4:4', 'C5:12 r:4'],
+    prog: [[9, 'm'], [9, 'm'], [7, 'M'], [0, 'M'], [0, 'M'], [5, 'M'], [7, '7'], [0, 'M']] },
+  marina: { name: 'Marcia di marina', bpm: 108, lead: 'harmonium', band: 'harmonium',
+    bars: ['G4:3 C5:1 E5:4 D5:3 C5:1 D5:4', 'E5:3 G5:1 E5:4 C5:8', 'A4:3 C5:1 F5:4 E5:3 D5:1 C5:4', 'D5:3 E5:1 D5:4 G4:8', 'G4:3 C5:1 E5:4 G5:3 E5:1 G5:4', 'A5:6 G5:2 F5:4 E5:4', 'D5:3 E5:1 F5:4 E5:3 D5:1 B4:4', 'C5:12 r:4'],
+    prog: [[0, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [0, 'M'], [5, 'M'], [7, '7'], [0, 'M']] },
+  cav: { name: 'La carica', bpm: 126, lead: 'bugle', band: 'brass',
+    bars: ['G4:2 C5:2 E5:4 G4:2 C5:2 E5:4', 'G5:6 E5:2 C5:4 G4:4', 'G4:2 C5:2 E5:4 C5:2 E5:2 G5:4', 'C6:8 G5:8', 'A5:4 G5:2 F5:2 E5:4 D5:4', 'E5:4 D5:2 C5:2 B4:4 G4:4', 'G4:2 C5:2 E5:2 G5:2 C6:4 G5:4', 'C6:12 r:4'],
+    prog: [[0, 'M'], [0, 'M'], [0, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [0, 'M'], [0, 'M']] },
+  carab: { name: 'Marcia d’ordinanza', bpm: 98, lead: 'brass', band: 'brass',
+    bars: ['C5:6 E5:2 G5:8', 'A5:6 G5:2 E5:8', 'F5:4 E5:4 D5:4 C5:4', 'D5:12 G4:4', 'C5:6 E5:2 G5:8', 'C6:6 B5:2 A5:8', 'G5:4 F5:4 E5:4 D5:4', 'C5:12 r:4'],
+    prog: [[0, 'M'], [9, 'm'], [5, 'M'], [7, 'M'], [0, 'M'], [5, 'M'], [7, '7'], [0, 'M']] },
+  desert: { name: 'Marcia del deserto', bpm: 110, lead: 'bugle', band: 'brass',
+    bars: ['E5:4 E5:2 F5:2 G5:4 E5:4', 'C5:4 D5:4 E5:8', 'F5:4 F5:2 G5:2 A5:4 F5:4', 'D5:4 E5:4 G5:8', 'C6:6 B5:2 A5:4 G5:4', 'A5:4 G5:2 F5:2 E5:8', 'D5:4 G5:4 B4:4 D5:4', 'C5:12 r:4'],
+    prog: [[0, 'M'], [0, 'M'], [5, 'M'], [7, 'M'], [9, 'm'], [5, 'M'], [7, '7'], [0, 'M']] },
+};
+const CORPS_TUNE = { alpini: 'alpini', tridentina: 'alpini', sassari: 'piave', granatieri: 'piave', raggr43: 'piave', bersaglieri: 'bersa', arditi: 'arditi',
+  mas: 'marina', assalto18: 'marina', decima: 'marina', sanmarco: 'marina', sommergibili: 'marina', flotta: 'marina', marina17: 'marina',
+  cav17: 'cav', savoia: 'cav', carabinieri: 'carab', folgore: 'desert', ariete: 'desert' };
+function tuneOf(M) { return TUNES[M && CORPS_TUNE[M.corps]] || TUNES[M && M.sea ? 'marina' : 'piave']; }
+// one bar of a marching band under a tune: bass on one and three, the chord on the off-beats
+function bandBar(T, layer, s, root, type, inst, vel) {
+  const lo = root - 12 - (root > 52 ? 12 : 0);
+  T.add(layer, 'bass', s, lo, 4, 0.85 * vel); T.add(layer, 'bass', s + 8, lo + 7 > 43 ? lo - 5 : lo + 7, 4, 0.7 * vel);
+  for (const st of [4, 12]) for (const n of chordNotes(root, type, 55)) T.add(layer, inst, s + st, n, 3, 0.5 * vel);
+}
+// the title: the cavalry call with the whole band, bright and forward
 function trackTitle() {
-  const T = new Track(80, 16, ['lead', 'harm', 'pad', 'bass', 'drums']);
-  PROG_A.forEach(([r, ty], i) => { marchBar(T, i, r, ty, { harm: true, pad: true, drums: i > 1, kick: false }); T.melody('lead', 'brass', i, THEME_A[i], 0, 0.75); });
-  PROG_B.forEach(([r, ty], i) => {
-    const b = 8 + i; marchBar(T, b, r, ty, { harm: true, pad: true, drums: true, kick: true });
-    T.melody('lead', 'bugle', b, THEME_B[i], 0, 0.8); T.melody('lead', 'brass', b, THEME_B[i], -12, 0.55);
-    if (i % 2 === 0) T.add('drums', 'timpani', b * 16, r - 12 - (r > 52 ? 12 : 0) + 12, 4, 0.8);
+  const U = TUNES.cav, T = new Track(112, 16, ['lead', 'harm', 'pad', 'bass', 'drums']), K = 2;
+  for (let rep = 0; rep < 2; rep++) U.bars.forEach((str, i) => {
+    const b = rep * 8 + i, s = b * 16, root = 48 + K + U.prog[i][0], ty = U.prog[i][1];
+    bandBar(T, 'bass', s, root, ty, 'harmonium', 1);
+    if (rep) for (const n of chordNotes(root, ty, 50)) T.add('pad', 'strings', s, n, 16, 0.5);
+    T.melody('lead', rep ? 'bugle' : 'brass', b, str, K, 0.8); if (rep) T.melody('lead', 'brass', b, str, K - 12, 0.5);
+    for (const [st, v] of rep ? [[0, 1], [4, 0.5], [6, 0.5], [7, 0.6], [8, 0.85], [12, 0.6], [14, 0.5], [15, 0.6]] : [[0, 0.8], [8, 0.6], [12, 0.4], [14, 0.4]]) T.add('drums', 'snare', s + st, null, 1, v);
+    if (rep) { T.add('drums', 'kick', s, null, 1, 0.9); T.add('drums', 'kick', s + 8, null, 1, 0.7); }
   });
-  for (let k = 0; k < 4; k++) T.add('drums', 'snare', 7 * 16 + 12 + k, null, 1, 0.45 + k * 0.12);
-  for (let k = 0; k < 8; k++) T.add('drums', 'snare', 15 * 16 + 8 + k, null, 1, 0.4 + k * 0.08);
   T.add('drums', 'cymbal', 8 * 16, null, 8, 0.9); T.add('drums', 'cymbal', 0, null, 8, 0.5);
+  for (let k = 0; k < 8; k++) T.add('drums', 'snare', 7 * 16 + 8 + k, null, 1, 0.4 + k * 0.08);
   return T.index();
 }
-// the briefing: the lament alone, on mandolin over the harmonium, slower
-function trackBrief() {
-  const T = new Track(68, 8, ['lead', 'harm', 'pad', 'bass']);
-  PROG_A.forEach(([r, ty], i) => {
-    const s = i * 16; T.add('bass', 'bass', s, r - 12 - (r > 52 ? 12 : 0), 8, 0.7);
-    for (const n of chordNotes(r, ty, 52)) T.add('harm', 'harmonium', s, n, 16, 0.5);
-    T.melody('lead', 'mandolin', i, THEME_A[i], 0, 0.75);
+// the briefing: the song of the corps you are about to lead, unhurried, on its own instrument
+function trackBrief(M) {
+  const U = tuneOf(M), T = new Track(Math.round(U.bpm * 0.86), 8, ['lead', 'harm', 'pad', 'bass']), K = M ? missionMood(M).root - 48 : 2;
+  U.bars.forEach((str, i) => {
+    const root = 48 + K + U.prog[i][0];
+    bandBar(T, 'bass', i * 16, root, U.prog[i][1], 'harmonium', 0.8);
+    T.melody('lead', U.lead === 'bugle' || U.lead === 'brass' ? 'mandolin' : U.lead, i, str, K, 0.8);
   });
   return T.index();
 }
-/* the mission music, in three layers over the same harmony: calm, tension, combat.
-   Each mission has its own key, pace and colour, after its light and its weather. */
+/* the mission music, in three layers over the corps' own march: the tune alone while unseen, the band under it when
+   they search, drums and brass when the shooting starts. Each mission has its key; night and bad weather only slow it a little. */
 function missionMood(M) {
   const wx = missionWx(M).kind, lt = M.light;
   const keyOf = { montenero: 52, castelletto: 48, coldelrosso: 50, premuda: 47, moschin: 50, pola: 45, alessandria: 49, tobruk: 46, alamein: 48, nikolajewka: 45, cengio: 50, quota85: 47, ortigara: 49, cortellazzo: 46, trieste: 48, buccari: 51, culqualber: 47, gibilterra: 46, montelungo: 49, pozzuolo: 48, isbuscenskij: 50, birelgobi: 47, suda: 46, cappellini: 45, pantelleria: 49 };
-  const mood = { root: keyOf[M.id] || 50, bpm: 80, prog: [[0, 'm'], [8, 'M'], [5, 'm'], [7, 'M']], scale: MINOR, calm: 'mandolin', pad: 'strings' };
-  if (M.fill === '~') Object.assign(mood, { calm: 'harmonium', pad: 'strings' });
-  if (lt === 'night' || lt === 'dusk') Object.assign(mood, { bpm: 66, prog: [[0, 'm'], [5, 'm'], [0, 'm'], [7, 'M']], calm: 'harmonium' });
-  if (wx === 'snow') Object.assign(mood, { bpm: 72, prog: [[0, 'm'], [3, 'M'], [10, 'M'], [5, 'm']], calm: 'celesta' });
-  if (wx === 'storm') Object.assign(mood, { bpm: 88, prog: [[0, 'm'], [1, 'M'], [0, 'm'], [10, 'M']], calm: 'harmonium' });
-  if (wx === 'fog') Object.assign(mood, { bpm: 62, prog: [[0, 'sus2'], [5, 'm'], [8, 'M'], [7, 'sus4']], calm: 'pluck' });
-  if (wx === 'ash') Object.assign(mood, { bpm: 76 });
+  const mood = { root: keyOf[M.id] || 50, pace: 1, calm: null, pad: 'strings' };
+  if (lt === 'night' || lt === 'dusk') mood.pace = 0.9;
+  if (wx === 'snow') mood.calm = 'celesta';
+  if (wx === 'fog') { mood.pace = 0.88; mood.calm = 'pluck'; }
   return mood;
 }
 function trackGame(M) {
-  const md = missionMood(M), T = new Track(md.bpm, 8, ['pad', 'calm', 'tension', 'combat']), R = md.root;
-  const deg = (d, oct = 0) => R + md.scale[((d % 7) + 7) % 7] + 12 * (Math.floor(d / 7) + oct);
-  md.prog.forEach(([iv, ty], k) => {
-    const s = k * 32, root = R + iv, chord = chordNotes(root, ty, 55);
-    // pad: sustained strings and a drone, always there
-    for (const n of chord) T.add('pad', md.pad, s, n, 32, 0.55);
-    T.add('pad', 'drone', s, root - 24 + (root - 24 < 33 ? 12 : 0), 32, 0.7);
-    // tension: a bowed ostinato in eighths, a heartbeat on the timpani
-    for (let e = 0; e < 16; e++) T.add('tension', 'cello', s + e * 2, (e % 4 === 2 ? root + 7 : root) - 12 - (root > 52 ? 12 : 0), 2, e % 4 === 0 ? 0.9 : 0.6);
-    for (const st of [0, 16]) T.add('tension', 'timpani', s + st, root - 12, 4, 0.55);
-    T.add('tension', 'timpani', s + 6, root - 12, 2, 0.35); T.add('tension', 'timpani', s + 22, root - 12, 2, 0.35);
-    // combat: the march drums, brass stabs on the chord, a rising call
-    for (let b = 0; b < 2; b++) {
-      const bs = s + b * 16;
-      for (const [st, v] of [[0, 1], [4, 0.55], [6, 0.6], [7, 0.7], [8, 0.9], [10, 0.5], [12, 0.7], [14, 0.6], [15, 0.7]]) T.add('combat', 'snare', bs + st, null, 1, v);
-      T.add('combat', 'kick', bs, null, 1, 1); T.add('combat', 'kick', bs + 8, null, 1, 0.8);
-      for (const n of chord) { T.add('combat', 'brass', bs, n, 3, 0.75); T.add('combat', 'brass', bs + 6, n, 2, 0.6); }
-    }
-    T.add('combat', 'brass', s + 16, chord[0] + 12, 2, 0.8); T.add('combat', 'brass', s + 18, chord[1] + 12, 2, 0.8); T.add('combat', 'brass', s + 20, chord[2] + 12, 4, 0.85);
-    if (k === 0) T.add('combat', 'cymbal', s, null, 8, 0.7);
+  const md = missionMood(M), U = tuneOf(M), T = new Track(Math.round(U.bpm * md.pace), 8, ['pad', 'calm', 'tension', 'combat']), K = md.root - 48;
+  const soft = U.lead === 'bugle' || U.lead === 'brass' ? 'mandolin' : U.lead;
+  U.bars.forEach((str, i) => {
+    const s = i * 16, root = 48 + K + U.prog[i][0], ty = U.prog[i][1], chord = chordNotes(root, ty, 55);
+    // always there: warm strings on the harmony
+    for (const n of chord) T.add('pad', md.pad, s, n, 16, 0.42);
+    // unseen: the tune, lightly, with a walking bass
+    T.melody('calm', md.calm || soft, i, str, K, 0.72);
+    T.add('calm', 'bass', s, root - 12 - (root > 52 ? 12 : 0), 6, 0.55); T.add('calm', 'bass', s + 8, root - 5 - (root > 52 ? 12 : 0), 6, 0.45);
+    for (const st of [4, 12]) T.add('calm', 'pluck', s + st, chord[1], 2, 0.3);
+    // they are searching: the band comes in under the tune, the drum keeps step
+    T.melody('tension', U.lead, i, str, K, 0.7);
+    bandBar(T, 'tension', s, root, ty, U.band, 0.9);
+    for (const [st, v] of [[0, 0.8], [8, 0.6], [12, 0.35], [14, 0.4]]) T.add('tension', 'snare', s + st, null, 1, v);
+    if (i % 2 === 0) T.add('tension', 'timpani', s, root - 12, 4, 0.5);
+    // the fight: full drums, brass on the beat, the tune an octave down as well
+    for (const [st, v] of [[0, 1], [4, 0.55], [6, 0.6], [7, 0.7], [8, 0.9], [10, 0.5], [12, 0.7], [14, 0.6], [15, 0.7]]) T.add('combat', 'snare', s + st, null, 1, v);
+    T.add('combat', 'kick', s, null, 1, 1); T.add('combat', 'kick', s + 8, null, 1, 0.8);
+    for (const n of chord) { T.add('combat', 'brass', s, n, 3, 0.6); T.add('combat', 'brass', s + 8, n, 2, 0.5); }
+    T.melody('combat', 'brass', i, str, K - 12, 0.55);
+    if (i === 0 || i === 4) T.add('combat', 'cymbal', s, null, 8, 0.6);
   });
-  // calm: a short song phrase twice in the loop, in the instrument of the mission's mood; every action has its own tune
-  const [phraseA, phraseB] = missionPhrases(M.id);
-  for (const [bar, ph] of [[1, phraseA], [5, phraseB]]) { let st = bar * 16; for (const [d, len] of ph) { T.add('calm', md.calm, st, deg(d, 1), len, 0.7); st += len; } }
   return T.index();
-}
-// a two-bar phrase for each mission, from a seeded walk over the scale: it rises, turns, and comes home
-function missionPhrases(id) {
-  let h = 2166136261; for (const ch of id) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-  const rnd = () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
-  const cells = [[4, 4, 8], [6, 2, 4, 4], [2, 2, 4, 8], [4, 2, 2, 8], [8, 4, 4], [3, 1, 4, 8]];
-  const make = (start, end) => {
-    const rh = [...cells[Math.floor(rnd() * cells.length)], ...cells[Math.floor(rnd() * cells.length)]];
-    let d = start; const out = [];
-    rh.forEach((len, i) => {
-      if (i === rh.length - 1) d = end;
-      else if (i > 0) { const stp = [-2, -1, -1, 1, 1, 2][Math.floor(rnd() * 6)]; d = clamp(d + stp, -1, 7); }
-      out.push([d, len]);
-    });
-    return out;
-  };
-  return [make(rnd() < 0.5 ? 4 : 2, rnd() < 0.5 ? 1 : 4), make(rnd() < 0.5 ? 2 : 5, 0)];
 }
 // a stinger when the shooting starts: a brass stab over a timpani roll
 function musSting(kind) {
   const P = MUS.player; if (!P || !AU.ctx || !musInit()) return;
   const c = AU.ctx, t = c.currentTime + 0.03, R = P.M ? missionMood(P.M).root : 50, d = { dry: MUS.bus };
   if (kind === 'alarm') {
-    for (const n of chordNotes(R, 'm', 55)) INST.brass(t, n, 0.5, 0.95, d);
-    INST.brass(t, R + 13 - (R + 13 > 64 ? 12 : 0), 0.5, 0.6, d);
+    for (const n of chordNotes(R, 'M', 55)) INST.brass(t, n, 0.5, 0.9, d);
+    INST.bugle(t + 0.12, R + 19, 0.2, 0.7, d); INST.bugle(t + 0.3, R + 24, 0.5, 0.8, d);
     for (let k = 0; k < 6; k++) INST.timpani(t + k * 0.06, R - 12, 0.1, 0.35 + k * 0.08, d);
     INST.cymbal(t + 0.36, null, 1, 0.6, d);
   } else if (kind === 'start') {
-    for (const n of chordNotes(R, 'm', 50)) INST.strings(t, n, 3.2, 0.7, d);
+    for (const n of chordNotes(R, 'M', 50)) INST.strings(t, n, 3.2, 0.7, d);
     INST.timpani(t, R - 12, 1, 0.7, d); INST.bugle(t + 0.5, R + 19 - (R + 19 > 76 ? 12 : 0), 1.4, 0.5, d);
   }
 }
@@ -10263,11 +10284,18 @@ function musSting(kind) {
 function trackCue(kind, M) {
   const R = M ? missionMood(M).root : 50;
   if (kind === 'win') {
-    const T = new Track(96, 4, ['lead', 'pad', 'drums']), K = R - 50 > 4 ? R - 62 : R - 50;
-    T.melody('lead', 'bugle', 0, 'D5:2 D5:2 A4:2 D5:2 F#5:4 D5:4 F#5:2 F#5:2 D5:2 F#5:2 A5:8 r:4 A5:2 F#5:2 D5:4 A4:4 D5:12', K, 0.9);
-    for (const n of chordNotes(R + 12, 'M', 57)) { T.add('pad', 'brass', 32, n, 24, 0.8); T.add('pad', 'strings', 32, n, 28, 0.7); }
-    for (let k = 0; k < 12; k++) T.add('drums', 'timpani', 32 + k, R - 12, 1, 0.3 + k * 0.04);
-    T.add('drums', 'cymbal', 44, null, 8, 1); T.add('drums', 'timpani', 44, R - 12, 4, 1);
+    const U = tuneOf(M), T = new Track(Math.round(U.bpm * 1.04), 6, ['lead', 'pad', 'drums']), K = R - 48;
+    for (let i = 0; i < 4; i++) {
+      const root = 48 + K + U.prog[4 + i][0], ty = U.prog[4 + i][1], s = i * 16;
+      T.melody('lead', 'bugle', i, U.bars[4 + i], K, 0.9); T.melody('lead', 'brass', i, U.bars[4 + i], K - 12, 0.6);
+      bandBar(T, 'pad', s, root, ty, 'brass', 0.9);
+      for (const [st, v] of [[0, 1], [4, 0.5], [6, 0.6], [7, 0.7], [8, 0.9], [12, 0.7], [14, 0.6], [15, 0.7]]) T.add('drums', 'snare', s + st, null, 1, v);
+      T.add('drums', 'kick', s, null, 1, 0.9);
+    }
+    for (const n of chordNotes(R + 12, 'M', 57)) { T.add('pad', 'brass', 64, n, 28, 0.8); T.add('pad', 'strings', 64, n, 30, 0.7); }
+    T.add('lead', 'bugle', 64, R + 24, 24, 0.8);
+    for (let k = 0; k < 8; k++) T.add('drums', 'timpani', 56 + k, R - 12, 1, 0.3 + k * 0.06);
+    T.add('drums', 'cymbal', 64, null, 10, 1); T.add('drums', 'timpani', 64, R - 12, 6, 1);
     T.once = true; return T.index();
   }
   const T = new Track(60, 5, ['lead', 'pad', 'drums']), K = R - 50;
@@ -10299,7 +10327,7 @@ function musTick() {
   const c = AU.ctx, T = P.T, spb = 60 / T.bpm / 4;
   if (P.next < c.currentTime - 0.5) P.next = c.currentTime + 0.05; // the tab was asleep: pick up from now
   while (P.next < c.currentTime + 0.25) {
-    if (T.once && P.step >= T.steps) { P.stop = true; if (P.after) setTimeout(() => musPlay(P.after), 900); return; }
+    if (T.once && P.step >= T.steps) { P.stop = true; if (P.after) setTimeout(() => musPlay(P.after, P.M), 900); return; }
     for (const e of T.at[P.step % T.steps]) {
       const lay = P.L[e.layer]; if (!lay) continue;
       if (P.key === 'game' && musLayerGain(P, e.layer) === 0 && lay.dry.gain.value < 0.02) continue; // skip silent layers
@@ -10314,8 +10342,8 @@ function musPlay(key, M) {
   if (!AU.ctx || !SAVE.sound || SAVE.music === false) { MUS.pending = { key, M }; if (MUS.player) { MUS.player.stop = true; } return; }
   if (!musInit()) return;
   const cur = MUS.player;
-  if (cur && !cur.stop && cur.key === key && (key !== 'game' || cur.M === M)) { musVolume(); return; }
-  const T = key === 'title' ? trackTitle() : key === 'brief' ? trackBrief() : key === 'game' ? trackGame(M) : trackCue(key, M);
+  if (cur && !cur.stop && cur.key === key && ((key !== 'game' && key !== 'brief') || cur.M === M)) { musVolume(); return; }
+  const T = key === 'title' ? trackTitle() : key === 'brief' ? trackBrief(M) : key === 'game' ? trackGame(M) : trackCue(key, M);
   musStart(T, key); MUS.player.M = M;
   if (key === 'win' || key === 'lose') MUS.player.after = 'brief';
   MUS.level = 0; MUS.holdT = 0;
@@ -10747,7 +10775,7 @@ function show(name) {
   $('#hud').hidden = name !== 'game';
   $('#pause').hidden = true;
   if (name === 'title' || name === 'missions' || name === 'archive') musPlay('title');
-  else if (name === 'brief') musPlay('brief');
+  else if (name === 'brief') musPlay('brief', MISSIONS[UI.mi]);
   if (name !== 'game') {
     $('#help').hidden = true;
     const el = $(SCREENS[name]); if (el) el.scrollTop = 0;
