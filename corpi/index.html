@@ -461,6 +461,10 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .corpsline { margin: 4px 0 10px; font-family: var(--f-type); font-size: 14px; color: var(--paper-ink); display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
 .corpsline b { font-family: var(--f-ui); letter-spacing: .08em; text-transform: uppercase; border-left: 4px solid var(--cc); padding-left: 7px; }
 .corpsline i { color: var(--paper-dim); }
+.corpsid { margin: 0 0 12px; padding: 8px 12px; border-left: 4px solid var(--cc); background: rgba(60,50,30,.06); font-size: 14.5px; line-height: 1.45; }
+.corpsid p { margin: 0; }
+.corpsid p + p { margin-top: 5px; }
+.corpsid b { font-family: var(--f-ui); font-weight: 700; }
 .seabox { border-left-color: #2f6e8e; background: rgba(47,110,142,.08); }
 .vicon { display: grid; place-items: center; width: 52px; height: 52px; color: var(--paper-ink); background: rgba(0,0,0,.06); }
 .vicon .ic { width: 30px; height: 30px; }
@@ -794,6 +798,166 @@ const CORPS = {
   raggr43:    { name: 'I Raggruppamento motorizzato', motto: '', look: 'raggr43', men: 'fante', color: '#2f6b4a' },
   tridentina: { name: 'Alpini, Divisione Tridentina', motto: '«Tridentina, avanti!»', look: 'alpini43', men: 'alpino', color: '#3f6b3a' },
 };
+
+/* Ogni corpo ha la sua divisa, le sue armi e una dote tutta sua.
+   names: come si chiamano le armi del corpo (sui pulsanti); words: come si contano nel briefing;
+   roles[ruolo]: kit (se la missione non lo scrive), give (armi in più, con le munizioni), ammo (munizioni in più),
+   range (gittata in caselle), swap (un'arma al posto di un'altra), names e words solo per quel ruolo.
+   perk: la dote, che il gioco applica davvero (vedi sim.js: corsa, monte, anfibi, tenaci, assalto, tiratori, lancia...). */
+const ARMS = {
+  alpini: {
+    dress: 'Cappello alpino con la penna nera, fiamme verdi, corda da roccia e piccozza.',
+    names: { carbine: 'Fucile 91', grenade: 'SIPE', burst: 'V. Perosa', knife: 'Baionetta' },
+    words: { grenade: ['bomba SIPE', 'bombe SIPE'] },
+    roles: {
+      fuciliere: { kit: 'Baionetta, fucile 91, corda da roccia e piccozza' },
+      guastatore: { kit: 'Pinze tagliafili, piccozza e cariche di gelatina' },
+      bombardiere: { kit: 'Baionetta e bombe a mano SIPE' },
+      mitragliere: { kit: 'Baionetta e pistola mitragliatrice Villar Perosa' },
+    },
+    perk: { key: 'monte', name: 'Gente di montagna', desc: 'su roccia, ghiaione, scarpate e neve camminano svelti come in piano' },
+  },
+  tridentina: {
+    dress: 'Cappello alpino con la penna nera, fiamme verdi, pastrano e coperta arrotolata a tracolla.',
+    names: { carbine: 'Moschetto', grenade: 'Breda 35', burst: 'Breda 30', knife: 'Pugnale' },
+    words: { grenade: ['bomba Breda 35', 'bombe Breda 35'] },
+    roles: {
+      fuciliere: { kit: 'Moschetto 91/38, pugnale e la coperta arrotolata a tracolla' },
+      bombardiere: { kit: 'Pugnale e bombe a mano Breda 35' },
+      guastatore: { kit: 'Pinze tagliafili e cariche da demolizione' },
+    },
+    perk: { key: 'monte', name: 'Gente di montagna', desc: 'nella neve alta e sui pendii camminano svelti come in piano' },
+  },
+  granatieri: {
+    dress: 'Elmetto con la granata, alamari bianchi sul bavero rosso: i granatieri sono i più alti dell’esercito.',
+    names: { carbine: 'Fucile 91', grenade: 'SIPE', burst: 'V. Perosa', knife: 'Baionetta' },
+    words: { grenade: ['bomba SIPE', 'bombe SIPE'] },
+    roles: {
+      fuciliere: { kit: 'Fucile 91 con la baionetta e una bomba SIPE alla cintura', give: { grenade: 1 } },
+      mitragliere: { give: { grenade: 1 } },
+      bombardiere: { kit: 'Baionetta e un tascapane pieno di bombe SIPE', ammo: { grenade: 1 }, range: { grenade: 7.5 } },
+    },
+    perk: { key: 'granate', name: 'Granatieri', desc: 'tutti portano bombe a mano; il bombardiere ne ha una in più e lancia più lontano' },
+  },
+  bersaglieri: {
+    dress: 'Il piumetto di penne di gallo cedrone sull’elmetto e le fiamme cremisi.',
+    names: { carbine: 'Moschetto', grenade: 'SIPE', burst: 'V. Perosa', knife: 'Pugnale' },
+    words: { grenade: ['bomba SIPE', 'bombe SIPE'] },
+    roles: {
+      fuciliere: { kit: 'Moschetto 91 da bersaglieri e pugnale' },
+      guastatore: { kit: 'Pugnale, pinze tagliafili e tubi di gelatina' },
+    },
+    perk: { key: 'corsa', name: 'Sempre di corsa', desc: 'i bersaglieri si muovono più svelti di ogni altro fante' },
+  },
+  sassari: {
+    dress: 'Le mostrine bianche e rosse della Brigata Sassari sul bavero grigioverde.',
+    names: { carbine: 'Fucile 91', grenade: 'SIPE', burst: 'V. Perosa', knife: 'Baionetta' },
+    words: { grenade: ['bomba SIPE', 'bombe SIPE'] },
+    roles: {
+      fuciliere: { kit: 'Fucile 91 e baionetta' },
+      guastatore: { kit: 'Pinze tagliafili e cariche di gelatina' },
+      bombardiere: { kit: 'Baionetta e bombe a mano SIPE' },
+    },
+    perk: { key: 'tenaci', name: '«Forza Paris!»', desc: 'i sardi della Sassari reggono un colpo in più' },
+  },
+  arditi: {
+    dress: 'Fez nero col fiocco, giubba aperta sul maglione nero, fiamme nere e pugnale alla cintura.',
+    names: { carbine: 'Moschetto', grenade: 'Petardo', burst: 'V. Perosa', knife: 'Pugnale' },
+    words: { grenade: ['petardo Thévenot', 'petardi Thévenot'] },
+    roles: {
+      fuciliere: { give: { grenade: 2 } },
+      mitragliere: { give: { grenade: 2 } },
+      lanciafiamme: { kit: 'Pugnale, lanciafiamme da spalla e due petardi', give: { grenade: 2 } },
+    },
+    perk: { key: 'assalto', name: 'All’assalto!', desc: 'ognuno porta due petardi; col pugnale balzano sul nemico da più lontano' },
+  },
+  marina17: {
+    dress: 'Marinai a terra: grigioverde da fante sopra il maglione blu, l’ancora della Regia Marina sull’elmetto.',
+    names: { carbine: 'Moschetto', grenade: 'SIPE', burst: 'V. Perosa', knife: 'Baionetta' },
+    words: { grenade: ['bomba SIPE', 'bombe SIPE'] },
+    roles: {
+      fuciliere: { kit: 'Moschetto 91 e baionetta' },
+      guastatore: { kit: 'Pinze tagliafili e cariche da demolizione' },
+      bombardiere: { kit: 'Baionetta e bombe a mano SIPE' },
+    },
+    perk: { key: 'anfibi', name: 'Gente di mare', desc: 'nei guadi, tra canneti e acquitrini camminano svelti come all’asciutto' },
+  },
+  carabinieri: {
+    dress: 'Casco coloniale con la fiamma d’argento, alamari d’argento sul bavero nero, tela cachi d’Africa.',
+    names: { carbine: 'Moschetto', grenade: 'Breda 35', burst: 'MAB 38', knife: 'Baionetta' },
+    words: { grenade: ['bomba Breda 35', 'bombe Breda 35'] },
+    roles: { bombardiere: { kit: 'Baionetta e bombe a mano Breda 35' } },
+    perk: { key: 'tiratori', name: 'Tiratori scelti', desc: 'col moschetto tirano una casella più lontano e sbagliano meno' },
+  },
+  sanmarco: {
+    dress: 'Elmetto col leone di San Marco, divisa coloniale cachi, fiamme rosse col leone.',
+    names: { carbine: 'Moschetto', grenade: 'OTO 35', burst: 'MAB 38', knife: 'Pugnale' },
+    words: { grenade: ['bomba OTO 35', 'bombe OTO 35'] },
+    roles: {
+      fuciliere: { kit: 'Pugnale e moschetto automatico Beretta MAB 38', swap: { carbine: 'burst' }, ammo: { burst: 3 } },
+      bombardiere: { kit: 'Pugnale e bombe a mano OTO 35' },
+      guastatore: { kit: 'Pinze tagliafili e cariche da demolizione' },
+    },
+    perk: { key: 'mab', name: 'Per mare, per terram', desc: 'anche i fucilieri hanno il moschetto automatico Beretta: raffiche al posto dei colpi singoli' },
+  },
+  folgore: {
+    dress: 'Elmetto da paracadutista, sahariana color sabbia, ginocchiere, fiamme azzurre col gladio alato.',
+    names: { carbine: 'Moschetto', grenade: 'Bottiglia', burst: 'MAB 38', knife: 'Pugnale' },
+    words: { grenade: ['bottiglia incendiaria', 'bottiglie incendiarie'] },
+    roles: {
+      fuciliere: { kit: 'Moschetto 91/38, pugnale e una bottiglia incendiaria', give: { grenade: 1 } },
+      mitragliere: { give: { grenade: 1 } },
+      cacciacarri: { kit: 'Pugnale, bottiglie incendiarie e mine anticarro', ammo: { charge: 1 } },
+    },
+    perk: { key: 'anticarro', name: 'Contro i carri', desc: 'ognuno porta una bottiglia incendiaria; i cacciatori di carri hanno una mina in più' },
+  },
+  raggr43: {
+    dress: 'Elmetto M33 e grigioverde; il bombardiere porta in spalla il mortaio d’assalto Brixia.',
+    names: { carbine: 'Moschetto', grenade: 'Breda 35', burst: 'MAB 38', knife: 'Pugnale' },
+    roles: {
+      fuciliere: { kit: 'Moschetto 91/38 e pugnale' },
+      guastatore: { kit: 'Pinze tagliafili e cariche da demolizione' },
+      bombardiere: { kit: 'Mortaio d’assalto Brixia da 45 mm e le sue bombe', names: { grenade: 'Mortaio' }, words: { grenade: ['bomba da mortaio', 'bombe da mortaio'] }, ammo: { grenade: 1 }, range: { grenade: 9.5 } },
+    },
+    perk: { key: 'mortaio', name: 'Mortaio da 45', desc: 'il bombardiere tira col mortaio Brixia: arriva molto più lontano di una bomba a mano' },
+  },
+  cav17: {
+    dress: 'Elmetto da fante, fiamme gialle di Genova Cavalleria o bianche dei Lancieri di Novara; i lancieri caricano con la lancia.',
+    names: { carbine: 'Moschetto' },
+    roles: { cavaliere: { kit: 'Sciabola o lancia, moschetto 91 da cavalleria e cavallo' } },
+    perk: { key: 'lancia', name: 'Lance e sciabole', desc: 'la carica al galoppo travolge anche chi sta ai lati del percorso' },
+  },
+  savoia: {
+    dress: 'Elmetto M33, fiamme nere e la cravatta rossa di Savoia Cavalleria.',
+    names: { carbine: 'Moschetto', grenade: 'Bomba' },
+    roles: { cavaliere: { kit: 'Sciabola, moschetto 91/38, due bombe a mano e cavallo', give: { grenade: 2 } } },
+    perk: { key: 'bombe', name: 'Bombe dal cavallo', desc: 'ogni cavaliere porta due bombe a mano da lanciare in sella' },
+  },
+  ariete: {
+    dress: 'Giaccone di cuoio nero e casco imbottito da carrista, fiamme rosse e blu.',
+    roles: { carro: { ammo: { cannon: 2 } }, cacciacarri: { ammo: { charge: 1 } } },
+    perk: { key: 'carristi', name: 'Ferrea mole', desc: 'i carri hanno due colpi da 47 in più, il cacciatore di carri una mina in più' },
+  },
+};
+/* Il mestiere di un uomo in questa missione: la specialità, con le armi e la dote del suo corpo. */
+function corpsRole(M, s) {
+  const R0 = ROLES[s.role], A = ARMS[M && M.corps] || {}, RA = (A.roles || {})[s.role] || {};
+  const R = Object.assign({}, R0, { abilities: R0.abilities.slice(), ammo: Object.assign({}, R0.ammo), range: Object.assign({}, R0.range || {}) });
+  for (const k in RA.swap || {}) {
+    const to = RA.swap[k], i = R.abilities.indexOf(k);
+    if (i >= 0) R.abilities[i] = to; if (R.ammo[k] != null) { R.ammo[to] = R.ammo[k]; delete R.ammo[k]; }
+  }
+  for (const k in RA.give || {}) {
+    if (!R.abilities.includes(k)) { const at = R.abilities.indexOf('stone'); R.abilities.splice(at >= 0 ? at : R.abilities.length, 0, k); }
+    R.ammo[k] = (R.ammo[k] || 0) + RA.give[k];
+  }
+  for (const k in RA.ammo || {}) if (RA.swap && Object.values(RA.swap).includes(k)) R.ammo[k] = RA.ammo[k]; else if (R.ammo[k] != null) R.ammo[k] += RA.ammo[k];
+  Object.assign(R.range, RA.range || {});
+  // names: the corps' own, then this trade's in this corps, then what the mission says, then the trade's own (a cavalryman's knife is always a sabre)
+  R.labels = Object.assign({}, A.names, RA.names, M && M.labels, R0.labels);
+  R.words = Object.assign({}, A.words, RA.words, R0.words);
+  return { R, kit: s.kit || RA.kit || R0.kit, perk: A.perk || null };
+}
 
 /* Esperienza: ogni specialità impara di missione in missione e sblocca piccole abilità.
    L'esperienza di una missione conta una volta sola (la migliore ottenuta), così rigiocare serve solo a fare meglio. */
@@ -2858,14 +3022,16 @@ function createGame(mi, diffKey, opts = {}) {
 // what a veteran's skills add to his kit
 const VET_AMMO = { petardo: 'grenade', carica: 'charge', caricatore: 'burst', vampata: 'flame', siluro: 'torpedo', bombe: 'depth' };
 function makeUnit(G, s, i) {
-  const R = ROLES[s.role], ammo = {}, base = Object.assign({}, R.ammo, s.ammo || {});
+  // the trade, with the arms and the gift of this corps (data.js: ARMS)
+  const CR = corpsRole(G.M, s), R = CR.R, perk = CR.perk ? CR.perk.key : null, ammo = {}, base = Object.assign({}, R.ammo);
+  for (const k in s.ammo || {}) base[k] = s.ammo[k] + (R.ammo[k] || 0) - (ROLES[s.role].ammo[k] || 0);
   for (const k in base) ammo[k] = base[k] > 0 ? Math.max(1, Math.round(base[k] * G.diff.ammo)) : 0;
   const vet = G.vets[vetKey(s)] || 0, sk = {};
   for (const S of vetSkills(s.role, vet)) sk[S.key] = true;
   for (const k in VET_AMMO) if (sk[k] && ammo[VET_AMMO[k]] > 0) ammo[VET_AMMO[k]]++;
-  const hp = Math.round((G.diff.hp + (sk.pelle ? 1 : 0)) * (R.hpMul || 1));
+  const hp = Math.round((G.diff.hp + (sk.pelle ? 1 : 0) + (perk === 'tenaci' ? 1 : 0)) * (R.hpMul || 1));
   return {
-    id: 'u' + i, idx: i, role: s.role, R, name: s.name || R.title, short: s.short || R.title, labels: Object.assign({}, G.M.labels, R.labels), kit: s.kit || R.kit,
+    id: 'u' + i, idx: i, role: s.role, R, perk, name: s.name || R.title, short: s.short || R.title, labels: Object.assign({}, R.labels), kit: CR.kit,
     x: ctr(s.c), y: ctr(s.r), facing: -Math.PI / 2, hp, maxHp: hp, alive: true,
     crawl: false, path: [], order: null, busy: 0, busyMax: 1, busyKind: null, busyData: null,
     ammo, stoneCd: 0, carrying: null, swim: !!R.swim, boat: !!R.boat, dive: !!R.dive, vehicle: !!R.vehicle, mounted: !!R.mounted, gallop: false, wakeT: 0, hitT: 0, repathT: 0, aimT: 0, moving: false,
@@ -2876,7 +3042,7 @@ function makeUnit(G, s, i) {
 function abilRange(u, a) {
   const sk = (u && u.sk) || {};
   const base = (u && u.R && u.R.range && u.R.range[a]) || ABIL[a].range;
-  return base + (a === 'carbine' && sk.tiratore ? 1 : 0) + (a === 'ram' && sk.mira ? 1.5 : 0) + (a === 'grenade' && sk.braccio ? 1.5 : 0) + (a === 'burst' && sk.raffica ? 1.5 : 0) + (a === 'flame' && sk.getto ? 1 : 0) + (a === 'torpedo' && sk.mira ? 1 : 0);
+  return base + (a === 'carbine' && (sk.tiratore ? 1 : 0) + (u && u.perk === 'tiratori' ? 1 : 0)) + (a === 'ram' && sk.mira ? 1.5 : 0) + (a === 'grenade' && sk.braccio ? 1.5 : 0) + (a === 'burst' && sk.raffica ? 1.5 : 0) + (a === 'flame' && sk.getto ? 1 : 0) + (a === 'torpedo' && sk.mira ? 1 : 0);
 }
 function makeEnemy(G, d) {
   const T = ETYPES[d.t];
@@ -2983,10 +3149,17 @@ function unitSpeed(G, u) {
   if (u.boat) return s * (u.crawl ? (u.R.quiet || 0.3) * (u.sk && u.sk.motori ? 1.25 : 1) * (u.dive && u.sk && u.sk.fiato ? 1.2 : 1) : 1) * (u.sk && u.sk.motori && !u.crawl ? 1.1 : 1);
   if (u.vehicle) return s * Math.max(0.6, t.walk || 1) * (u.crawl ? 0.5 : 1) * (u.sk && u.sk.motori ? 1.12 : 1);
   if (u.mounted) return s * (t.walk || 1) * (u.gallop ? (u.sk && u.sk.galoppo ? 1.75 : 1.55) : u.crawl ? 0.45 : 1) * G.walkK;
-  if (t.water) s *= (u.sk && u.sk.nuoto ? 0.78 : 0.62) * (u.crawl && u.dive ? (u.sk && u.sk.fiato ? 0.9 : 0.72) : 1); else s *= t.walk || 1;
+  let wk = G.walkK;
+  if (t.water) s *= (u.sk && u.sk.nuoto ? 0.78 : 0.62) * (u.crawl && u.dive ? (u.sk && u.sk.fiato ? 0.9 : 0.72) : 1);
+  // the gifts of the corps: alpini on rock and in snow, sailors in the fords, bersaglieri always at the double
+  else if (u.perk === 'monte' && (t === TILES[':'] || t === TILES.g || t === TILES.k || t === TILES['.'] && G.M.winter)) { s *= 1.0; wk = Math.max(wk, 1); }
+  else if (u.perk === 'monte' && G.wx && G.wx.kind === 'snow') { s *= t.walk || 1; wk = Math.max(wk, 1); }
+  else if (u.perk === 'anfibi' && (t.ford || t === TILES.b || t === TILES.v)) s *= 1;
+  else s *= t.walk || 1;
+  if (u.perk === 'corsa' && !u.crawl && !t.water) s *= 1.15;
   if (u.crawl && !t.water) s *= u.sk && u.sk.felpato ? 0.54 : 0.45;
   if (u.carrying) s *= 0.6;
-  return s * G.walkK;
+  return s * wk;
 }
 function approachPath(G, u, x, y, R) {
   let p = findPath(G, u.x, u.y, x, y, u);
@@ -3015,7 +3188,7 @@ function updateOrder(G, u, dt) {
   if (o.kind === 'knife') {
     const e = o.target;
     if (!e.alive) { u.order = null; u.path = []; return; }
-    if (dist(u, e) <= TILE * 0.95) { u.facing = angTo(u, e); knifeKill(G, u, e); u.order = null; u.path = []; return; }
+    if (dist(u, e) <= TILE * (u.perk === 'assalto' ? 1.4 : 0.95)) { u.facing = angTo(u, e); knifeKill(G, u, e); u.order = null; u.path = []; return; }
     pathToward(G, u, e.x, e.y, 0.4);
   } else if (o.kind === 'shoot') {
     const e = o.target;
@@ -3176,7 +3349,7 @@ function fireWeapon(G, u, abil, e) {
   if ((u.ammo[abil] || 0) <= 0) { msg(G, 'Munizioni esaurite.', 'warn'); return; }
   u.ammo[abil]--;
   if (abil === 'carbine') {
-    const p = clamp(0.95 - 0.4 * (d / R) + (u.sk && u.sk.tiratore ? 0.1 : 0), 0.35, 0.97);
+    const p = clamp(0.95 - 0.4 * (d / R) + (u.sk && u.sk.tiratore ? 0.1 : 0) + (u.perk === 'tiratori' ? 0.12 : 0), 0.35, 0.98);
     const hit = Math.random() < p;
     tracer(G, u.x, u.y, e.x + (hit ? 0 : 14), e.y + (hit ? 0 : -10), hit);
     say(G, u, 'special');
@@ -3762,7 +3935,7 @@ function updateUnit(G, u, dt) {
     if (u.gallop) {
       u.wakeT -= dt; if (u.wakeT <= 0) { u.wakeT = 0.9; makeNoise(G, u.x, u.y, 9, 'loud', { x: u.x, y: u.y }); }
       for (const e of G.enemies) {
-        if (!e.alive || e.ship || e.dummy || e.trainer || u.sabred.has(e) || dist(u, e) > TILE * 0.9) continue;
+        if (!e.alive || e.ship || e.dummy || e.trainer || u.sabred.has(e) || dist(u, e) > TILE * (u.perk === 'lancia' ? 1.3 : 0.9)) continue;
         u.sabred.add(e);
         if (Math.random() < (u.sk && u.sk.sciabola ? 0.92 : 0.8)) { killEnemy(G, e, 'sabre', u); G.fx.push({ k: 'slash', x: e.x, y: e.y, a: u.facing, t: 0, T: 0.3 }); sound(G, 'knife', e.x, e.y); }
         else floatText(G, e.x, e.y - 14, 'schivato', '#e9e0c8');
@@ -4412,7 +4585,20 @@ function drawHorse2D(ctx, x, y, ang, dead, moving, T) {
   ctx.restore();
 }
 /* ---------- entity drawing ---------- */
-function UI2Coat(G) { const k = (LOOKS[(CORPS[G.M.corps] || {}).look] || {}).kind; return k === 'para' ? ['#b39d6e', '#9c875c'] : k === 'aoi' ? ['#b3a275', '#9c8c62'] : k === 'sub' ? ['#2a2d2c', '#202322'] : [COL.uni, COL.uniD]; }
+function UI2Coat(G) { const k = (LOOKS[(CORPS[G.M.corps] || {}).look] || {}).kind; return k === 'para' ? ['#b39d6e', '#9c875c'] : k === 'aoi' ? ['#b3a275', '#9c8c62'] : k === 'sub' ? ['#2a2d2c', '#202322'] : k === 'carr' ? ['#2a2724', '#1c1a18'] : [COL.uni, COL.uniD]; }
+// headgear seen from above: colour, and the feather or plume that tells the corps apart
+const HAT_2D = { fez: '#121212', alpino: '#4f5338', adrian: '#5d634a', m33: '#5c6046', para: '#8a7a54', colonial: '#d4c69a', carrista: '#1f1c19' };
+function drawHat2D(ctx, G, x) {
+  const Lk = LOOKS[(CORPS[G.M.corps] || {}).look] || LOOKS.ardito, h = Lk.hat;
+  if (h === 'alpino') { ctx.fillStyle = '#3f432c'; ctx.beginPath(); ctx.ellipse(x, 0, 5.6, 5.2, 0, 0, TAU); ctx.fill(); }
+  if (h === 'colonial') { ctx.fillStyle = '#b8a97c'; ctx.beginPath(); ctx.arc(x, 0, 5.4, 0, TAU); ctx.fill(); }
+  ctx.fillStyle = h === 'adrian' && Lk.helm ? '#' + Lk.helm.toString(16).padStart(6, '0') : HAT_2D[h] || COL.fez;
+  ctx.beginPath(); ctx.arc(x, 0, 3.9, 0, TAU); ctx.fill();
+  if (h === 'fez') { ctx.strokeStyle = '#000'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x - 5, 4.5); ctx.stroke(); }
+  else if (h === 'alpino') { ctx.strokeStyle = '#0c0c0c'; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(x - 1, 2); ctx.lineTo(x - 9, 6); ctx.stroke(); }
+  else if (Lk.plume) { ctx.fillStyle = '#10130f'; ctx.beginPath(); ctx.ellipse(x - 3, 4.5, 5.5, 3, 0.4, 0, TAU); ctx.fill(); }
+  if (Lk.badge) { ctx.fillStyle = '#' + Lk.badge.toString(16).padStart(6, '0'); ctx.beginPath(); ctx.arc(x + 2.6, 0, 1.1, 0, TAU); ctx.fill(); }
+}
 function drawArdito(ctx, G, u, sel, T) {
   const t = tileAt(G, u.x, u.y), swim = t.water;
   if (u.vehicle) { if (sel) { ctx.strokeStyle = COL.gold; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(u.x, u.y, 30, 20, u.facing, 0, TAU); ctx.stroke(); } drawTank2D(ctx, u.x, u.y, u.facing, 'm13', !u.alive); return; }
@@ -4457,7 +4643,7 @@ function drawArdito(ctx, G, u, sel, T) {
   } else if (u.crawl) {
     ctx.fillStyle = bodyD; ctx.beginPath(); ctx.ellipse(-9, -3, 6, 2.4, 0.2, 0, TAU); ctx.ellipse(-9, 3, 6, 2.4, -0.2, 0, TAU); ctx.fill();
     ctx.fillStyle = body; ctx.beginPath(); ctx.ellipse(-1, 0, 8, 5.5, 0, 0, TAU); ctx.fill(); ctx.stroke();
-    ctx.fillStyle = caim ? '#2a2018' : COL.fez; ctx.beginPath(); ctx.arc(8, 0, 4, 0, TAU); ctx.fill();
+    drawHat2D(ctx, G, 8);
   } else {
     // pack / tank
     if (u.role === 'lanciafiamme') { ctx.fillStyle = '#4b4e40'; ctx.beginPath(); ctx.arc(-8, -3, 4, 0, TAU); ctx.arc(-8, 3.5, 4, 0, TAU); ctx.fill(); ctx.stroke(); }
@@ -4478,8 +4664,7 @@ function drawArdito(ctx, G, u, sel, T) {
     ctx.fillStyle = caim ? '#2a2018' : COL.skin; ctx.strokeStyle = COL.outline; ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.arc(1.5, 0, 4.6, 0, TAU); ctx.fill(); ctx.stroke();
     if (!caim) {
-      ctx.fillStyle = COL.fez; ctx.beginPath(); ctx.arc(1, 0, 3.9, 0, TAU); ctx.fill();
-      ctx.strokeStyle = '#000'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(1, 0); ctx.lineTo(-4, 4.5); ctx.stroke();
+      drawHat2D(ctx, G, 1);
     }
   }
   ctx.restore();
@@ -6340,25 +6525,35 @@ const PAL = {
   aoi:   { coat: 0xb3a275, coatD: 0x9c8c62, trou: 0xa49468, putt: 0x8f805a, puttD: 0x7d704e, boot: 0x3a2a1a, belt: 0x6a5434, pouch: 0x8f805a },
   de:    { coat: 0x5f6456, coatD: 0x4f5447, trou: 0x585d50, putt: 0x2c2620, puttD: 0x241f1a, boot: 0x241f1a, belt: 0x241f1a, pouch: 0x3a332a },
   ussr:  { coat: 0x6e6852, coatD: 0x5c5744, trou: 0x5e5a46, putt: 0x3a3632, puttD: 0x302c28, boot: 0x3a3632, belt: 0x4a3a28, pouch: 0x5a5440 },
+  carr:  { coat: 0x22201d, coatD: 0x181614, trou: 0x5e6046, putt: 0x55583f, puttD: 0x484a36, boot: 0x241c15, belt: 0x2c2620, pouch: 0x3a3630 },
 };
 /* how each corps dresses: the 3D figure reads these */
 const LOOKS = {
-  alpini:    { kind: 'it', hat: 'alpino', flames: true, flameCol: 0x2f6a34, under: 'sweater' },
-  alpini43:  { kind: 'it', hat: 'alpino', flames: true, flameCol: 0x2f6a34, under: 'sweater' },
-  fante:     { kind: 'it', hat: 'adrian', flames: true, flameCol: 'sassari', under: 'tie' },
-  ardito:    { kind: 'it', hat: 'fez', flames: true, flameCol: 0x141414, under: 'tie' },
+  // alpini: the felt hat and its black feather, green flames, rope and ice axe (in Russia a greatcoat and a rolled blanket)
+  alpini:    { kind: 'it', hat: 'alpino', flames: true, flameCol: 0x2f6a34, under: 'sweater', rope: true, axe: true, hands: { fuciliere: 'rifle' } },
+  alpini43:  { kind: 'it42', hat: 'alpino', flames: true, flameCol: 0x2f6a34, under: 'sweater', blanket: true, hands: { mitragliere: 'breda30' } },
+  // the Sassari: red and white collar patches, and many a Sardinian beard
+  fante:     { kind: 'it', hat: 'adrian', flames: true, flameCol: [0xf0ece0, 0xb8302a], under: 'tie', beards: 0.4, hands: { fuciliere: 'rifle' } },
+  // arditi: black fez, open jacket on the black jumper, black flames, petardi on every belt
+  ardito:    { kind: 'it', hat: 'fez', flames: true, flameCol: 0x141414, under: 'black', bombsAll: true },
   nuotatore: { kind: 'sub', hat: 'hood' },
-  maro:      { kind: 'it42', hat: 'm33', flames: true, flameCol: 0xa82a22, under: 'tie' },
-  cav17:     { kind: 'it', hat: 'adrian', flames: true, flameCol: 0xe8e4d8, under: 'tie' },
-  savoia:    { kind: 'it42', hat: 'm33', flames: true, flameCol: 0x111111, under: 'tie' },
-  ariete:    { kind: 'it42', hat: 'carrista', flames: true, flameCol: 0x2a4f8c, under: 'tie' },
+  maro:      { kind: 'aoi', hat: 'm33', badge: 0xd6aa4c, flames: true, flameCol: 0xa82a22, under: 'tie', hands: { fuciliere: 'mab' } },
+  cav17:     { kind: 'it', hat: 'adrian', flames: true, flameCol: 0xd9b52c, under: 'tie' },
+  // Savoia Cavalleria: black flames and the red tie
+  savoia:    { kind: 'it42', hat: 'm33', flames: true, flameCol: 0x111111, under: 'redtie', bombsAll: true },
+  // tank men: black leather coat, padded helmet, red and blue flames
+  ariete:    { kind: 'carr', hat: 'carrista', flames: true, flameCol: [0xb8302a, 0x2a4f8c], under: 'tie' },
   marina:    { kind: 'navy', hat: 'sailor' },
   bersa:     { kind: 'it', hat: 'adrian', plume: true, flames: true, flameCol: 0xa8302a, under: 'tie' },
-  granatieri:{ kind: 'it', hat: 'adrian', flames: true, flameCol: 0xc23a2e, under: 'tie' },
-  marina17:  { kind: 'it', hat: 'adrian', flames: true, flameCol: 0x27466e, under: 'tie' },
-  carab41:   { kind: 'aoi', hat: 'colonial', flames: true, flameCol: 0x111111, under: 'tie' },
-  raggr43:   { kind: 'it42', hat: 'm33', flames: true, flameCol: 0xa8302a, under: 'tie' },
-  para:      { kind: 'para', hat: 'm33', helmCol: 0x8a7a54, flames: true, flameCol: 0x6fa8d8, under: 'tie' },
+  // granatieri: the grenade on the helmet, white alamari on the red collar, the tallest men in the army
+  granatieri:{ kind: 'it', hat: 'adrian', badge: 0xd6aa4c, collar: [0xc23a2e, 0xf2f0ea], under: 'tie', tall: 1.07, bombsAll: true, hands: { fuciliere: 'rifle' } },
+  // the sailors of the Reggimento Marina: the navy's blue jersey under the grey-green, the anchor on a grey helmet
+  marina17:  { kind: 'it', hat: 'adrian', helm: 0x565e62, badge: 0xd6aa4c, under: 'navy' },
+  // carabinieri in Africa: sun helmet with the silver flame, silver alamari on the black collar
+  carab41:   { kind: 'aoi', hat: 'colonial', badge: 0xd8dade, collar: [0x151515, 0xd8dade], under: 'tie' },
+  raggr43:   { kind: 'it42', hat: 'm33', flames: true, flameCol: 0xa8302a, under: 'tie', mortar: true },
+  // the Folgore: paratrooper's helmet, sand-coloured smock, knee pads, a bottle for everyone
+  para:      { kind: 'para', hat: 'para', helmCol: 0x8a7a54, flames: true, flameCol: 0x6fa8d8, under: 'tie', knees: true, bottlesAll: true },
 };
 const FOE_LOOKS = {
   au:       { kind: 'au', hat: 'stahl', off: { kind: 'auOff', hat: 'kappe' } },
@@ -6382,11 +6577,17 @@ function actorSpec(G, a, isUnit) {
   const war = G.M.war || 1;
   if (isUnit) {
     const Lk = LOOKS[(CORPS[G.M.corps] || {}).look] || LOOKS.ardito;
+    const hands = Object.assign({ fuciliere: 'carbine', bombardiere: 'knife', guastatore: 'knife', mitragliere: war === 1 ? 'vp' : 'mab', lanciafiamme: 'flamer', cacciacarri: 'knife', nuotatore: null }, Lk.hands);
     Object.assign(sp, {
-      kind: Lk.kind, flames: !!Lk.flames, flameCol: Lk.flameCol, helmCol: Lk.helmCol, dagger: Lk.kind !== 'sub', under: Lk.under || 'tie', canteen: Lk.kind !== 'sub', mask: war === 1 && Lk.kind !== 'sub',
-      hat: Lk.hat, hand: { fuciliere: war === 1 ? 'carbine' : 'rifle', bombardiere: 'knife', guastatore: 'knife', mitragliere: war === 1 ? 'vp' : 'mab', lanciafiamme: 'flamer', cacciacarri: 'knife', nuotatore: null }[a.role],
-      plume: !!Lk.plume, bombs: a.role === 'bombardiere' || a.role === 'cacciacarri', bottles: a.role === 'cacciacarri', pliers: a.role === 'guastatore', tanks: a.role === 'lanciafiamme', cacc: Lk.kind !== 'sub',
+      kind: Lk.kind, flames: !!Lk.flames, flameCol: Lk.flameCol, helmCol: Lk.helmCol, helm: Lk.helm, badge: Lk.badge, collar: Lk.collar, dagger: Lk.kind !== 'sub', under: Lk.under || 'tie', canteen: Lk.kind !== 'sub', mask: war === 1 && Lk.kind !== 'sub',
+      hat: Lk.hat, hand: hands[a.role],
+      plume: !!Lk.plume, bombs: a.role === 'bombardiere' || a.role === 'cacciacarri' || !!Lk.bombsAll || !!Lk.bottlesAll, bottles: a.role === 'cacciacarri' || !!Lk.bottlesAll, pliers: a.role === 'guastatore', tanks: a.role === 'lanciafiamme', cacc: Lk.kind !== 'sub',
+      rope: !!Lk.rope, axe: !!Lk.axe && a.role !== 'mitragliere', blanket: !!Lk.blanket, knees: !!Lk.knees, mortar: !!Lk.mortar && a.role === 'bombardiere', coatLong: Lk.kind === 'carr',
     });
+    if (Lk.tall) sp.hgt *= Lk.tall;
+    if (Lk.beards) sp.beard = h(4) < Lk.beards;
+    // at Pozzuolo the Lancieri di Novara ride with Genova Cavalleria: white flames and the lance
+    if (G.M.corps === 'cav17' && /Novara/.test(a.name || '')) { sp.flameCol = 0xeceae2; sp.lance = true; }
     if (Lk.kind === 'sub') Object.assign(sp, { must: false, beard: false, gloves: false, winter: false });
     if (G.M.id === 'nikolajewka') Object.assign(sp, { beard: h(4) < 0.55, stubble: true });
   } else {
@@ -6419,6 +6620,15 @@ function weaponKit(type) {
     K.add(G0.cyl6, m, 0, 0.012, 0.2, 0.014, 0.2, 0.014, Math.PI / 2, 0, 0);
     K.add(G0.cyl6, 0x4a4c4c, 0, 0.012, 0.22, 0.02, 0.12, 0.02, Math.PI / 2, 0, 0);
     K.add(G0.box, m, 0, -0.06, 0.05, 0.016, 0.09, 0.024);
+  } else if (type === 'breda30') {
+    // the Breda 30 light machine gun: long barrel with its flash hider, magazine on the right, bipod folded
+    K.add(G0.box, WOOD, 0, -0.015, -0.12, 0.03, 0.06, 0.18);
+    K.add(G0.box, m, 0, 0.0, 0.06, 0.042, 0.05, 0.2);
+    K.add(G0.box, m, 0.036, 0.0, 0.08, 0.03, 0.03, 0.09);
+    K.add(G0.cyl6, m, 0, 0.012, 0.33, 0.011, 0.36, 0.011, Math.PI / 2, 0, 0);
+    K.add(G0.cyl6, 0x3a3c3c, 0, 0.012, 0.52, 0.018, 0.05, 0.018, Math.PI / 2, 0, 0);
+    for (const s of [-1, 1]) K.beam(m, 0, 0.0, 0.36, s * 0.02, -0.012, 0.52, 0.008, 0.008);
+    K.add(G0.box, WOOD, 0, -0.05, 0.03, 0.022, 0.06, 0.03);
   } else if (type === 'flamer') {
     K.add(G0.cyl6, 0x3a3c34, 0, 0, 0.17, 0.016, 0.42, 0.016, Math.PI / 2, 0, 0);
     K.add(G0.cone7, 0x222222, 0, 0, 0.4, 0.024, 0.05, 0.024, Math.PI / 2, 0, 0);
@@ -6455,8 +6665,8 @@ function buildHuman(sp) {
   const kP = new Kit();
   kP.add(G0.sph6, trou, 0, -0.02, 0, 0.125 * bk, 0.085, 0.09 * bk);
   if (!cai) kP.add(G0.fez, coat, 0, -0.03, 0, 0.13 * bk, 0.11, 0.095 * bk);
-  if (sp.winter && !cai) {
-    kP.add(G0.skirt, coat, 0, 0.0, 0, 0.13 * bk, 0.25, 0.098 * bk);
+  if ((sp.winter || sp.coatLong) && !cai) {
+    kP.add(G0.skirt, coat, 0, 0.0, 0, 0.13 * bk, sp.coatLong ? 0.2 : 0.25, 0.098 * bk);
     for (const sx of [-1, 1]) kP.add(G0.box, coatD, sx * 0.012, -0.13, 0.1 * bk, 0.006, 0.24, 0.012, -0.12, 0, 0);
   }
   hips.add(kP.mesh());
@@ -6470,6 +6680,8 @@ function buildHuman(sp) {
     if (sp.kind === 'auOff') kK.add(limbGeo(1.12), boot, 0, -0.108, 0, 0.044, 0.22, 0.047);
     else for (let j = 0; j < 3; j++) kK.add(limbGeo(1.08), j % 2 ? puttD : putt, 0, -0.04 - j * 0.07, 0, 0.045 - j * 0.002, 0.075, 0.047 - j * 0.002);
     if (cai) { kK.add(limbGeo(1.15), skin, 0, -0.11, 0, 0.042, 0.215, 0.045); }
+    // the paratroopers' leather knee pads
+    if (sp.knees) kK.add(G0.box, 0x5a4a32, 0, 0.0, 0.04, 0.062, 0.07, 0.03);
     B.kn[i].add(kK.mesh());
     const kA = new Kit();
     kA.add(G0.box, boot, 0, -0.012, 0.028, cai ? 0.06 : 0.074, 0.05, cai ? 0.13 : 0.15);
@@ -6481,16 +6693,29 @@ function buildHuman(sp) {
   kS.add(G0.torso, coat, 0, 0, 0, 0.152 * bk, 0.335, 0.104 * bk);
   kS.add(G0.cyl, belt, 0, 0.035, 0, 0.128 * bk, 0.034, 0.094 * bk);
   kS.add(G0.box, 0x8a8470, 0, 0.035, 0.094 * bk, 0.028, 0.026, 0.008);
-  const itLike = sp.kind === 'it' || sp.kind === 'itOff' || sp.kind === 'it42' || sp.kind === 'para' || sp.kind === 'sub';
+  const itLike = sp.kind === 'it' || sp.kind === 'itOff' || sp.kind === 'it42' || sp.kind === 'para' || sp.kind === 'sub' || sp.kind === 'aoi' || sp.kind === 'carr';
   if (itLike) {
+    const openC = sp.under === 'black' || sp.under === 'navy';
     for (const s of [-1, 1]) {
-      kS.add(G0.box, coat, s * 0.036, 0.3, 0.088, 0.044, 0.08, 0.014, -0.2, 0, -s * 0.38);
-      if (sp.flames && sp.flameCol === 'sassari') { kS.add(G0.box, 0xf0ece0, s * 0.042, 0.31, 0.096, 0.024, 0.02, 0.006, -0.2, 0, -s * 0.3); kS.add(G0.box, 0xb8302a, s * 0.042, 0.29, 0.096, 0.024, 0.02, 0.006, -0.2, 0, -s * 0.3); }
-      else if (sp.flames && sp.flameCol !== 0x141414) { kS.add(G0.box, sp.flameCol, s * 0.042, 0.3, 0.096, 0.026, 0.04, 0.006, -0.2, 0, -s * 0.3); }
-      else if (sp.flames) { kS.add(G0.box, dark, s * 0.04, 0.305, 0.096, 0.02, 0.045, 0.006, -0.2, 0, -s * 0.3); kS.add(G0.box, dark, s * 0.05, 0.292, 0.096, 0.012, 0.03, 0.006, -0.2, 0, -s * 0.6); }
+      // the lapels: wide open over a jumper for the arditi and the sailors
+      kS.add(G0.box, coat, s * (openC ? 0.05 : 0.036), 0.3, 0.088, openC ? 0.05 : 0.044, 0.08, 0.014, -0.2, 0, -s * (openC ? 0.55 : 0.38));
+      if (sp.collar) {
+        // alamari: two bars on a coloured patch (white on red for the granatieri, silver on black for the carabinieri)
+        kS.add(G0.box, sp.collar[0], s * 0.042, 0.3, 0.096, 0.03, 0.046, 0.006, -0.2, 0, -s * 0.3);
+        for (const yy of [0.31, 0.292]) kS.add(G0.box, sp.collar[1], s * 0.042, yy, 0.1, 0.028, 0.007, 0.004, -0.2, 0, -s * 0.3);
+      } else if (sp.flames && Array.isArray(sp.flameCol)) { kS.add(G0.box, sp.flameCol[0], s * 0.042, 0.31, 0.096, 0.026, 0.022, 0.006, -0.2, 0, -s * 0.3); kS.add(G0.box, sp.flameCol[1], s * 0.042, 0.289, 0.096, 0.026, 0.022, 0.006, -0.2, 0, -s * 0.3); }
+      else if (sp.flames && sp.flameCol !== 0x141414) { kS.add(G0.box, sp.flameCol, s * 0.042, 0.3, 0.096, 0.028, 0.044, 0.006, -0.2, 0, -s * 0.3); }
+      else if (sp.flames && openC) { kS.add(G0.box, dark, s * 0.075, 0.29, 0.094, 0.024, 0.05, 0.006, -0.2, 0, -s * 0.55); kS.add(G0.box, dark, s * 0.088, 0.278, 0.093, 0.014, 0.034, 0.006, -0.2, 0, -s * 0.85); }
+      else if (sp.flames) { kS.add(G0.box, dark, s * 0.048, 0.305, 0.097, 0.022, 0.048, 0.006, -0.2, 0, -s * 0.5); kS.add(G0.box, dark, s * 0.06, 0.292, 0.097, 0.014, 0.034, 0.006, -0.2, 0, -s * 0.8); }
     }
     if (sp.under === 'sweater') kS.add(G0.cyl8, 0x4c4f3c, 0, 0.33, 0.004, 0.052, 0.05, 0.05);
-    else { kS.add(G0.box, 0x7f8160, 0, 0.3, 0.09, 0.044, 0.06, 0.012, -0.2, 0, 0); kS.add(G0.box, dark, 0, 0.288, 0.097, 0.012, 0.06, 0.006, -0.2, 0, 0); }
+    else if (openC) {
+      // a roll-neck jumper showing in the open collar: black for the arditi, navy blue for the sailors
+      const jc = sp.under === 'black' ? 0x151515 : 0x1f2838;
+      kS.add(G0.cyl8, jc, 0, 0.334, 0.004, 0.06, 0.062, 0.058);
+      kS.add(G0.box, jc, 0, 0.29, 0.096, 0.07, 0.07, 0.01, -0.18, 0, 0);
+      kS.add(G0.box, jc, 0, 0.24, 0.1, 0.042, 0.05, 0.008, -0.1, 0, 0);
+    } else { kS.add(G0.box, 0x7f8160, 0, 0.3, 0.09, 0.044, 0.06, 0.012, -0.2, 0, 0); kS.add(G0.box, sp.under === 'redtie' ? 0xb0261d : dark, 0, 0.286, 0.097, sp.under === 'redtie' ? 0.016 : 0.012, 0.066, 0.006, -0.2, 0, 0); }
     if (!sp.officer) for (const s of [-1, 1]) kS.add(G0.box, pouch, s * 0.065, 0.06, 0.095 * bk, 0.055, 0.046, 0.03);
     if (sp.dagger) { kS.add(G0.box, dark, 0.118 * bk, -0.02, 0.05, 0.018, 0.13, 0.026, 0, 0, 0.25); kS.add(G0.box, 0x3a2a1c, 0.132 * bk, 0.06, 0.05, 0.016, 0.05, 0.02, 0, 0, 0.25); }
     if (sp.cacc) kS.add(G0.box, coatD, 0, 0.075, -0.09 * bk, 0.15, 0.1, 0.025);
@@ -6502,6 +6727,25 @@ function buildHuman(sp) {
     if (sp.canteen) { kS.add(G0.cyl8, 0x55553f, -0.11 * bk, -0.005, -0.055, 0.034, 0.075, 0.034, 0, 0, 0.1); kS.add(G0.cyl8, 0x2a2a26, -0.11 * bk, 0.04, -0.055, 0.01, 0.02, 0.01); }
     // the gas mask in its tin, slung on the left hip
     if (sp.mask) { kS.add(G0.cyl8, 0x5d6248, 0.105 * bk, 0.02, -0.07, 0.03, 0.1, 0.03, 0.12, 0, 0); kS.beam(0x4a4a36, 0.105, 0.07, -0.07, -0.12, 0.31, 0.05, 0.012, 0.006); }
+    // the alpini's climbing rope, coiled across the chest, and the ice axe on the back
+    if (sp.rope) {
+      const rc = 0xb5a272;
+      for (const dz of [0, 0.014]) { kS.beam(rc, 0.13 * bk, 0.31, 0.05 + dz, -0.12 * bk, 0.04, 0.1 + dz, 0.022, 0.016); kS.beam(rc, 0.13 * bk, 0.31, -0.05 - dz, -0.12 * bk, 0.04, -0.1 - dz, 0.022, 0.016); }
+      kS.add(G0.wheel, rc, -0.13 * bk, 0.05, 0.0, 0.055, 0.055, 0.055, 0, Math.PI / 2, 0);
+    }
+    if (sp.axe) {
+      kS.beam(WOOD, 0.09, 0.36, -0.125 * bk, -0.07, -0.04, -0.125 * bk, 0.018, 0.018);
+      kS.beam(STEEL, 0.04, 0.37, -0.125 * bk, 0.15, 0.33, -0.125 * bk, 0.02, 0.012);
+      kS.add(G0.cone7, STEEL, -0.075, -0.06, -0.125 * bk, 0.012, 0.04, 0.012, Math.PI, 0, 0);
+    }
+    // the rolled blanket worn across the body, as on the retreat from the Don
+    if (sp.blanket) { kS.beam(0x5a4c3e, 0.13 * bk, 0.32, 0.045, -0.13 * bk, 0.03, 0.095, 0.05, 0.05); kS.beam(0x5a4c3e, 0.13 * bk, 0.32, -0.05, -0.13 * bk, 0.03, -0.1, 0.05, 0.05); }
+    // the Brixia 45 mm assault mortar, carried on the back
+    if (sp.mortar) {
+      kS.add(G0.cyl8, 0x3a3d34, 0.03, 0.27, -0.15 * bk, 0.028, 0.3, 0.028, 0.2, 0, 0.15);
+      kS.add(G0.box, 0x3a3d34, 0.0, 0.1, -0.16 * bk, 0.14, 0.12, 0.03);
+      kS.add(G0.box, 0x2c2e28, 0.06, 0.06, -0.15 * bk, 0.03, 0.08, 0.06);
+    }
   } else if (sp.kind === 'au' || sp.kind === 'auOff' || sp.kind === 'navy' || sp.kind === 'uk' || sp.kind === 'ussr') {
     kS.add(G0.cyl8, coat, 0, 0.33, 0.004, 0.054, 0.045, 0.052);
     for (let j = 0; j < 4; j++) kS.add(G0.tiny, 0x2e2e2a, 0, 0.1 + j * 0.055, 0.1 * bk, 0.008, 0.008, 0.006);
@@ -6562,14 +6806,15 @@ function buildHuman(sp) {
     if (ms === 'handlebar') for (const s of [-1, 1]) kH.add(G0.box, hair, s * 0.033, 0.058, 0.072, 0.022, 0.007, 0.008, 0, 0, s * 0.55);
     else for (const s of [-1, 1]) kH.add(G0.tiny, hair, s * 0.027, 0.047, 0.072, 0.01, ms === 'walrus' ? 0.018 : 0.012, 0.01);
   }
-  if (sp.hat !== 'stahl' && sp.hat !== 'adrian' && sp.hat !== 'm33' && sp.hat !== 'brodie' && sp.hat !== 'hood' && sp.hat !== 'colonial' && sp.hat !== 'carrista') kH.add(G0.sph, cai ? hair.clone().multiplyScalar(0.6) : hair, 0, 0.097, -0.014, 0.071, 0.068, 0.075);
+  if (sp.hat !== 'stahl' && sp.hat !== 'adrian' && sp.hat !== 'm33' && sp.hat !== 'para' && sp.hat !== 'brodie' && sp.hat !== 'hood' && sp.hat !== 'colonial' && sp.hat !== 'carrista') kH.add(G0.sph, cai ? hair.clone().multiplyScalar(0.6) : hair, 0, 0.097, -0.014, 0.071, 0.068, 0.075);
   else kH.add(G0.box, hair, 0, 0.09, -0.05, 0.12, 0.05, 0.05);
   const hatK = new Kit();
   if (sp.hat === 'adrian') {
-    const hc = col3(0x5d634a);
+    const hc = col3(sp.helm || 0x5d634a);
     hatK.add(G0.hemi, hc, 0, 0.112, 0, 0.082, 0.072, 0.092);
     hatK.add(G0.cyl, hc.clone().multiplyScalar(0.9), 0, 0.112, 0, 0.108, 0.008, 0.124);
     hatK.add(G0.box, hc, 0, 0.18, 0, 0.012, 0.03, 0.15);
+    if (sp.badge) hatK.add(G0.box, sp.badge, 0, 0.152, 0.074, 0.026, 0.03, 0.008, -0.55, 0, 0);
   } else if (sp.hat === 'fez') {
     hatK.add(G0.fez, 0x111111, 0, 0.16, 0, 0.07, 0.08, 0.07);
     hatK.beam(0x0a0a0a, 0, 0.2, 0, 0.035, 0.15, -0.065, 0.008, 0.008);
@@ -6595,7 +6840,8 @@ function buildHuman(sp) {
     hatK.add(G0.cyl, hc, 0, 0.128, -0.006, 0.12, 0.012, 0.135, -0.08, 0, 0);
     hatK.add(G0.cyl, hc, 0, 0.17, -0.01, 0.07, 0.08, 0.078);
     hatK.add(G0.cyl, shadeHex(0x5d6142, -0.3), 0, 0.142, -0.01, 0.074, 0.018, 0.081);
-    hatK.beam(0x101010, -0.065, 0.15, 0.0, -0.11, 0.33, -0.1, 0.012, 0.004);
+    hatK.beam(0x101010, -0.068, 0.15, 0.0, -0.13, 0.38, -0.15, 0.02, 0.006);
+    hatK.beam(0x1c1c1c, -0.07, 0.16, -0.01, -0.12, 0.34, -0.17, 0.012, 0.004);
     hatK.add(G0.tiny, 0xd8d0b0, -0.07, 0.16, 0.04, 0.014, 0.018, 0.006);
   } else if (sp.hat === 'm33') {
     // the Italian M33 helmet: a deep dome, a short flare all round
@@ -6603,6 +6849,14 @@ function buildHuman(sp) {
     hatK.add(G0.hemi, hc, 0, 0.106, -0.004, 0.084, 0.082, 0.092);
     hatK.add(G0.flare, hc.clone().multiplyScalar(0.92), 0, 0.09, -0.008, 0.094, 0.04, 0.104);
     hatK.add(G0.box, hc.clone().multiplyScalar(0.85), 0, 0.12, 0.09, 0.07, 0.012, 0.02, 0.3, 0, 0);
+    if (sp.badge) hatK.add(G0.box, sp.badge, 0, 0.15, 0.082, 0.026, 0.028, 0.008, -0.6, 0, 0);
+  } else if (sp.hat === 'para') {
+    // the paratrooper's helmet: round and close, no brim, held by a chin strap
+    const hc = col3(sp.helmCol || 0x8a7a54);
+    hatK.add(G0.hemi, hc, 0, 0.1, -0.006, 0.08, 0.084, 0.088);
+    hatK.add(G0.cyl, hc.clone().multiplyScalar(0.88), 0, 0.1, -0.006, 0.082, 0.014, 0.09);
+    for (const s of [-1, 1]) hatK.beam(0x3a2e20, s * 0.074, 0.1, 0.0, s * 0.05, 0.03, 0.04, 0.01, 0.006);
+    hatK.add(G0.box, 0x6fa8d8, 0, 0.15, 0.078, 0.018, 0.022, 0.006, -0.6, 0, 0);
   } else if (sp.hat === 'hood') {
     hatK.add(G0.sph, 0x1d201f, 0, 0.096, -0.01, 0.074, 0.082, 0.082);
     hatK.add(G0.box, 0x7a9aa0, 0, 0.09, 0.07, 0.07, 0.03, 0.01);
@@ -6641,6 +6895,7 @@ function buildHuman(sp) {
     hatK.add(G0.hemi, hc, 0, 0.118, -0.004, 0.086, 0.09, 0.1);
     hatK.add(G0.cyl, hc.clone().multiplyScalar(0.92), 0, 0.112, -0.004, 0.122, 0.008, 0.138);
     hatK.add(G0.cyl, col3(0xa8976a), 0, 0.13, -0.004, 0.088, 0.014, 0.1);
+    if (sp.badge) hatK.add(G0.box, sp.badge, 0, 0.165, 0.088, 0.024, 0.032, 0.008, -0.45, 0, 0);
   } else if (sp.hat === 'carrista') {
     // the tank crew's padded leather helmet
     hatK.add(G0.sph, 0x1f1c19, 0, 0.11, -0.012, 0.082, 0.08, 0.088);
@@ -6658,7 +6913,7 @@ function buildHuman(sp) {
     hatK.add(G0.tiny, 0xd6aa4c, 0, 0.162, 0.078, 0.011, 0.014, 0.006);
   }
   // the bersaglieri's plume of black capercaillie feathers, on the right side of the helmet
-  if (sp.plume) for (let i = 0; i < 7; i++) { const a = -0.5 + i * 0.16; hatK.beam(i % 2 ? 0x1c201a : 0x10130f, 0.075, 0.16, 0.02, 0.1 + Math.cos(a) * 0.05, 0.1 + Math.sin(a) * 0.05, -0.16 - i * 0.008, 0.018, 0.006); }
+  if (sp.plume) for (let i = 0; i < 11; i++) { const a = -0.6 + i * 0.13; hatK.beam(i % 2 ? 0x1c201a : 0x10130f, 0.075, 0.165, 0.02, 0.13 + Math.cos(a) * 0.07, 0.11 + Math.sin(a) * 0.08, -0.2 - (i % 3) * 0.02, 0.024, 0.008); }
   if (sp.mud) kH.add(G0.box, 0x4a3b2c, 0.03, 0.075, 0.068, 0.03, 0.012, 0.01, 0, 0, 0.4);
   // in the snow storm, snow settles on helmets and shoulders
   if (sp.winter && (sp.hat === 'adrian' || sp.hat === 'stahl' || sp.hat === 'm33')) hatK.add(G0.hemi, 0xf0f3f6, 0, sp.hat === 'adrian' ? 0.168 : 0.172, 0, 0.066, 0.022, 0.074);
@@ -6693,7 +6948,7 @@ function mountWeapons(B, sp) {
   const twoHand = sp.hand === 'vp' || sp.hand === 'flamer';
   if (twoHand) { W.hip = mk(); W.hip.position.set(-0.02, 0.07, 0.15); B.spine.add(W.hip); return W; }
   W.hand = mk(); W.hand.position.set(0, -0.2, 0.01); W.hand.rotation.x = Math.PI / 2; B.el[0].add(W.hand);
-  if (sp.hand === 'rifle' || sp.hand === 'carbine' || sp.hand === 'mab') {
+  if (sp.hand === 'rifle' || sp.hand === 'carbine' || sp.hand === 'mab' || sp.hand === 'breda30') {
     W.aim = mk(); W.aim.position.set(-0.07, 0.27, 0.12); B.spine.add(W.aim); W.aim.visible = false;
     W.back = mk(); W.back.position.set(0.0, 0.17, -0.13); W.back.rotation.set(-Math.PI / 2, 0, 0.75); B.spine.add(W.back); W.back.visible = false;
   }
@@ -8776,7 +9031,14 @@ function makeRider(G, a) {
   Object.assign(P, { rtx: -1.35, ltx: -1.35, rtz: -0.32, ltz: 0.32, rkx: 1.5, lkx: 1.5, rsx: -0.75, lsx: -0.55, rex: -0.6, lex: -0.9, sx: 0.08 });
   applyPose(B, P);
   B.root.position.set(0, 0.42, -0.04); hull.add(B.root);
-  const SK2 = new Kit(); SK2.add(G0.box, 0xc8ccd0, 0, -0.22, 0.12, 0.01, 0.025, 0.42, 0.5, 0, 0); SK2.add(G0.box, 0x8a6a30, 0, -0.2, -0.06, 0.03, 0.03, 0.06);
+  const SK2 = new Kit();
+  if (sp.lance) {
+    // a lancer of Novara: the long lance couched like the sabre, steel head and white pennant
+    const dy = -Math.sin(0.5), dz = Math.cos(0.5), at = k => [-0.2 + dy * k, 0.12 + dz * k], rx = Math.PI / 2 + 0.5;
+    SK2.add(G0.cyl6, 0x6a4a2c, 0, ...at(0.5), 0.014, 2.0, 0.014, rx, 0, 0);
+    SK2.add(G0.cone7, 0xc8ccd0, 0, ...at(1.55), 0.02, 0.11, 0.02, rx, 0, 0);
+    const [py, pz] = at(1.36); SK2.add(G0.box, 0xeceae2, 0, py + 0.04, pz, 0.005, 0.075, 0.16, 0.5, 0, 0);
+  } else { SK2.add(G0.box, 0xc8ccd0, 0, -0.22, 0.12, 0.01, 0.025, 0.42, 0.5, 0, 0); SK2.add(G0.box, 0x8a6a30, 0, -0.2, -0.06, 0.03, 0.03, 0.06); }
   B.el[0].add(SK2.mesh(false, false));
   return { root, hull, boatM: true, land: true, kind: 'horse', legs, B, L: 1.2, Bm: 0.3, yaw: 0, px: null, pz: null, spd: 0, phase: HASH(sd, 5, 5) * 6, fire: 0, deadT: 0, wakeT: 0, gait: 0 };
 }
@@ -9952,18 +10214,24 @@ function showMissions() {
 
 /* ---------------- briefing ---------------- */
 const AMMO_WORDS = { carbine: ['colpo', 'colpi'], grenade: ['bomba a mano', 'bombe a mano'], charge: ['carica', 'cariche'], burst: ['caricatore', 'caricatori'], flame: ['vampata', 'vampate'], torpedo: ['siluro', 'siluri'], depth: ['bomba di profondità', 'bombe di profondità'], cannon: ['colpo di cannone', 'colpi di cannone'], ram: ['carica da 300 kg', 'cariche da 300 kg'] };
-function ammoLine(s) {
-  const R = ROLES[s.role], base = Object.assign({}, R.ammo, s.ammo || {}), d = DIFF[SAVE.diff], parts = [];
+function ammoLine(s, M) {
+  const R = corpsRole(M, s).R, base = Object.assign({}, R.ammo), d = DIFF[SAVE.diff], parts = [];
+  for (const k in s.ammo || {}) base[k] = s.ammo[k] + (R.ammo[k] || 0) - (ROLES[s.role].ammo[k] || 0);
   const sk = {}; for (const S of vetSkills(s.role, vetLevelOf(vetXp(vetKey(s))))) sk[S.key] = true;
   for (const k in base) if (base[k] > 0) { const n = Math.max(1, Math.round(base[k] * d.ammo)) + (Object.keys(VET_AMMO).some(x => sk[x] && VET_AMMO[x] === k) ? 1 : 0); parts.push(`${n} ${((R.words && R.words[k]) || AMMO_WORDS[k] || [k, k])[n === 1 ? 0 : 1]}`); }
   return parts.length ? `Porta ${parts.join(', ')}.` : '';
+}
+// what sets this corps apart: how its men dress, and the gift the game gives them
+function briefCorps(M) {
+  const A = ARMS[M.corps]; if (!A) return '';
+  return `<div class="corpsid" style="--cc:${(CORPS[M.corps] || {}).color || '#666'}">${A.dress ? `<p><b>La divisa.</b> ${esc(A.dress)}</p>` : ''}${A.perk ? `<p><b>La dote del corpo: ${esc(A.perk.name)}.</b> ${esc(A.perk.desc.charAt(0).toUpperCase() + A.perk.desc.slice(1))}.</p>` : ''}</div>`;
 }
 function showBrief(mi) {
   UI.mi = mi;
   const M = MISSIONS[mi];
   const squadHtml = () => M.squad.map(s => {
-    const R = ROLES[s.role], xp = vetXp(vetKey(s)), l = vetLevelOf(xp), sks = vetSkills(s.role, l);
-    return `<li><svg class="ic"><use href="#i-${R.icon}"/></svg><div><b>${esc(s.name || R.title)}</b><span class="role">${esc(R.title)}</span>${l ? `<span class="vst" title="${esc(VET_LEVELS[l].title)}">${vetStars(l)} ${esc(VET_LEVELS[l].title)}</span>` : ''}<p>${esc(s.kit || R.kit)}. ${esc(ammoLine(s))}</p>${sks.length ? `<p class="vsk">${sks.map(S => `<b>${esc(S.name)}</b>: ${esc(S.desc)}`).join(' · ')}</p>` : ''}</div></li>`;
+    const CR = corpsRole(M, s), R = CR.R, xp = vetXp(vetKey(s)), l = vetLevelOf(xp), sks = vetSkills(s.role, l);
+    return `<li><svg class="ic"><use href="#i-${R.icon}"/></svg><div><b>${esc(s.name || R.title)}</b><span class="role">${esc(R.title)}</span>${l ? `<span class="vst" title="${esc(VET_LEVELS[l].title)}">${vetStars(l)} ${esc(VET_LEVELS[l].title)}</span>` : ''}<p>${esc(CR.kit)}. ${esc(ammoLine(s, M))}</p>${sks.length ? `<p class="vsk">${sks.map(S => `<b>${esc(S.name)}</b>: ${esc(S.desc)}`).join(' · ')}</p>` : ''}</div></li>`;
   }).join('');
   $('#briefSheet').innerHTML = `
     <div class="lh"><span>Ordine d’operazione</span><span>Azione ${esc(M.num)}</span></div>
@@ -9971,6 +10239,7 @@ function showBrief(mi) {
     <p class="meta">${esc(M.place)} · ${esc(M.date)}</p>
     <p class="meta">${esc(M.unit)} · ${esc(M.context)}</p>
     <p class="corpsline" style="--cc:${(CORPS[M.corps] || {}).color || '#666'}"><b>${esc((CORPS[M.corps] || {}).name || '')}</b> <i>${esc((CORPS[M.corps] || {}).motto || '')}</i></p>
+    ${briefCorps(M)}
     <div class="thumbwrap"><canvas class="thumb" id="thumb" aria-label="Mappa della zona d’operazione"></canvas></div>
     <div class="legend"><span><i style="background:#d6aa4c"></i>La tua squadra</span><span><i style="background:#b0574a"></i>Nemico</span>${M.enemies.some(e => e.t === 'mg') ? '<span><i style="background:#e24a33"></i>Mitragliatrice</span>' : ''}${M.enemies.some(e => e.t === 'faro') ? '<span><i style="background:#f2e39a"></i>Riflettore</span>' : ''}${M.enemies.some(e => e.t === 'dog') ? '<span><i style="background:#d08a3a"></i>Cane da guardia</span>' : ''}<span><i style="background:#e9e0c8;border-radius:0"></i>Bersaglio</span><span>Tratteggio: area dell’obiettivo</span></div>
     ${M.brief.map(p => `<p>${esc(p)}</p>`).join('')}
@@ -10347,7 +10616,7 @@ function hatFor(u) {
   if (R.boat) return 'navy'; if (R.dive) return 'diver';
   return lookFor(u).hat;
 }
-const COAT_2D = { aoi: ['#b3a275', '#c6b689', '#8f805a'], it: ['#767a52', '#8a8e62', '#5a5e47'], it42: ['#6e714f', '#82865f', '#585b42'], para: ['#b39d6e', '#c6b083', '#8f7c55'], sub: ['#2a2d2c', '#3a3d3c', '#1c1e1d'], navy: ['#1f2633', '#2c3546', '#161b26'] };
+const COAT_2D = { carr: ['#24211e', '#34302b', '#161412'], aoi: ['#b3a275', '#c6b689', '#8f805a'], it: ['#767a52', '#8a8e62', '#5a5e47'], it42: ['#6e714f', '#82865f', '#585b42'], para: ['#b39d6e', '#c6b083', '#8f7c55'], sub: ['#2a2d2c', '#3a3d3c', '#1c1e1d'], navy: ['#1f2633', '#2c3546', '#161b26'] };
 function portrait(u) {
   const key = u.name + '|' + u.role + '|' + hatFor(u);
   if (PORTRAITS.has(key)) return PORTRAITS.get(key);
@@ -10362,7 +10631,8 @@ function drawFace(g, u, W, H) {
   let s = 7; for (const ch of u.name) s = (s * 31 + ch.charCodeAt(0)) >>> 0;
   const rnd = () => { s = (Math.imul(s, 1103515245) + 12345) >>> 0; return (s >>> 8) / 16777216; };
   const caim = false, hat = hatFor(u), Lk = lookFor(u), kind = hat === 'navy' ? 'navy' : hat === 'diver' || hat === 'hood' ? 'sub' : Lk.kind, CC = COAT_2D[kind] || COAT_2D.it;
-  const flame = hat === 'navy' || kind === 'sub' ? null : Lk.flameCol === 'sassari' ? 'sassari' : Lk.flameCol != null ? '#' + Lk.flameCol.toString(16).padStart(6, '0') : '#111';
+  const hex = n => '#' + n.toString(16).padStart(6, '0');
+  const flame = hat === 'navy' || kind === 'sub' ? null : Lk.collar ? 'collar' : Array.isArray(Lk.flameCol) ? 'two' : Lk.flameCol === 0x141414 ? '#111' : Lk.flameCol != null ? hex(Lk.flameCol) : null;
   const bg = g.createLinearGradient(0, 0, 0, H); bg.addColorStop(0, '#4a523b'); bg.addColorStop(1, '#171a12');
   g.fillStyle = bg; g.fillRect(0, 0, W, H);
   const skins = ['#d3a47c', '#c69570', '#b6845d', '#dcae88', '#bf8b65'], skin = skins[Math.floor(rnd() * skins.length)];
@@ -10373,21 +10643,31 @@ function drawFace(g, u, W, H) {
     g.fillStyle = CC[0]; g.beginPath(); g.moveTo(0, H); g.lineTo(4, 112); g.quadraticCurveTo(20, 100, 42, 98); g.lineTo(78, 98); g.quadraticCurveTo(100, 100, 116, 112); g.lineTo(W, H); g.fill();
     if (hat === 'navy') { g.fillStyle = '#e8e6de'; g.beginPath(); g.moveTo(44, 96); g.lineTo(60, 124); g.lineTo(76, 96); g.fill(); g.fillStyle = '#2c3a5a'; g.fillRect(30, 96, 60, 8); }
     else if (kind === 'sub') { g.fillStyle = '#3b403a'; g.fillRect(44, 100, 32, 26); g.fillStyle = '#5a5e52'; g.fillRect(50, 104, 20, 8); }
-    else if (Lk.under === 'tie' || hat === 'fez') { g.fillStyle = shadeCss(CC[1], 0.1); g.beginPath(); g.moveTo(44, 96); g.lineTo(60, 128); g.lineTo(76, 96); g.fill(); g.fillStyle = '#111'; g.fillRect(57, 100, 6, 26); }
+    else if (Lk.under === 'black' || Lk.under === 'navy') {
+      // the open collar over a roll-neck jumper: black for the arditi, navy blue for the sailors
+      const jc = Lk.under === 'black' ? '#141414' : '#1f2838';
+      g.fillStyle = jc; g.beginPath(); g.moveTo(40, 94); g.lineTo(60, 134); g.lineTo(80, 94); g.fill(); g.fillRect(44, 88, 32, 12);
+    }
+    else if (Lk.under === 'tie' || Lk.under === 'redtie' || hat === 'fez') { g.fillStyle = shadeCss(CC[1], 0.1); g.beginPath(); g.moveTo(44, 96); g.lineTo(60, 128); g.lineTo(76, 96); g.fill(); g.fillStyle = Lk.under === 'redtie' ? '#b0261d' : '#111'; g.fillRect(Lk.under === 'redtie' ? 56 : 57, 100, Lk.under === 'redtie' ? 8 : 6, 26); }
     else { g.fillStyle = CC[2]; g.beginPath(); g.moveTo(44, 96); g.lineTo(60, 128); g.lineTo(76, 96); g.fill(); g.fillStyle = CC[2]; g.fillRect(46, 92, 28, 9); }
     if (kind !== 'sub') { g.fillStyle = CC[1]; g.beginPath(); g.moveTo(42, 98); g.lineTo(30, 104); g.lineTo(58, 134); g.closePath(); g.fill(); g.beginPath(); g.moveTo(78, 98); g.lineTo(90, 104); g.lineTo(62, 134); g.closePath(); g.fill(); }
     if (flame === '#111') {
       g.fillStyle = '#111';
       g.beginPath(); g.moveTo(33, 118); g.lineTo(37, 102); g.lineTo(41, 112); g.lineTo(45, 104); g.lineTo(47, 122); g.closePath(); g.fill();
       g.beginPath(); g.moveTo(87, 118); g.lineTo(83, 102); g.lineTo(79, 112); g.lineTo(75, 104); g.lineTo(73, 122); g.closePath(); g.fill();
-    } else if (flame === 'sassari') {
-      for (const x of [34, 74]) { g.fillStyle = '#f0ece0'; g.fillRect(x, 106, 12, 7); g.fillStyle = '#b8302a'; g.fillRect(x, 113, 12, 7); }
+    } else if (flame === 'two') {
+      for (const x of [34, 74]) { g.fillStyle = hex(Lk.flameCol[0]); g.fillRect(x, 106, 12, 7); g.fillStyle = hex(Lk.flameCol[1]); g.fillRect(x, 113, 12, 7); }
+    } else if (flame === 'collar') {
+      // alamari: two bars on the collar patch
+      for (const x of [33, 73]) { g.fillStyle = hex(Lk.collar[0]); g.fillRect(x, 104, 14, 16); g.fillStyle = hex(Lk.collar[1]); g.fillRect(x + 1, 107, 12, 3); g.fillRect(x + 1, 113, 12, 3); }
     } else if (flame) {
       // two-pointed collar flashes: green for the alpini, red for the marò, sky blue for the paratroopers
       g.fillStyle = flame;
       for (const s of [-1, 1]) { const x = 60 + s * 21; g.beginPath(); g.moveTo(x - 7, 104); g.lineTo(x + 7, 104); g.lineTo(x + 7, 118); g.lineTo(x + 2, 113); g.lineTo(x - 2, 118); g.lineTo(x - 7, 113); g.closePath(); g.fill(); }
     }
   }
+  // the alpini's rope, or the rolled blanket of the retreat, across the chest
+  if ((Lk.rope || Lk.blanket) && kind !== 'sub' && hat !== 'navy') { g.strokeStyle = Lk.rope ? '#b5a272' : '#5a4c3e'; g.lineWidth = Lk.rope ? 7 : 12; g.lineCap = 'round'; g.beginPath(); g.moveTo(26, 104); g.lineTo(96, 140); g.stroke(); g.lineCap = 'butt'; }
   // neck & head
   g.fillStyle = '#9d7253'; g.fillRect(hx - 12, hy + 18, 24, 24);
   // winter: the greatcoat's turned-up collar and a wool scarf
@@ -10429,9 +10709,10 @@ function drawFace(g, u, W, H) {
     const t = (rnd() - 0.5) * 0.12;
     g.save(); g.translate(hx, hy - 16); g.rotate(t);
     g.fillStyle = '#4f553f'; g.beginPath(); g.ellipse(0, 4, 36, 8, 0, 0, TAU); g.fill();
-    const hg = g.createLinearGradient(-20, -30, 20, 0); hg.addColorStop(0, '#7a8162'); hg.addColorStop(1, '#4e543f');
+    const hb = Lk.helm ? hex(Lk.helm) : '#5d634a', hg = g.createLinearGradient(-20, -30, 20, 0); hg.addColorStop(0, shadeCss(hb, 0.3)); hg.addColorStop(1, shadeCss(hb, -0.15));
     g.fillStyle = hg; g.beginPath(); g.ellipse(0, 0, 26, 24, 0, Math.PI, TAU); g.fill();
-    g.fillStyle = '#6a7154'; g.fillRect(-3, -30, 6, 28);
+    g.fillStyle = shadeCss(hb, 0.12); g.fillRect(-3, -30, 6, 28);
+    if (Lk.badge) { g.fillStyle = hex(Lk.badge); g.beginPath(); g.ellipse(0, -8, 5, 6, 0, 0, TAU); g.fill(); }
     g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.ellipse(0, 7, 30, 4, 0, 0, Math.PI); g.fill();
     if (Lk.plume) { g.strokeStyle = '#151812'; g.lineCap = 'round'; for (let i = 0; i < 9; i++) { g.lineWidth = 4 - i * 0.25; g.beginPath(); g.moveTo(18, -14); g.quadraticCurveTo(36 + i * 2, -18 + i * 3, 40 + i * 2.4, 8 + i * 4.5); g.stroke(); } }
     g.restore();
@@ -10444,11 +10725,13 @@ function drawFace(g, u, W, H) {
     g.strokeStyle = '#111'; g.lineWidth = 3; g.beginPath(); g.moveTo(-18, 0); g.quadraticCurveTo(-30, -26, -14, -46); g.stroke();
     g.fillStyle = '#d8d0b0'; g.beginPath(); g.arc(-18, 0, 3, 0, TAU); g.fill();
     g.restore();
-  } else if (hat === 'm33') {
+  } else if (hat === 'm33' || hat === 'para') {
     g.save(); g.translate(hx, hy - 18);
     g.fillStyle = Lk.helmCol ? '#8a7a54' : '#5c6046';
-    g.beginPath(); g.moveTo(-31, 8); g.quadraticCurveTo(-28, -30, 0, -32); g.quadraticCurveTo(28, -30, 31, 8); g.quadraticCurveTo(0, 2, -31, 8); g.fill();
+    if (hat === 'para') { g.beginPath(); g.ellipse(0, 0, 27, 30, 0, Math.PI, TAU); g.fill(); g.fillRect(-27, -2, 54, 6); g.strokeStyle = '#3a2e20'; g.lineWidth = 3; g.beginPath(); g.moveTo(-24, 4); g.lineTo(-14, 34); g.moveTo(24, 4); g.lineTo(14, 34); g.stroke(); }
+    else { g.beginPath(); g.moveTo(-31, 8); g.quadraticCurveTo(-28, -30, 0, -32); g.quadraticCurveTo(28, -30, 31, 8); g.quadraticCurveTo(0, 2, -31, 8); g.fill(); }
     g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.ellipse(-10, -16, 9, 6, -0.4, 0, TAU); g.fill();
+    if (Lk.badge || hat === 'para') { g.fillStyle = hat === 'para' ? '#6fa8d8' : hex(Lk.badge); g.beginPath(); g.ellipse(0, -12, 5, 6, 0, 0, TAU); g.fill(); }
     g.restore();
   } else if (hat === 'colonial') {
     g.save(); g.translate(hx, hy - 18);
@@ -10456,6 +10739,7 @@ function drawFace(g, u, W, H) {
     const cg = g.createLinearGradient(-20, -34, 20, 4); cg.addColorStop(0, '#ddd0a6'); cg.addColorStop(1, '#ab9a6c');
     g.fillStyle = cg; g.beginPath(); g.ellipse(0, 2, 28, 32, 0, Math.PI, TAU); g.fill();
     g.fillStyle = '#9a8a60'; g.fillRect(-28, -4, 56, 6);
+    if (Lk.badge) { g.fillStyle = hex(Lk.badge); g.beginPath(); g.moveTo(0, -24); g.lineTo(5, -12); g.lineTo(0, -8); g.lineTo(-5, -12); g.closePath(); g.fill(); }
     g.restore();
   } else if (hat === 'carrista') {
     g.save(); g.translate(hx, hy - 12);
