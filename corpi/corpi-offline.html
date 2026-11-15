@@ -71,7 +71,7 @@ svg.ic, .ic { width: 22px; height: 22px; fill: none; stroke: currentColor; strok
 .page-head p { margin: 2px 0 0; font-family: var(--f-type); font-size: 13px; color: var(--ink-dim); }
 .back { width: 44px; height: 44px; border-radius: 50%; border: 1.5px solid var(--line); background: transparent; display: grid; place-items: center; cursor: pointer; flex: none; }
 .mlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-.mcard { width: 100%; display: grid; grid-template-columns: 52px 1fr auto; gap: 12px; align-items: center; text-align: left; padding: 14px 14px 14px 10px; background: rgba(30,35,25,.92); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; }
+.mcard { width: 100%; display: grid; grid-template-columns: clamp(84px, 24vw, 132px) 1fr auto; gap: 12px; align-items: center; text-align: left; padding: 14px 14px 14px 10px; background: rgba(30,35,25,.92); border: 1px solid var(--line); border-radius: 4px; cursor: pointer; }
 .mcard:hover { border-color: var(--ink-dim); }
 .mnum { font-family: var(--f-display); font-weight: 800; font-style: italic; font-size: 30px; text-align: center; color: var(--oro); }
 .mtext { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
@@ -483,6 +483,7 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 .vic-bar i { flex: 1; } .vic-bar i:nth-child(1) { background: #1f8a45; } .vic-bar i:nth-child(2) { background: #f4f2ea; } .vic-bar i:nth-child(3) { background: #c8322e; }
 .vic-n { font-family: var(--f-display); font-weight: 700; font-size: clamp(26px, 7vw, 44px); line-height: 1.05; opacity: 0; animation: vicUp .6s 1.15s ease-out forwards; }
 .vic-d { font-family: var(--f-ui); font-weight: 600; font-size: clamp(15px, 4vw, 20px); letter-spacing: .06em; color: #e9d9a8; margin-top: 4px; opacity: 0; animation: vicUp .6s 1.35s ease-out forwards; }
+.vic-l { font-family: var(--f-ui); font-weight: 500; font-size: clamp(16px, 4.2vw, 21px); line-height: 1.25; max-width: 30em; margin: 10px auto 0; opacity: 0; animation: vicUp .7s 1.6s ease-out forwards; }
 .vic-m { font-family: var(--f-display); font-style: italic; font-size: clamp(17px, 4.6vw, 26px); margin-top: 12px; opacity: 0; animation: vicUp .7s 1.9s ease-out forwards; }
 .vic-skip { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 0; right: 0; text-align: center; font-family: var(--f-ui); font-weight: 600; font-size: 14px; letter-spacing: .18em; text-transform: uppercase; color: rgba(246,236,210,.8); text-shadow: 0 1px 6px #000; opacity: 0; animation: vicUp .6s 2.6s ease-out forwards; }
 @keyframes vicIn { to { opacity: 1; } }
@@ -493,6 +494,23 @@ table.dtab { border-collapse: collapse; font-family: var(--f-type); font-size: 1
 @keyframes vicBar { to { transform: scaleX(1); } }
 @keyframes vicUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .vic-rays { animation: none; } }
+
+/* defeat */
+#victory.lostbg { background: radial-gradient(120% 80% at 50% 0%, rgba(6,6,6,.78), rgba(6,6,6,.35) 60%, rgba(6,6,6,.12)); }
+.vic-box.lost { color: #d8d4c8; }
+.def-mark { display: block; width: clamp(44px, 10vw, 62px); margin: 6px auto 0; opacity: 0; animation: vicUp 1.2s .3s ease-out forwards; filter: drop-shadow(0 2px 6px rgba(0,0,0,.7)); }
+.def-t { font-family: var(--f-display); font-style: italic; font-weight: 700; font-size: clamp(38px, 10vw, 76px); line-height: 1.05; letter-spacing: .01em; color: #c9c4b6; margin: 4px 0 10px; opacity: 0; animation: defIn 1.6s .5s ease-out forwards; }
+.vic-box.lost .vic-k, .vic-box.lost .vic-d { color: #a8a396; }
+@keyframes defIn { from { opacity: 0; letter-spacing: .12em; } to { opacity: 1; letter-spacing: .01em; } }
+
+/* mission cards: a painted thumbnail with the chapter number on it */
+.mthumb { position: relative; display: block; align-self: stretch; min-height: 76px; border-radius: 3px; background-size: cover; background-position: center; box-shadow: inset 0 0 0 1px rgba(0,0,0,.5), 0 2px 8px rgba(0,0,0,.4); overflow: hidden; }
+.mthumb .mnum { position: absolute; left: 6px; bottom: 3px; font-size: 22px; line-height: 1; color: #f6ecd2; text-shadow: 0 1px 4px #000, 0 0 10px rgba(0,0,0,.8); width: auto; text-align: left; }
+.mcard { transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.mcard:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(0,0,0,.35); }
+.mcard:active { transform: translateY(1px); }
+/* with animations switched off the banner simply appears */
+@media (prefers-reduced-motion: reduce) { #victory, #victory * { opacity: 1 !important; transform: none !important; } .vic-laurel .st { stroke-dashoffset: 0 !important; } .vic-rays { display: none; } }
 </style>
 </head>
 <body>
@@ -1157,6 +1175,36 @@ const DIFF = {
     vision: 1.15, detect: 1.5, acc: 1.3, fireRate: 1.2, hp: 2, ammo: 1, reinf: 2, failOnLoss: true },
 };
 const DIFF_ORDER = ['recluta', 'ardito', 'fiamma'];
+
+/* La scena della vittoria, missione per missione: la riga sotto il titolo (da "Come andò davvero") e che cosa si vede.
+   fx: target = prima lo sguardo va sul bersaglio colpito; hats = i cappelli in aria; bottles = le tre bottiglie di Buccari. L'alba schiarisce da sola dove è l'alba. */
+const VICTORY = {
+  montenero:   { line: 'La vetta è presa prima dell’alba, quasi senza sparare un colpo.', fx: ['hats'] },
+  cengio:      { line: 'L’offensiva si ferma sull’orlo dell’Altopiano: la pianura non è raggiunta.', fx: ['hats'] },
+  castelletto: { line: 'La mina ha sventrato la sella del Castelletto.', fx: ['target', 'hats'] },
+  quota85:     { line: 'Quota 85 è occupata.', fx: ['hats'] },
+  ortigara:    { line: 'Quota 2105 è degli alpini.', fx: ['hats'] },
+  pozzuolo:    { line: 'L’ultima carica ha aperto la strada.', fx: [] },
+  trieste:     { line: 'La corazzata Wien si capovolge e affonda in cinque minuti.', fx: ['target'] },
+  cortellazzo: { line: 'La testa di ponte di Cortellazzo tiene.', fx: ['hats'] },
+  coldelrosso: { line: 'La prima vittoria italiana dopo Caporetto.', fx: ['hats'] },
+  buccari:     { line: 'Tre bottiglie restano a galleggiare nella baia.', fx: ['bottles'] },
+  premuda:     { line: 'La Szent István è colpita al centro, all’altezza delle caldaie.', fx: ['target'] },
+  moschin:     { line: 'La vetta è ripresa, con le batterie perdute il giorno prima.', fx: ['hats'] },
+  pola:        { line: 'La Viribus Unitis si capovolge e affonda.', fx: ['target'] },
+  cappellini:  { line: 'Il Kabalo è affondato. I naufraghi sono a rimorchio.', fx: [] },
+  suda:        { line: 'L’incrociatore York è fuori combattimento.', fx: ['target'] },
+  birelgobi:   { line: 'L’attacco della 22ª Brigata corazzata è respinto.', fx: [] },
+  culqualber:  { line: 'I carabinieri hanno tenuto il caposaldo.', fx: ['hats'] },
+  alessandria: { line: 'La Valiant è fuori combattimento.', fx: ['target'] },
+  pantelleria: { line: 'I cacciatorpediniere di scorta sono fermati.', fx: [] },
+  isbuscenskij:{ line: 'Alle 9:30 è finita: la carica ha rotto la linea.', fx: [] },
+  tobruk:      { line: 'I commandos sono ributtati verso il mare.', fx: ['hats'] },
+  alamein:     { line: 'La Folgore ha respinto ogni attacco.', fx: ['hats'] },
+  nikolajewka: { line: '«Tridentina, avanti!» La via di casa è aperta.', fx: ['hats'] },
+  gibilterra:  { line: 'Tre navi colpite, e tutti rientrati all’Olterra.', fx: ['target'] },
+  montelungo:  { line: 'Monte Lungo è preso.', fx: ['hats'] },
+};
 
 /* ================= LE MISSIONI =================
    Operazioni mappa: ['edge',caratteri] ['rect',c,r,w,h,ch] ['box',c,r,w,h,ch] ['h',riga,c0,c1,ch] ['v',col,r0,r1,ch]
@@ -4157,7 +4205,7 @@ function checkObjectives(G) {
 }
 function endGame(G, result, reason) {
   if (G.over) return;
-  G.over = true; G.result = result; G.reason = reason; G.overT = result === 'win' ? (G.attract ? 3.2 : 9.6) : 2.4;
+  G.over = true; G.result = result; G.reason = reason; G.overT = result === 'win' ? (G.attract ? 3.2 : 9.6) : (G.attract ? 2.4 : 6.5);
   for (const u of G.units) { u.order = null; u.path = []; }
   G.onEvent('end', { result, reason });
 }
@@ -5947,7 +5995,29 @@ function swayMat() {
   const m = new THREE.MeshLambertMaterial({ color: 0xffffff, vertexColors: true });
   m.onBeforeCompile = sh => {
     sh.uniforms.uWind = R3.windU; sh.uniforms.uWindK = R3.windK;
-    sh.vertexShader = 'uniform float uWind; uniform float uWindK;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+    if (!R3.footU) R3.footU = { value: Array.from({ length: 10 }, () => new THREE.Vector3()) };
+    sh.uniforms.uFoot = R3.footU;
+    // grass, reeds and ferns bend away from whoever walks through them (the thin blades only, never the tree crowns)
+    sh.vertexShader = sh.vertexShader.replace('#include <project_vertex>', `vec4 mvPosition = vec4( transformed, 1.0 );
+#ifdef USE_INSTANCING
+  mvPosition = instanceMatrix * mvPosition;
+  if (length(instanceMatrix[0].xyz) < 0.12) {
+    float tipK = clamp(position.y + 0.5, 0.0, 1.0);
+    for (int i = 0; i < 10; i++) {
+      vec2 dd = instanceMatrix[3].xz - uFoot[i].xy; float dl = length(dd);
+      float w = uFoot[i].z * (1.0 - smoothstep(0.0, 0.75, dl));
+      mvPosition.xz += (dd / max(dl, 0.05)) * w * 0.3 * tipK; mvPosition.y -= w * 0.12 * tipK;
+    }
+  }
+#endif
+  mvPosition = modelViewMatrix * mvPosition;
+  gl_Position = projectionMatrix * mvPosition;
+  { vec4 wg = vec4(transformed, 1.0);
+  #ifdef USE_INSTANCING
+    wg = instanceMatrix * wg;
+  #endif
+    vWorldG = (modelMatrix * wg).xyz; }`);
+    sh.vertexShader = 'uniform float uWind; uniform float uWindK; uniform vec3 uFoot[10];\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
 #ifdef USE_INSTANCING
   float ph = instanceMatrix[3][0] * 0.37 + instanceMatrix[3][2] * 0.53;
   float k = max(0.0, position.y + 0.6) * uWindK;
@@ -5955,7 +6025,7 @@ function swayMat() {
   transformed.z += cos(uWind * 1.3 + ph * 1.3) * 0.04 * k;
 #endif`);
   };
-  m.customProgramCacheKey = () => 'arditi-sway';
+  m.customProgramCacheKey = () => 'arditi-sway2';
   enhanceMat(m, 0.16, 'sway');
   R3.swayMat = m; return m;
 }
@@ -7249,7 +7319,7 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     }
   }
   // the lantern's pool of light follows its bearer, and goes out when he falls
-  if (M.pool) { M.pool.visible = a.alive; M.lantern.glow.visible = a.alive; if (a.alive) { const lf = 0.92 + 0.08 * Math.sin(T * 13 + M.phase) * Math.sin(T * 7.3); M.pool.position.set(wx + Math.sin(M.yaw) * 0.25, y + 0.04, wz + Math.cos(M.yaw) * 0.25); M.pool.material.opacity = 0.42 * lf; M.lantern.glow.material.opacity = 0.8 * lf; } }
+  if (M.pool) { M.pool.visible = a.alive; M.lantern.glow.visible = a.alive; if (a.alive) { (R3.lightSrc || (R3.lightSrc = [])).push({ id: a.id, x: wx + Math.sin(M.yaw) * 0.25, y: y + 0.6, z: wz + Math.cos(M.yaw) * 0.25, col: 0xffc070, pow: 1.1 }); const lf = 0.92 + 0.08 * Math.sin(T * 13 + M.phase) * Math.sin(T * 7.3); M.pool.position.set(wx + Math.sin(M.yaw) * 0.25, y + 0.04, wz + Math.cos(M.yaw) * 0.25); M.pool.material.opacity = 0.42 * lf; M.lantern.glow.material.opacity = 0.8 * lf; } }
   // dead or carried
   if (!a.alive) {
     M.tag.visible = false;
@@ -7262,7 +7332,10 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
       for (let i = 0; i < 6; i++) { const an = Math.random() * TAU, sp = 0.4 + Math.random() * 0.8; spawnParticle({ x: wx, y: hy, z: wz, vx: Math.cos(an) * sp, vy: 0.6 + Math.random() * 0.6, vz: Math.sin(an) * sp, T: 0.45, s0: 0.07, s1: 0.04, col: 0x5a1610, a0: 0.9, add: false, grav: true }); }
       if (t.water) for (let i = 0; i < 8; i++) { const an = Math.random() * TAU, sp = 0.5 + Math.random(); spawnParticle({ x: wx, y: -0.1, z: wz, vx: Math.cos(an) * sp, vy: 1.8 + Math.random() * 1.5, vz: Math.sin(an) * sp, T: 0.8, s0: 0.15, s1: 0.25, col: 0xdfeaec, a0: 0.8, add: false, grav: true }); }
     }
+    if (!M.deadT && !a.sunk && !t.water && typeof spawnDebris === 'function') spawnDebris(wx + (Math.random() - 0.5) * 0.3, y + 0.9, wz + (Math.random() - 0.5) * 0.3, 1, isUnit ? 0x5d634a : 0x4c5450);
     M.deadT = (M.deadT || 0) + dt;
+    // he staggers, half turns, and goes down
+    if (M.deadT < 0.55 && !a.carriedBy) M.yaw += (sp.seed % 2 ? 1 : -1) * dt * 1.6;
     if (M.deadT < 0.3 && !a.carriedBy) {
       Object.assign(P, { hy: 0.34, hx: back ? -0.25 : 0.3, sx: back ? -0.3 : 0.55, nx: back ? -0.4 : 0.5, rsx: -0.3, rsz: -0.4, rex: -0.6, lsx: 0.2, lsz: 0.5, lex: -0.5, rtx: -0.8, rkx: 1.6, ltx: -0.5, lkx: 1.2 });
       if (M.mg) M.mg.visible = true;
@@ -7270,6 +7343,10 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     }
     Object.assign(P, { hy: 0.1, hx: back ? -1.5 : 1.5, hpz: back ? -0.38 : 0.38, sx: 0, nx: back ? 0.2 : -0.35, ny: 0.5,
       rsx: back ? 0.4 : -0.5, rsz: -1.0, rex: -0.4, lsx: back ? -0.3 : 0.4, lsz: 0.8, lex: -0.9, rtz: -0.18, ltz: 0.22, rkx: 0.35, lkx: 0.05 });
+    // not every man falls the same way: flat, on his side with a knee drawn up, or arms flung wide
+    const dv = Math.abs(sp.seed) % 3;
+    if (dv === 1) Object.assign(P, { hrz: back ? -0.55 : 0.55, rtx: -0.9, rkx: 1.3, ltx: -0.2, lkx: 0.3, rsx: -1.2, rsz: -0.3, rex: -1.1, ny: -0.6 });
+    else if (dv === 2) Object.assign(P, { rsx: 0, rsz: -1.45, rex: -0.1, lsx: 0, lsz: 1.45, lex: -0.1, rtz: -0.35, ltz: 0.35, rkx: 0.1, lkx: 0.5, ny: -0.3 });
     weapon = 'none';
     if (!isUnit && a.carriedBy) {
       const cu = G.units.find(u => u.id === a.carriedBy);
@@ -7313,8 +7390,14 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     if (busy) { const w = Math.sin(T * 12); Object.assign(P, { rsx: -1.05 + 0.22 * w, rsz: 0.1, rex: -0.65, lsx: -0.95 - 0.18 * w, lsz: -0.12, lex: -0.75 }); weapon = 'back'; }
     else Object.assign(P, { rsx: -1.15, rsz: 0.18, rex: -0.45, lsx: -1.15, lsz: -0.18, lex: -0.45 });
   } else {
-    if (walking) gait(P, ph, run, a.carrying ? 0.7 : 1);
-    else {
+    if (walking) {
+      gait(P, ph, run, (a.carrying ? 0.7 : 1) * clamp(M.spd / (run ? 2.6 : 1.25), 0.6, 1.12));
+      // the lie of the land: bent into the climb, hands to the rock where it is steep, leaning back on the way down
+      const rise = groundY(wx + Math.sin(M.yaw) * 0.45, wz + Math.cos(M.yaw) * 0.45) - y; M.rise = (M.rise || 0) + (rise - (M.rise || 0)) * Math.min(1, dt * 6);
+      if (M.rise > 0.04) { const k = clamp((M.rise - 0.04) * 5, 0, 1); P.sx += 0.4 * k; P.nx -= 0.25 * k; P.rkx += 0.35 * k * Math.max(0, Math.cos(ph)); P.lkx += 0.35 * k * Math.max(0, -Math.cos(ph)); P.hy -= 0.03 * k; M.climb = k > 0.75 && !a.carrying; }
+      else { M.climb = false; if (M.rise < -0.04) { const k = clamp((-M.rise - 0.04) * 5, 0, 1); P.sx -= 0.16 * k; P.rkx += 0.2 * k; P.lkx += 0.2 * k; } }
+    } else {
+      M.climb = false;
       // breathing, a slow shift of weight from one leg to the other, a look around
       const br = Math.sin(T * (a.state === 'combat' || a.state === 'alert' ? 3.2 : 1.6) + M.phase), ws = Math.sin(T * 0.31 + M.phase * 1.7);
       P.sx = 0.02 + 0.014 * br; P.hrz = 0.03 * ws; P.rtz = -0.03 - 0.03 * ws; P.ltz = 0.03 - 0.03 * ws; P.rkx = 0.04 + Math.max(0, ws) * 0.12; P.lkx = 0.04 + Math.max(0, -ws) * 0.12;
@@ -7332,6 +7415,7 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
       else { armsReady(P, 'rifle'); weapon = 'hand'; if (run) P.sx = 0.25; }
     } else if (sp.hand === 'knife') { if (!walking || !run) armsReady(P, 'blade'); weapon = 'hand'; }
     if (a.carrying) { Object.assign(P, { rsx: -2.75, rsz: 0.15, rex: -0.5, lsx: -2.3, lsz: -0.2, lex: -1.1, sx: 0.28 }); weapon = 'back'; }
+    else if (M.climb && walking && !run) { Object.assign(P, { rsx: -1.75 + 0.55 * s, rsz: 0.05, rex: -0.55, lsx: -1.75 - 0.55 * s, lsz: -0.05, lex: -0.55 }); if (long) weapon = 'back'; }
   }
   // combat overlays
   const aiming = isUnit ? (a.order && a.order.kind === 'shoot') || M.fire > 0 : a.state === 'combat';
@@ -7339,6 +7423,16 @@ function syncActor(G, a, isUnit, dt, T, selSet) {
     if (long) { armsAim(P); weapon = 'aim'; }
     else if (twoHand) { P.sx += 0.06; }
     if (M.fire > 0) P.sx -= M.fire * 0.5;
+  }
+  // after a rifle shot the bolt is worked: up, back, forward, down, and a spent case flies out
+  if (long && sp.hand !== 'mab') {
+    if (M.fire > 0 && !M.wasFire) M.bolt = 0.75;
+    M.wasFire = M.fire > 0;
+    if (M.bolt > 0 && M.fire <= 0) {
+      const k0 = M.bolt; M.bolt -= dt; const k = 1 - M.bolt / 0.75;
+      if (!crawl && !swim && !busy) { armsAim(P); P.rsx = -1.05; P.rsz = 0.3; P.rex = -1.55 + 0.45 * Math.sin(k * TAU); P.nx = 0.2; weapon = 'aim'; }
+      if (k0 > 0.5 && M.bolt <= 0.5) spawnParticle({ x: wx + Math.cos(M.yaw) * 0.15, y: y + 0.8 * sp.hgt, z: wz - Math.sin(M.yaw) * 0.15, vx: Math.cos(M.yaw) * 1.2, vy: 1.6, vz: -Math.sin(M.yaw) * 1.2, T: 0.5, s0: 0.035, s1: 0.03, col: 0xd8b050, a0: 1, add: false, grav: true });
+    }
   }
   // a man who is hit jerks back
   if (isUnit && a.hitT > 0 && !swim) { const k = a.hitT / 0.35; P.sx -= 0.45 * k; P.nx -= 0.4 * k; P.hrz += 0.12 * k; P.hy -= 0.03 * k; }
@@ -7924,7 +8018,8 @@ function syncFx(G, dt) {
         m.renderOrder = 9; R3.root.add(m); R3.fxVis.set(f, m);
         const x0 = f.x0 / TILE, z0 = f.y0 / TILE, x1 = f.x1 / TILE, z1 = f.y1 / TILE;
         const y0 = surfY(G, x0, z0) + 0.75, y1 = surfY(G, x1, z1) + 0.6, L = Math.hypot(x1 - x0, y1 - y0, z1 - z0);
-        m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.scale.set(0.025, 0.025, L);
+        m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); m.scale.set(0.034, 0.034, L);
+        spawnParticle({ x: x0, y: y0, z: z0, vx: 0, vy: 0.3, vz: 0, T: 0.5, s0: 0.1, s1: 0.4, col: 0xcfc8ba, a0: 0.35, add: false, tex: 'puff' });
         m.lookAt(x1, y1, z1);
         for (const [a, M] of R3.models) if (a.alive && Math.hypot(a.x - f.x0, a.y - f.y0) < 6) { M.fire = 0.18; break; }
         // where the round lands: a kick of dust, or a spout on the water
@@ -7950,6 +8045,17 @@ function syncFx(G, dt) {
         for (let i = 0; i < 18; i++) { const a = Math.random() * TAU, sp = 2.5 + Math.random() * 4; spawnParticle({ x, y: y + 0.3, z, vx: Math.cos(a) * sp, vy: 2 + Math.random() * 4, vz: Math.sin(a) * sp, T: 0.5 + Math.random() * 0.4, s0: 0.07, s1: 0.03, col: 0xffc878, a0: 1, add: true, grav: true }); }
         spawnDebris(x, y, z, r / TILE > 1.5 ? 14 : 9, G.M.winter ? 0x6a665e : null);
         spawnShock(x, y, z, r);
+        // a column of earth and smoke that hangs in the air and drifts, embers falling back, the ground left glowing
+        const wetB = isWaterCh(vch(G, Math.floor(x), Math.floor(z)));
+        if (!wetB) {
+          for (let i = 0; i < 6; i++) spawnParticle({ x: x + (Math.random() - 0.5) * 0.3, y: y + 0.4 + i * 0.3, z: z + (Math.random() - 0.5) * 0.3, vx: 0.15 + Math.random() * 0.2, vy: 1.0 + i * 0.28, vz: (Math.random() - 0.5) * 0.2, T: 3.2 + Math.random() * 2.2, s0: r * 0.55, s1: r * (1.5 + i * 0.22), col: i % 2 ? 0x3a342c : 0x55504a, a0: 0.5, add: false, tex: i % 2 ? 'puff' : 'puff2', spin: (Math.random() - 0.5) * 0.5, drag: 0.7 });
+          for (let i = 0; i < 12; i++) { const a = Math.random() * TAU, sp = 1 + Math.random() * 2.5; spawnParticle({ x, y: y + 0.4, z, vx: Math.cos(a) * sp, vy: 3 + Math.random() * 3.5, vz: Math.sin(a) * sp, T: 1.1 + Math.random() * 0.7, s0: 0.09, s1: 0.03, col: 0xffb050, a0: 1, add: true, grav: true }); }
+          (R3.afterglow || (R3.afterglow = [])).push({ id: 'ag' + Math.random(), x, y: y + 0.3, z, t: 2.4, T: 2.4 });
+        } else {
+          // on the water: a tall white column that collapses, and spray all round
+          for (let i = 0; i < 10; i++) spawnParticle({ x: x + (Math.random() - 0.5) * 0.25, y: -0.1 + i * 0.25, z: z + (Math.random() - 0.5) * 0.25, vx: (Math.random() - 0.5) * 0.5, vy: 3.5 + i * 0.5, vz: (Math.random() - 0.5) * 0.5, T: 1.3 + Math.random() * 0.5, s0: r * 0.35, s1: r * 0.9, col: 0xf2f6f8, a0: 0.8, add: false, tex: 'puff', grav: true });
+          for (let i = 0; i < 16; i++) { const a = i / 16 * TAU; spawnParticle({ x: x + Math.cos(a) * r * 0.5, y: -0.1, z: z + Math.sin(a) * r * 0.5, vx: Math.cos(a) * 1.6, vy: 1.2, vz: Math.sin(a) * 1.6, T: 0.9, s0: 0.2, s1: 0.5, col: 0xe8f0f2, a0: 0.6, add: false, grav: true }); }
+        }
         if (isWaterCh(vch(G, Math.floor(x), Math.floor(z)))) for (let i = 0; i < 14; i++) { const a = Math.random() * TAU, sp = 0.5 + Math.random(); spawnParticle({ x, y: -0.1, z, vx: Math.cos(a) * sp, vy: 3 + Math.random() * 2.5, vz: Math.sin(a) * sp, T: 1.0, s0: 0.25, s1: 0.4, col: 0xdfeaec, a0: 0.9, add: false, grav: true }); }
         r3Scorch(f.x, f.y, f.r * 0.8); r3TexDirty(f.x - f.r, f.y - f.r, f.x + f.r, f.y + f.r);
         const dc = Math.hypot(x - R3.cam.tx, z - R3.cam.tz);
@@ -8273,7 +8379,9 @@ function stepWeather(G, dt) {
   W.gustT -= dt; if (W.gustT <= 0) { W.gustT = 3 + Math.random() * 6; W.gustTo = Math.random() < 0.45 ? 1 : 0; }
   W.gust += ((W.gustTo || 0) - W.gust) * Math.min(1, dt * 1.5);
   const wk = W.wind * (0.7 + 0.8 * W.gust);
-  R3.windK.value = 0.6 + wk * 2.2;
+  // the wind comes in gusts: the trees, the grass, the rain and the snow all feel them together
+  const gT = performance.now() / 1000, gust = Math.max(0, Math.sin(gT * 0.31) * Math.sin(gT * 0.083 + 1.3)); R3.gust = gust;
+  R3.windK.value = 0.6 + wk * 2.2 * (1 + 0.9 * gust);
   if (R3.fogSheet) for (const s of R3.fogSheet) {
     s.mesh.position.set(c.tx, cy + s.hgt, c.tz);
     s.tex.offset.x = (c.tx / s.span * s.tex.repeat.x) + T * s.sp * (0.6 + wk);
@@ -8281,7 +8389,7 @@ function stepWeather(G, dt) {
   }
   if (W.drops) {
     if (!W.init) { W.init = true; for (const d of W.drops) { d.x = c.tx + (d.x * 2 - 1) * ext; d.z = c.tz + (d.z * 2 - 1) * ext; d.y += cy; } }
-    const wx = W.rain ? 1.2 + wk * 3.2 : W.kind === 'snow' ? 0.6 + wk * 3.4 : 0.5, H = W.rain ? 14 : W.kind === 'snow' ? 12 : 10;
+    const wx = (W.rain ? 1.2 + wk * 3.2 : W.kind === 'snow' ? 0.6 + wk * 3.4 : 0.5) * (1 + 0.8 * (R3.gust || 0)), H = W.rain ? 14 : W.kind === 'snow' ? 12 : 10;
     for (let i = 0; i < W.drops.length; i++) {
       const d = W.drops[i];
       d.y -= d.v * dt;
@@ -9039,6 +9147,19 @@ function tankKit(K, kind, seed) {
     K.add(G0.cyl6, 0x2a2a28, 0, 0.62, 0.15, 0.016, 0.3, 0.016, Math.PI / 2, 0, 0);
     K.add(G0.box, 0x1e1c1a, 0, 0.45, 0.42, 0.36, 0.05, 0.02);
   }
+  // what a crew carries and what the desert does to a vehicle: a rolled tarpaulin, cans, spare track, sandbags, dust low on the hull, soot at the exhaust
+  const h = k => HASH(seed, k, 71), tank = kind !== 'armcar', W = tank ? 0.5 : 0.44, Lh = kind === 'crusader' ? 0.62 : tank ? 0.54 : 0.46, top = kind === 'm13' ? 0.54 : kind === 'crusader' ? 0.48 : 0.54;
+  K.add(G0.cyl8, h(1) < 0.5 ? 0x6a6a48 : 0x7a6e50, 0, top + 0.05, -Lh + 0.08, 0.06, W * 0.86, 0.06, 0, 0, Math.PI / 2);
+  for (let k = 0, n = 1 + Math.floor(h(2) * 3); k < n; k++) K.add(G0.box, k % 2 ? 0x5a5e3c : 0x8a7a50, (h(3) < 0.5 ? -1 : 1) * (W / 2 + 0.035), top - 0.1, -0.1 + k * 0.12, 0.05, 0.16, 0.1);
+  if (tank) {
+    for (let k = 0; k < 3; k++) K.add(G0.box, 0x2c2924, -0.14 + k * 0.14, top - 0.08, Lh + 0.035, 0.11, 0.07, 0.03, -0.5, 0, 0);
+    if (h(4) < 0.6) for (let k = 0; k < 3; k++) K.add(G0.bag, 0xa8976f, -0.17 + k * 0.17, top + 0.02, Lh - 0.14, 0.085, 0.04, 0.06);
+    for (const sx of [-1, 1]) { K.add(G0.cyl8, 0x4a3426, sx * 0.14, top - 0.02, -Lh - 0.02, 0.035, 0.16, 0.035, Math.PI / 2, 0, 0); K.add(G0.box, 0x1a1816, sx * 0.14, top + 0.03, -Lh + 0.03, 0.09, 0.012, 0.1); }
+    for (const sx of [-1, 1]) K.add(G0.box, 0xcdbb94, sx * 0.345, 0.08, 0, 0.18, 0.1, kind === 'crusader' ? 1.3 : 1.16);
+    K.add(G0.cyl8, 0x2a2a28, 0.16, top - 0.02, Lh + 0.02, 0.035, 0.03, 0.035, Math.PI / 2, 0, 0);
+    if (kind === 'm13') for (const dz of [-0.03, 0.03]) K.add(G0.box, 0xf2efe6, 0.206, 0.82, 0.02 + dz, 0.008, 0.07, 0.016);
+    if (kind === 'crusader') { for (const sx of [-1, 1]) K.add(G0.box, 0xb8a47a, sx * 0.27, 0.58, -0.12, 0.07, 0.12, 0.3); K.add(G0.box, 0xb8302a, 0.15, 1.04, -0.12, 0.004, 0.05, 0.1); }
+  } else { K.add(G0.cyl8, 0x22201c, 0, 0.42, -0.5, 0.13, 0.08, 0.13, Math.PI / 2, 0, 0); K.add(G0.box, 0xcdbb94, 0, 0.2, 0, 0.5, 0.06, 0.9); }
 }
 const VEH_KIND = { crusader: 'crusader', autoblindo: 'armcar' };
 function makeVehicle(G, a, isUnit) {
@@ -9132,6 +9253,7 @@ function syncLand(G, a, isUnit, M, dt, T, selSet) {
     } else {
       // knocked out: she burns for a long while
       M.hull.rotation.z = 0.05; M.smokeT = (M.smokeT || 0) - dt;
+      if (M.deadT < 60) (R3.lightSrc || (R3.lightSrc = [])).push({ id: 'wr' + a.id, x: wx, y: y + 0.6, z: wz, col: 0xff8a3a, pow: 1.6 });
       if (M.deadT < 60 && M.smokeT <= 0) {
         M.smokeT = 0.15;
         spawnParticle({ x: wx + (Math.random() - 0.5) * 0.3, y: y + 0.8, z: wz + (Math.random() - 0.5) * 0.3, vx: 0.1, vy: 0.8, vz: 0, T: 3, s0: 0.3, s1: 1.6, col: 0x2e2c2a, a0: 0.6, add: false, tex: 'puff' });
@@ -9207,6 +9329,28 @@ function buildScenery(G, root) {
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, R, 0, TAU); ctx.fill();
   };
   if (ctx) {
+    // where two kinds of ground meet, each runs raggedly into the other instead of ending on a ruled line
+    const SOFT = '.,:g', soft = (c, r) => inMap(G, c, r) && SOFT.includes(G.map[r][c]) ? G.map[r][c] : null;
+    setGroundPal(G);
+    const spill = (c, r, dc, dr, key, seed) => {
+      // tile (c, r) takes tongues of its neighbour's ground along the shared edge
+      ctx.save(); ctx.beginPath();
+      const x0 = c * TILE, y0 = r * TILE;
+      for (let k = 0; k < 5; k++) {
+        const t = (k + HASH(c, r, seed + k)) / 5 * TILE, d = 1 + HASH(c, r, seed + 9 + k) * 7, rad = 3.5 + HASH(c, r, seed + 19 + k) * 5.5;
+        const px = dc ? (dc > 0 ? x0 + TILE - d : x0 + d) : x0 + t, py = dr ? (dr > 0 ? y0 + TILE - d : y0 + d) : y0 + t;
+        ctx.moveTo(px + rad, py); ctx.arc(px, py, rad, 0, TAU);
+      }
+      ctx.clip(); ctx.beginPath(); ctx.rect(x0, y0, TILE, TILE); ctx.clip();
+      paintGround(ctx, key, c, r); ctx.restore();
+    };
+    for (let r = 0; r < G.H; r++) for (let c = 0; c < G.W; c++) {
+      const a = soft(c, r); if (!a) continue;
+      for (const [dc, dr] of [[1, 0], [0, 1]]) {
+        const b = soft(c + dc, r + dr); if (!b || b === a) continue;
+        spill(c, r, dc, dr, groundKey(G, b), 400 + dc * 40); spill(c + dc, r + dr, -dc, -dr, groundKey(G, a), 500 + dc * 40);
+      }
+    }
     // broad patches, lighter and darker, so the ground never looks like a carpet of equal tiles
     const nB = Math.round(G.W * G.H / 9);
     for (let i = 0; i < nB; i++) {
@@ -9334,6 +9478,14 @@ function buildScenery(G, root) {
     if (name === 'sunflowers' && vnoise(c * 0.22 + 7, r * 0.22 + 3) < 0.46) name = null;
     if (name && THING[name]) THING[name](x, z, groundY(x, z), h, hx, hz);
   }
+  // lived-in houses: smoke from the chimney in the cold and the dark, lamplight spilling from the door at night
+  S.extra = [];
+  for (const p of G.M.props || []) {
+    const t = p.type || p.t; if (t !== 'house' && t !== 'hut' && t !== 'kitchen') continue;
+    const x = p.c + (p.w || 2) / 2, z = p.r + (p.h || 2) / 2, y = groundY(x, z);
+    if ((snow || dim || lt === 'dawn') && HASH(p.c, p.r, 91) < 0.7) R3.emitters.push({ x: x + 0.4, y: y + (t === 'hut' ? 1.7 : 2.6), z: z - 0.2, every: 0.4, t: Math.random(), col: snow ? 0x8a8c90 : 0x5a5650, s0: 0.22, s1: 1.5, a0: 0.34 });
+    if (dim && HASH(p.c, p.r, 92) < 0.6) S.extra.push({ x, y: y + 0.5, z: p.r + (p.h || 2) + 0.4, col: 0xffb85a, pow: 1.0, ph: p.c });
+  }
   // a campfire before the tents, and its smoke
   let fires = 0;
   for (const p of G.M.props || []) {
@@ -9350,6 +9502,9 @@ function buildScenery(G, root) {
   }
   I.flush(root);
   if (R3.gTex) R3.gTex.needsUpdate = true;
+  // real light in the dark: a handful of lamps that move to whichever flames are nearest the view
+  S.pl = [];
+  if (dim) for (let i = 0; i < 5; i++) { const L = new THREE.PointLight(0xffb060, 0, 6.5, 1.5); root.add(L); S.pl.push({ L, src: null }); }
   // motes of dust and pollen in the sunlight, leaves coming down in autumn
   const wk = G.wx ? G.wx.kind : 'clear';
   if (!G.M.sea && (lt === 'day' || lt === 'dawn') && (wk === 'clear' || wk === 'ash') && r3Quality().post) {
@@ -9367,7 +9522,7 @@ function sceneGlow(root, S, x, y, z, col, size, a) {
   const m = own(new THREE.MeshBasicMaterial({ map: softDot(), color: col, transparent: true, opacity: a, blending: THREE.AdditiveBlending, depthWrite: false, fog: false }));
   const pool = new THREE.Mesh(R3.poolGeo, m); pool.position.set(x, groundY(x, z) + 0.09, z); pool.scale.set(size, 1, size); pool.renderOrder = 3; root.add(pool);
   const g = makeSprite(softDot(), 0.55, 0.55, true, true); g.material.color.setHex(col); g.material.opacity = 0.9; g.position.set(x, y, z); g.renderOrder = 9; root.add(g);
-  S.lamps.push({ pool, g, a, size, ph: Math.random() * 20 });
+  S.lamps.push({ pool, g, a, size, ph: Math.random() * 20, x, y, z, col });
 }
 function stepScenery(G, dt, T) {
   const S = R3.dress; if (!S) return;
@@ -9377,6 +9532,32 @@ function stepScenery(G, dt, T) {
     spawnParticle({ x: F.x + (Math.random() - 0.5) * 0.12, y: F.y, z: F.z + (Math.random() - 0.5) * 0.12, vx: (Math.random() - 0.5) * 0.1, vy: 0.7 + Math.random() * 0.4, vz: (Math.random() - 0.5) * 0.1, T: 0.55, s0: 0.26, s1: 0.05, col: Math.random() < 0.5 ? 0xffa23a : 0xffd070, a0: 0.9, add: true });
     if (Math.random() < 0.08) spawnParticle({ x: F.x, y: F.y + 0.3, z: F.z, vx: (Math.random() - 0.5) * 0.5, vy: 1 + Math.random(), vz: (Math.random() - 0.5) * 0.5, T: 1.2, s0: 0.05, s1: 0.02, col: 0xffc060, a0: 1, add: true });
   }
+  if (S.pl && S.pl.length) {
+    // every flame in the scene: the lamps and fires, and the lanterns the sentries carry
+    if (R3.afterglow) { for (const g of R3.afterglow) { g.t -= dt; g.pow = 2.2 * Math.max(0, g.t / g.T); g.col = 0xff7a30; } R3.afterglow = R3.afterglow.filter(g => g.t > 0); }
+    const c = R3.cam, src = S.lamps.concat(S.extra || [], R3.lightSrc || [], R3.afterglow || []);
+    R3.lightSrc = [];
+    src.sort((a, b) => Math.hypot(a.x - c.tx, a.z - c.tz) - Math.hypot(b.x - c.tx, b.z - c.tz));
+    const top = src.slice(0, S.pl.length);
+    for (const P of S.pl) {
+      const keep = P.src && top.find(q => q === P.src || (q.id != null && q.id === P.src.id));
+      if (keep) P.src = keep;
+      const want = keep ? (keep.pow || 1.25) * (0.9 + 0.1 * Math.sin(T * 11 + (keep.ph || 0))) : 0;
+      P.L.intensity += (want - P.L.intensity) * Math.min(1, dt * 5);
+      if (keep) { P.L.position.set(keep.x, keep.y + 0.25, keep.z); P.L.color.setHex(keep.col || 0xffb060); }
+      else if (P.L.intensity < 0.03) { const free = top.find(q => !S.pl.some(o => o.src && (o.src === q || (q.id != null && o.src.id === q.id)))); P.src = free || null; if (free) P.L.position.set(free.x, free.y + 0.25, free.z); }
+    }
+  }
+  // far-off lightning on a wet night: the sky flickers twice, the thunder comes later
+  const wkS = G.wx ? G.wx.kind : 'clear';
+  if (wkS === 'rain' && G.M.light !== 'day' && !G.over) {
+    S.boltT = (S.boltT == null ? 9 + Math.random() * 10 : S.boltT) - dt;
+    if (S.boltT <= 0) { S.boltT = 14 + Math.random() * 18; R3.skyFlash = 0.18; S.bolt2 = 0.16; S.thunder = 1.6 + Math.random() * 1.5; }
+    if (S.bolt2 > 0) { S.bolt2 -= dt; if (S.bolt2 <= 0) R3.skyFlash = 0.14; }
+    if (S.thunder > 0) { S.thunder -= dt; if (S.thunder <= 0 && typeof sfx === 'function') { try { sfx('thunder'); } catch (e) {} } }
+  }
+  // where the men tread, the grass leans away from their feet
+  if (R3.footU) { const F = R3.footU.value; let i = 0; for (const u of G.units) if (u.alive && i < F.length && !u.R.boat) F[i++].set(u.x / TILE, u.y / TILE, 1); for (const e of G.enemies) { if (i >= F.length) break; if (e.alive && !e.ship && Math.hypot(e.x / TILE - R3.cam.tx, e.y / TILE - R3.cam.tz) < 12) F[i++].set(e.x / TILE, e.y / TILE, 1); } for (; i < F.length; i++) F[i].z = 0; }
   if (S.motes.length) {
     const c = R3.cam, w = G.wx ? G.wx.wind : 0.2;
     for (const m of S.motes) {
@@ -9387,7 +9568,7 @@ function stepScenery(G, dt, T) {
       else m.sp.material.rotation = T * 2 + m.ph;
     }
   }
-  r3VictoryStep(G, dt, T);
+  r3VictoryStep(G, dt, T); r3DefeatStep(G, dt);
 }
 
 /* ---------- victory: the flag goes up, the men cheer, signal rockets in the three colours ---------- */
@@ -9413,7 +9594,21 @@ function r3VictoryStart(G) {
   const fg = own(new THREE.PlaneGeometry(1.5, 1.0, 14, 6)), fm = own(new THREE.MeshBasicMaterial({ map: flagTex(), side: THREE.DoubleSide, color: new THREE.Color(dimK, dimK, dimK), fog: false }));
   const flag = new THREE.Mesh(fg, fm); flag.castShadow = true; g.add(flag);
   g.rotation.y = R3.cam.yaw + 0.15; R3.root.add(g);
-  R3.vic = { t: 0, x, z, g, flag, base: Float32Array.from(fg.attributes.position.array), H, sea, lead, big, size0: R3.cam.size, yaw0: R3.cam.yaw, tx0: R3.cam.tx, tz0: R3.cam.tz, next: 1.3, n: 0, rockets: [], night: G.M.light === 'night' || G.M.light === 'dusk' };
+  // what is particular to this day: the stricken ship or the blown saddle seen first, hats in the air, the bottles of Buccari, the sun coming up
+  const VX = (typeof VICTORY !== 'undefined' && VICTORY[G.M.id] || {}).fx || [], last = G.M.objectives[G.M.objectives.length - 1];
+  let focus = null;
+  if (VX.includes('target')) {
+    for (let i = G.M.objectives.length - 1; i >= 0 && !focus; i--) { const o = G.M.objectives[i]; for (const id of o.targets || []) { const b = G.objects.find(q => q.id === id) || G.enemies.find(q => q.id === id); if (b && Math.hypot(b.x / TILE - x, b.y / TILE - z) > 3) { focus = { x: b.x / TILE, z: b.y / TILE }; break; } } }
+  }
+  const bottles = [];
+  if (VX.includes('bottles')) for (let i = 0; i < 3; i++) {
+    const bg = new THREE.Group(), b = new THREE.Mesh(geo().cyl8, lmat(0x2f5a3a)); b.scale.set(0.045, 0.2, 0.045); bg.add(b);
+    const nk = new THREE.Mesh(geo().cyl8, lmat(0x2f5a3a)); nk.scale.set(0.018, 0.09, 0.018); nk.position.y = 0.14; bg.add(nk);
+    [0x1f8a45, 0xf4f2ea, 0xc8322e].forEach((c, k) => { const r = new THREE.Mesh(geo().box, own(new THREE.MeshBasicMaterial({ color: c }))); r.scale.set(0.012, 0.05, 0.05); r.position.set(0.02, 0.19, -0.05 + k * 0.05); bg.add(r); });
+    bg.position.set(lead.x / TILE + 1.2 + i * 0.7, -0.1, lead.y / TILE + 0.9 - i * 0.5); R3.root.add(bg); bottles.push(bg);
+  }
+  const sun0 = R3.sun ? R3.sun.intensity : 0;
+  R3.vic = { fx: VX, focus, bottles, sun0, hatT: 0.8, dawn: G.M.light === 'dawn', hatCol: ({ ardito: 0x141414, alpini: 0x4f5338, alpini43: 0x4f5338, carab41: 0xd4c69a }[(CORPS[G.M.corps] || {}).look]) || 0x5d634a, t: 0, x, z, g, flag, base: Float32Array.from(fg.attributes.position.array), H, sea, lead, big, size0: R3.cam.size, yaw0: R3.cam.yaw, tx0: R3.cam.tx, tz0: R3.cam.tz, next: 1.3, n: 0, rockets: [], night: G.M.light === 'night' || G.M.light === 'dusk' };
 }
 function r3VictoryStep(G, dt, T) {
   const V = R3.vic; if (!V) return;
@@ -9421,6 +9616,20 @@ function r3VictoryStep(G, dt, T) {
   V.t += dt;
   const c = R3.cam, ease = k => k * k * (3 - 2 * k), k = ease(Math.min(1, V.t / 3.2));
   // the camera comes down to the men and turns slowly around them
+  // first, where it was decided: the ship going down, the saddle blown open
+  if (V.focus && V.t < 2.6) {
+    const kf = ease(Math.min(1, V.t / 1.6));
+    c.tx = V.tx0 + (V.focus.x - V.tx0) * kf; c.tz = V.tz0 + (V.focus.z - V.tz0) * kf; c.goal = null; c.yaw = c.yawTo = V.yaw0 + 0.12 * kf;
+    V.fx1 = c.tx; V.fz1 = c.tz; return;
+  }
+  if (V.focus && !V.rebased) { V.rebased = true; V.tx0 = V.fx1; V.tz0 = V.fz1; V.yaw0 = c.yaw; V.size0 = c.size; V.t = 0; }
+  // the sun climbs over a won field at dawn; hats and helmets go up; the bottles ride the swell
+  if (V.dawn && R3.sun) R3.sun.intensity = V.sun0 * (1 + 0.4 * ease(Math.min(1, V.t / 6)));
+  if (V.fx.includes('hats')) {
+    V.hatT -= dt;
+    if (V.hatT <= 0 && V.t < 8) { V.hatT = 0.35 + Math.random() * 0.4; const us = G.units.filter(u => u.alive && !u.vehicle && !u.mounted); const u = us[Math.floor(Math.random() * us.length)]; if (u) { const ux = u.x / TILE, uz = u.y / TILE; spawnParticle({ x: ux, y: groundY(ux, uz) + 1.1, z: uz, vx: (Math.random() - 0.5) * 0.8, vy: 4.2 + Math.random() * 1.2, vz: (Math.random() - 0.5) * 0.8, T: 1.45, s0: 0.17, s1: 0.15, col: V.hatCol, a0: 1, add: false, grav: true, spin: 6 }); } }
+  }
+  for (let i = 0; i < V.bottles.length; i++) { const b = V.bottles[i]; b.position.y = -0.1 + Math.sin(T * 1.7 + i * 2) * 0.03; b.rotation.set(0.5 + Math.sin(T * 1.1 + i) * 0.25, i, Math.sin(T * 1.4 + i * 3) * 0.3); }
   const base = r3BaseSize(), goal = Math.max(base * 0.46, V.big ? (V.sea ? 7.5 : 6) : 4.6);
   c.size = V.size0 + (goal - V.size0) * k;
   // the men stand in the lower half of the screen, under the banner
@@ -9454,6 +9663,34 @@ function r3VictoryStep(G, dt, T) {
     }
   }
   if (V.night && R3.flash && R3.flash.intensity > 0) R3.flash.intensity = Math.max(0, R3.flash.intensity - dt * 3);
+}
+
+/* ---------- defeat: the colour drains away, and a rifle with a helmet stands where each man fell ---------- */
+function r3DefeatStart(G) {
+  if (R3.defeat || !R3.root) return;
+  const D = R3.defeat = { t: 0, sat0: R3.post ? R3.post.U.uSat.value : 1, vig0: R3.post ? R3.post.U.uVig.value : 0, marks: [], ashT: 0 };
+  for (const u of G.units) {
+    if (u.alive || u.vehicle || (u.R && (u.R.boat || u.R.ship)) || G.M.sea) continue;
+    const x = u.x / TILE + 0.35, z = u.y / TILE - 0.2; if (isWaterCh(vch(G, Math.floor(x), Math.floor(z)))) continue;
+    const g = new THREE.Group(), r = new THREE.Mesh(geo().box, lmat(0x3a2c20)); r.scale.set(0.035, 0.82, 0.035); r.position.y = 0.41; r.castShadow = true; g.add(r);
+    const h = new THREE.Mesh(geo().sph, lmat(G.M.war === 1 ? 0x5d634a : 0x5c6046)); h.scale.set(0.11, 0.075, 0.125); h.position.y = 0.86; h.rotation.z = 0.2; h.castShadow = true; g.add(h);
+    g.position.set(x, groundY(x, z) - 0.9, z); R3.root.add(g); D.marks.push({ g, y: groundY(x, z) });
+  }
+}
+function r3DefeatEnd() {
+  const D = R3.defeat; if (!D) return;
+  if (R3.post) { R3.post.U.uSat.value = D.sat0; R3.post.U.uVig.value = D.vig0; }
+  R3.defeat = null;
+}
+function r3DefeatStep(G, dt) {
+  const D = R3.defeat; if (!D) return;
+  if (R3.G !== G || !G.over || G.result === 'win') { r3DefeatEnd(); return; }
+  D.t += dt; const k = Math.min(1, D.t / 3.5), e = k * k * (3 - 2 * k);
+  if (R3.post) { R3.post.U.uSat.value = D.sat0 + (0.16 - D.sat0) * e; R3.post.U.uVig.value = D.vig0 + (0.85 - D.vig0) * e; }
+  for (const m of D.marks) m.g.position.y = m.y - 0.9 * (1 - Math.min(1, Math.max(0, D.t - 0.8) / 1.4));
+  // ash coming down on a field gone quiet
+  D.ashT -= dt;
+  if (D.ashT <= 0) { D.ashT = 0.06; const c = R3.cam, x = c.tx + (Math.random() - 0.5) * 16, z = c.tz + (Math.random() - 0.5) * 16; spawnParticle({ x, y: groundY(clamp(x, 0, G.W), clamp(z, 0, G.H)) + 4 + Math.random() * 2, z, vx: 0.2, vy: -0.7, vz: 0.05, T: 5, s0: 0.05, s1: 0.04, col: 0x9a968c, a0: 0.7, add: false }); }
 }
 
 /* ================= MAP FILM: before each action, an animated map of the front closes in on the place and the attack ================= */
@@ -10562,12 +10799,71 @@ function diffControl(box, desc) {
 }
 
 /* ---------------- missions list ---------------- */
+/* A small painted picture for each mission card: the hour in the sky, the country below it, the weather over both. */
+const THUMBS = {};
+function missionThumb(M) {
+  if (THUMBS[M.id]) return THUMBS[M.id];
+  const W = 192, H = 128, cv = document.createElement('canvas'); cv.width = W; cv.height = H; const g = cv.getContext('2d'); if (!g) return '';
+  let sd = 0; for (const ch of M.id) sd = (sd * 31 + ch.charCodeAt(0)) % 9973; const rnd = () => { sd = (sd * 16807 + 11) % 2147483647; return (sd % 10000) / 10000; };
+  const set = M.sea ? ((M.style || {}).water === 'harbour' ? 'port' : 'sea') : (typeof SCENE_SET !== 'undefined' && SCENE_SET[M.id]) || 'front', lt = M.light || 'day', wk = missionWx(M).kind;
+  const SKY = { night: ['#070c1c', '#1c2c52'], dawn: ['#34467a', '#f2a56a'], day: ['#5c98d0', '#d6e8f2'], dusk: ['#241f44', '#dc7038'] }[lt] || ['#5c98d0', '#d6e8f2'];
+  const hz = set === 'sea' || set === 'port' ? H * 0.5 : H * 0.62, dark = lt === 'night' ? 0.42 : lt === 'dusk' ? 0.68 : lt === 'dawn' ? 0.85 : 1;
+  const tone = (hex, k = dark) => { const n = parseInt(hex.slice(1), 16), r = Math.round(((n >> 16) & 255) * k), gg = Math.round(((n >> 8) & 255) * k), b = Math.round((n & 255) * (k + (1 - k) * 0.35)); return `rgb(${r},${gg},${b})`; };
+  let sk = g.createLinearGradient(0, 0, 0, hz); sk.addColorStop(0, SKY[0]); sk.addColorStop(1, SKY[1]); g.fillStyle = sk; g.fillRect(0, 0, W, H);
+  if (lt === 'night') { g.fillStyle = '#fff'; for (let i = 0; i < 40; i++) g.fillRect(rnd() * W, rnd() * hz * 0.9, 1.2, 1.2); g.fillStyle = '#eef0e0'; g.beginPath(); g.arc(W * 0.78, H * 0.2, 9, 0, TAU); g.fill(); g.fillStyle = SKY[0]; g.beginPath(); g.arc(W * 0.78 + 4, H * 0.2 - 2, 8, 0, TAU); g.fill(); }
+  else { const sx = W * (0.25 + rnd() * 0.5), sy = lt === 'day' ? H * 0.16 : hz - 6; const rg = g.createRadialGradient(sx, sy, 2, sx, sy, 46); rg.addColorStop(0, lt === 'day' ? 'rgba(255,250,220,.95)' : 'rgba(255,214,150,.95)'); rg.addColorStop(1, 'rgba(255,220,160,0)'); g.fillStyle = rg; g.fillRect(0, 0, W, hz + 4); }
+  const ridge = (y0, amp, col, n = 7, snowCap = false) => {
+    const pts = []; for (let i = 0; i <= n; i++) pts.push([i / n * W, y0 - amp * (0.25 + rnd() * 0.75) * (i % 2 ? 1 : 0.45)]);
+    g.fillStyle = col; g.beginPath(); g.moveTo(0, H); for (const [x, y] of pts) g.lineTo(x, y); g.lineTo(W, H); g.fill();
+    if (snowCap) { g.fillStyle = tone('#eef2f6'); for (const [x, y] of pts) if (y < y0 - amp * 0.45) { g.beginPath(); g.moveTo(x, y); g.lineTo(x - 9, y + 13); g.lineTo(x - 2, y + 9); g.lineTo(x + 3, y + 14); g.lineTo(x + 10, y + 12); g.fill(); } }
+  };
+  const fir = (x, y, h, col) => { g.fillStyle = col; for (let k = 0; k < 3; k++) { g.beginPath(); g.moveTo(x, y - h + k * h * 0.22); g.lineTo(x - h * (0.16 + k * 0.08), y - h * 0.5 + k * h * 0.25); g.lineTo(x + h * (0.16 + k * 0.08), y - h * 0.5 + k * h * 0.25); g.fill(); } };
+  if (set === 'sea' || set === 'port') {
+    const wg = g.createLinearGradient(0, hz, 0, H); wg.addColorStop(0, tone('#4f86a8')); wg.addColorStop(1, tone('#1d4460')); g.fillStyle = wg; g.fillRect(0, hz, W, H - hz);
+    if (set === 'port') { ridge(hz + 2, 14, tone('#4a5048'), 9); g.fillStyle = tone('#3a3e3a'); g.fillRect(0, hz - 2, W * 0.34, 8); if (lt !== 'day') { g.fillStyle = '#ffcf7a'; for (let i = 0; i < 6; i++) g.fillRect(8 + i * 10, hz - 1, 2, 2); } }
+    g.strokeStyle = lt === 'night' ? 'rgba(220,230,255,.35)' : 'rgba(255,240,200,.5)'; g.lineWidth = 1.4; for (let i = 0; i < 16; i++) { const y = hz + 5 + rnd() * (H - hz - 8), x = W * 0.3 + rnd() * W * 0.5, l = 6 + rnd() * 16; g.beginPath(); g.moveTo(x, y); g.lineTo(x + l, y); g.stroke(); }
+    // a hull on the horizon: a big ship for the raids, a small fast boat for the rest
+    const bx = W * 0.56, by = hz + 16, col = tone('#15191c', Math.min(1, dark + 0.2));
+    g.fillStyle = col; g.beginPath(); g.moveTo(bx - 44, by - 9); g.lineTo(bx + 46, by - 9); g.lineTo(bx + 36, by + 3); g.lineTo(bx - 38, by + 3); g.fill();
+    g.fillRect(bx - 20, by - 19, 34, 10); g.fillRect(bx - 8, by - 31, 8, 13); g.fillRect(bx + 8, by - 27, 6, 9); g.fillRect(bx - 27, by - 34, 1.6, 25);
+    g.fillStyle = 'rgba(240,246,248,.7)'; g.fillRect(bx - 44, by + 2, 90, 1.6);
+  } else if (set === 'desert') {
+    ridge(hz + 6, 16, tone('#c9a56a'), 5); ridge(hz + 22, 12, tone('#b48e54'), 4); g.fillStyle = tone('#a57f48'); g.fillRect(0, H - 22, W, 22);
+    const px = W * 0.2, py = H - 20; g.strokeStyle = tone('#3a2e1e'); g.lineWidth = 3; g.beginPath(); g.moveTo(px, py); g.quadraticCurveTo(px + 5, py - 26, px + 2, py - 46); g.stroke();
+    g.lineWidth = 2.2; for (let k = 0; k < 7; k++) { const a = -Math.PI + k * Math.PI / 6; g.beginPath(); g.moveTo(px + 2, py - 46); g.quadraticCurveTo(px + 2 + Math.cos(a) * 14, py - 54 + Math.sin(a) * 6, px + 2 + Math.cos(a) * 24, py - 40 + Math.sin(a) * 8); g.stroke(); }
+  } else if (set === 'steppe') {
+    g.fillStyle = tone('#8a8a4a'); g.fillRect(0, hz, W, H - hz); g.fillStyle = tone('#b89a34'); g.fillRect(0, hz + 14, W, H - hz);
+    for (let i = 0; i < 90; i++) { const y = hz + 16 + rnd() * (H - hz - 18), x = rnd() * W, r = 1 + (y - hz) / 26; g.fillStyle = tone('#f2c224'); g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); g.fillStyle = tone('#5a3a1c'); g.beginPath(); g.arc(x, y, r * 0.4, 0, TAU); g.fill(); }
+  } else if (set === 'russia' || set === 'snow') {
+    if (set === 'snow') { ridge(hz, 34, tone('#8e9aa8'), 6, true); for (let i = 0; i < 7; i++) fir(rnd() * W, hz + 12 + rnd() * 10, 22 + rnd() * 10, tone('#2c3a34')); }
+    g.fillStyle = tone('#e6ecf2'); g.fillRect(0, hz + 6, W, H); ridge(hz + 14, 6, tone('#d2dbe6'), 5);
+    if (set === 'russia') for (let i = 0; i < 4; i++) { const x = 20 + i * 44 + rnd() * 10, y = hz + 12 + (i % 2) * 6; g.fillStyle = tone('#4a3a2c'); g.fillRect(x, y, 22, 11); g.fillStyle = tone('#f2f5f8'); g.beginPath(); g.moveTo(x - 3, y); g.lineTo(x + 11, y - 9); g.lineTo(x + 25, y); g.fill(); if (lt !== 'day') { g.fillStyle = '#ffcf7a'; g.fillRect(x + 8, y + 4, 4, 4); } }
+  } else if (set === 'village') {
+    ridge(hz + 4, 14, tone('#55683e'), 5); g.fillStyle = tone('#4a5a34'); g.fillRect(0, hz + 10, W, H);
+    for (let i = 0; i < 5; i++) { const x = 14 + i * 34 + rnd() * 6, y = hz + 4 + (i % 2) * 5, w = 22, h = 16; g.fillStyle = tone('#d8ceb8'); g.fillRect(x, y, w, h); g.fillStyle = tone('#a4543a'); g.beginPath(); g.moveTo(x - 3, y); g.lineTo(x + w / 2, y - 10); g.lineTo(x + w + 3, y); g.fill(); if (lt !== 'day') { g.fillStyle = '#ffcf7a'; g.fillRect(x + 5, y + 5, 4, 5); } }
+    g.fillStyle = tone('#cfc6b2'); g.fillRect(W * 0.62, hz - 22, 9, 30); g.fillStyle = tone('#8a4a34'); g.beginPath(); g.moveTo(W * 0.62 - 2, hz - 22); g.lineTo(W * 0.62 + 4.5, hz - 36); g.lineTo(W * 0.62 + 11, hz - 22); g.fill();
+  } else if (set === 'marsh') {
+    ridge(hz + 2, 6, tone('#56684a'), 6); const wg = g.createLinearGradient(0, hz + 6, 0, H); wg.addColorStop(0, tone('#7f97a2')); wg.addColorStop(1, tone('#3f5560')); g.fillStyle = wg; g.fillRect(0, hz + 6, W, H);
+    g.strokeStyle = tone('#8a7a44'); g.lineWidth = 1.4; for (let i = 0; i < 70; i++) { const x = rnd() * W, y = H - rnd() * 34; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (rnd() - 0.5) * 5, y - 10 - rnd() * 12); g.stroke(); }
+  } else {
+    const rock = { alp: '#7d8590', karst: '#9a9484', amba: '#8a6a4a', south: '#8a8a76', wood: '#5d7050', front: '#6f7a62' }[set] || '#6f7a62', low = { alp: '#55683e', karst: '#8a8266', amba: '#9a7a48', south: '#7a8452', wood: '#3f5a34', front: '#55683e' }[set] || '#55683e';
+    ridge(hz - 4, set === 'alp' ? 52 : 34, tone(rock), 6, set === 'alp'); ridge(hz + 10, 18, tone(low), 5); g.fillStyle = tone(low, dark * 0.86); g.fillRect(0, H - 20, W, 20);
+    if (set === 'wood' || set === 'alp' || set === 'front') for (let i = 0; i < (set === 'wood' ? 12 : 5); i++) fir(rnd() * W, H - 10 - rnd() * 16, 20 + rnd() * 14, tone('#243426'));
+    if (set === 'south' || set === 'amba') for (let i = 0; i < 6; i++) { const x = rnd() * W, y = H - 12 - rnd() * 14; g.fillStyle = tone(set === 'south' ? '#64785a' : '#5e7038'); g.beginPath(); g.ellipse(x, y - 9, set === 'amba' ? 13 : 8, set === 'amba' ? 4 : 7, 0, 0, TAU); g.fill(); g.fillStyle = tone('#3a2e22'); g.fillRect(x - 1, y - 8, 2, 9); }
+    if (set === 'front' || set === 'karst') { g.strokeStyle = tone('#2a241c'); g.lineWidth = 1.2; for (let i = 0; i < 9; i++) { const x = 10 + i * 21, y = H - 12 + (i % 2) * 3; g.beginPath(); g.moveTo(x - 5, y - 7); g.lineTo(x + 5, y + 3); g.moveTo(x + 5, y - 7); g.lineTo(x - 5, y + 3); g.stroke(); } g.beginPath(); g.moveTo(0, H - 13); g.lineTo(W, H - 11); g.stroke(); }
+  }
+  if (wk === 'rain' || wk === 'storm') { g.strokeStyle = 'rgba(210,225,240,.38)'; g.lineWidth = 1; for (let i = 0; i < 70; i++) { const x = rnd() * W, y = rnd() * H; g.beginPath(); g.moveTo(x, y); g.lineTo(x - 4, y + 12); g.stroke(); } }
+  if (wk === 'snow') { g.fillStyle = 'rgba(255,255,255,.85)'; for (let i = 0; i < 80; i++) g.fillRect(rnd() * W, rnd() * H, 1.6, 1.6); }
+  if (wk === 'fog' || wk === 'haze' || wk === 'ash') { const fg = g.createLinearGradient(0, hz - 30, 0, H); fg.addColorStop(0, 'rgba(190,196,196,0)'); fg.addColorStop(0.5, wk === 'fog' ? 'rgba(190,196,196,.6)' : 'rgba(170,160,140,.34)'); fg.addColorStop(1, 'rgba(190,196,196,.1)'); g.fillStyle = fg; g.fillRect(0, 0, W, H); }
+  const vg = g.createRadialGradient(W / 2, H / 2, H * 0.3, W / 2, H / 2, W * 0.72); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.5)'); g.fillStyle = vg; g.fillRect(0, 0, W, H);
+  try { return THUMBS[M.id] = cv.toDataURL('image/jpeg', 0.82); } catch (e) { return ''; }
+}
 function showMissions() {
   $('#roster').innerHTML = rosterHtml();
   $('#mlist').innerHTML = MISSIONS.map((M, i) => {
     const d = SAVE.done[M.id], C = CORPS[M.corps] || {}, head = i === 0 || MISSIONS[i - 1].war !== M.war;
     return `${head ? `<li class="mwar"><span>${M.war === 2 ? 'Seconda guerra mondiale' : 'Grande Guerra'}</span><small>${M.war === 2 ? '1940–1943' : '1915–1918'}</small></li>` : ''}<li><button class="mcard" data-i="${i}">
-      <span class="mnum">${esc(M.num)}</span>
+      <span class="mthumb" style="background-image:url(${missionThumb(M)})"><span class="mnum">${esc(M.num)}</span></span>
       <span class="mtext"><span class="mcorps" style="--cc:${C.color || '#666'}">${esc(C.name || '')}${M.sea ? ' · in mare' : ''}</span><span class="mname">${esc(M.name)}</span><span class="mmeta">${esc(M.date)} · ${esc(M.place)}</span><span class="mmeta">${esc(M.context)}${missionWx(M).kind !== 'clear' ? ' · ' + esc(WEATHER[missionWx(M).kind].label) : ''}</span></span>
       ${d != null ? `<span class="mright">${SAVE.medal[M.id] != null ? medalSvg(SAVE.medal[M.id], 26) : ''}<span class="stamp">Compiuta<br>${esc(DIFF[DIFF_ORDER[d]].label)}</span></span>` : ''}
     </button></li>`;
@@ -10752,6 +11048,7 @@ function onGameEvent(k, d) {
       if (d.result !== 'win') { const u = G.units.find(v => v.alive) || G.units[0]; if (u) { x = u.x; y = u.y; } }
       if (x != null) { VIEW.centerOn(G, x, y); UI.outro = { t: 0, size0: R3.cam.size, yaw0: R3.cam.yaw }; }
     }
+    if (d.result !== 'win' && UI.G && !UI.G.attract) defeatShow(UI.G, d.reason);
     if (!UI.G.attract) UI.vetRes = awardXp(UI.G);
     if (d.result === 'win') {
       const M = UI.G.M, idx = DIFF_ORDER.indexOf(UI.G.diffKey);
@@ -10832,13 +11129,30 @@ function victoryShow(G) {
     <div class="vic-t">${'VITTORIA'.split('').map((ch, i) => `<span style="animation-delay:${(0.25 + i * 0.07).toFixed(2)}s">${ch}</span>`).join('')}</div>
     <div class="vic-bar"><i></i><i></i><i></i></div>
     <div class="vic-n">${esc(M.name)}</div><div class="vic-d">${esc(M.date)}</div>
+    ${(VICTORY[M.id] || {}).line ? `<div class="vic-l">${esc(VICTORY[M.id].line)}</div>` : ''}
     ${C.motto ? `<div class="vic-m">${esc(C.motto)}</div>` : ''}</div><div class="vic-skip">Tocca per il rapporto</div>`;
   el.hidden = false; el.classList.remove('on'); void el.offsetWidth; el.classList.add('on');
   UI.vicT = performance.now(); UI.outro = null;
   for (const id of ['hud', 'abil', 'squad']) { const h = document.getElementById(id); if (h) h.classList.add('vic-hide'); }
-  if (VIEW.mode === '3d') { try { r3VictoryStart(G); } catch (e) {} }
+  if (VIEW.mode === '3d') { try { r3VictoryStart(G); if (R3.vic && R3.vic.focus) G.overT += 2.6; } catch (e) {} }
+}
+/* Defeat: no fanfare. The colour drains from the field, a rifle and a helmet mark where each man fell, and the report follows. */
+function defeatShow(G, reason) {
+  const M = G.M;
+  let el = $('#victory'); if (!el) { el = document.createElement('div'); el.id = 'victory'; document.body.appendChild(el); el.addEventListener('pointerdown', () => { if (UI.G && UI.G.over && performance.now() - UI.vicT > 1500) UI.G.overT = 0; }); }
+  el.innerHTML = `<div class="vic-box lost"><svg class="def-mark" viewBox="0 0 60 90" aria-hidden="true"><path d="M30 20 L30 84" stroke="#b9b4a6" stroke-width="3.2" stroke-linecap="round"/><path d="M24 62 L36 62" stroke="#b9b4a6" stroke-width="3"/><path d="M14 22 Q14 4 30 4 Q46 4 46 22 Q30 16 14 22 Z" fill="#b9b4a6"/><path d="M10 86 Q30 78 50 86" stroke="#8a8578" stroke-width="2" fill="none"/></svg>
+    <div class="vic-k">${esc((CORPS[M.corps] || {}).name || M.unit)}</div>
+    <div class="def-t">Missione fallita</div>
+    <div class="vic-n">${esc(M.name)}</div><div class="vic-d">${esc(M.date)}</div>
+    ${reason ? `<div class="vic-l">${esc(reason)}</div>` : ''}</div><div class="vic-skip">Tocca per il rapporto</div>`;
+  el.hidden = false; el.classList.remove('on'); el.classList.add('lostbg'); void el.offsetWidth; el.classList.add('on');
+  UI.vicT = performance.now();
+  for (const id of ['hud', 'abil', 'squad']) { const h = document.getElementById(id); if (h) h.classList.add('vic-hide'); }
+  if (VIEW.mode === '3d') { try { r3DefeatStart(G); } catch (e) {} }
 }
 function victoryHide() {
+  if (typeof r3DefeatEnd === 'function') r3DefeatEnd();
+  { const e0 = $('#victory'); if (e0) e0.classList.remove('lostbg'); }
   const el = $('#victory'); if (el) { el.hidden = true; el.classList.remove('on'); }
   document.querySelectorAll('.vic-hide').forEach(h => h.classList.remove('vic-hide'));
   if (typeof R3 !== 'undefined') R3.vic = null;
