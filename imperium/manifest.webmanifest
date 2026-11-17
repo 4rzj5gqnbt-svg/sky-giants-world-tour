@@ -1,0 +1,20 @@
+{
+  "name": "Imperium — Le battaglie che fecero grande Roma",
+  "short_name": "Imperium",
+  "description": "Dodici battaglie vere della Repubblica romana, per terra e per mare, in 3D. Si gioca anche senza internet.",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "landscape",
+  "background_color": "#1a0e0b",
+  "theme_color": "#1a0e0b",
+  "categories": ["games"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
